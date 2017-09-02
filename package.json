@@ -1,0 +1,23 @@
+{
+  "name": "static-page",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "nodemon -w src -e pug,js,coffee,styl,css,svg -x 'npm run build'",
+    "build": "coffee -r ./src/_build -e '_build.auto()'",
+    "prod": "NODE_ENV=production npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bluebird": "^3.5.0",
+    "coffee-script": "^1.12.7",
+    "image-size": "^0.6.1",
+    "mkdirp": "^0.5.1",
+    "pug": "^2.0.0-rc.3",
+    "sprintf-js": "^1.1.1",
+    "stylus": "^0.54.5",
+    "uglify-js": "^3.0.28"
+  }
+}
