@@ -7,35 +7,54 @@ coffeescript = require 'coffee-script'
 uglify = require 'uglify-js'
 styl = pr.promisifyAll require 'stylus'
 imgsize = require 'image-size'
+uglifycss = require 'uglifycss'
 { exec } = require 'child_process'
 { log } = console
+
+prod = process.env.NODE_ENV
 
 module.exports =
   pug: (file, opts) ->
     out = file.replace /\.pug$/i, '.html'
     out = out.replace /\/src\//, '/dist/'
+    opts.pretty = not prod
     fs.writeFileAsync out, pug.renderFile file, opts
 
-  uglify: (js) ->
+  jsfilter: (js, f) ->
     new pr (resolve) ->
-      r = uglify.minify js
-      throw r.error if r.error
-      resolve r.code
+      if prod
+        r = uglify.minify js,
+          sourceMap:
+            filename: f
+            url: 'inline'
+        throw r.error if r.error
+        resolve r.code
+      else
+        resolve js
 
   js: (file) ->
-    fs.readFileAsync(file, 'utf8').then (js) => @uglify js
+    fs.readFileAsync(file, 'utf8').then (js) => @jsfilter js, file
 
   coffee: (file) ->
     coffee = fs.readFileSync file, 'utf8'
-    js = coffeescript.compile coffee, bare: true
-    @uglify js
+    js = coffeescript.compile coffee,
+      bare: true
+      filename: file
+      map: not prod
+      inlineMap: not prod
+    @jsfilter js, file
+
+  cssfilter: (css) ->
+    new pr (resolve) ->
+      resolve if prod then uglifycss.processString(css) else css
 
   styl: (file) ->
     styl.renderAsync fs.readFileSync(file, 'utf8'),
       filename: file
+    .then @cssfilter
 
   css: (file) ->
-    fs.readFileAsync file, 'utf8'
+    fs.readFileAsync(file, 'utf8').then @cssfilter
 
   svg: (file) ->
     log 'svg:', file
