@@ -23,10 +23,7 @@ module.exports =
   jsfilter: (js, f) ->
     new pr (resolve) ->
       if prod
-        r = uglify.minify js,
-          sourceMap:
-            filename: f
-            url: 'inline'
+        r = uglify.minify js
         throw r.error if r.error
         resolve r.code
       else
