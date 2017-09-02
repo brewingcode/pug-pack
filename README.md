@@ -6,4 +6,3 @@ The basics of a static site with:
 * bootstrap
 * coffee-script
 * stylus
-

@@ -84,7 +84,6 @@ module.exports =
         return unless f
         { dir, name, ext } = path.parse f
         ext = ext.replace /^\./, ''
-        #log 'f:', dir, name, ext, this[ext]
         if name.match(/^_/) or not this[ext]
           log "skip: #{f}"
         else if ext is 'pug'
