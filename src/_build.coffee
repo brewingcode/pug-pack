@@ -20,7 +20,7 @@ module.exports =
     opts.pretty = not prod
     fs.writeFileAsync out, pug.renderFile file, opts
 
-  jsfilter: (js, f) ->
+  jsfilter: (js) ->
     new pr (resolve) ->
       if prod
         r = uglify.minify js
@@ -30,7 +30,7 @@ module.exports =
         resolve js
 
   js: (file) ->
-    fs.readFileAsync(file, 'utf8').then (js) => @jsfilter js, file
+    fs.readFileAsync(file, 'utf8').then @jsfilter
 
   coffee: (file) ->
     coffee = fs.readFileSync file, 'utf8'
@@ -39,7 +39,7 @@ module.exports =
       filename: file
       map: not prod
       inlineMap: not prod
-    @jsfilter js, file
+    @jsfilter js
 
   cssfilter: (css) ->
     new pr (resolve) ->
