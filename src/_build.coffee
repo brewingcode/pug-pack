@@ -11,22 +11,21 @@ uglifycss = require 'uglifycss'
 { exec } = require 'child_process'
 { log } = console
 
-prod = process.env.NODE_ENV
-
 module.exports =
+  prod: process.env.NODE_ENV
   src: __dirname
   dist: "#{__dirname}/../dist"
 
   pug: (file, opts) ->
     out = file.replace /\.pug$/i, '.html'
     out = out.replace new RegExp(@src, 'i'), @dist
-    opts.pretty = not prod
+    opts.pretty = not @prod
     mkdirp.sync @dist
     fs.writeFileAsync out, pug.renderFile file, opts
 
   jsfilter: (js) ->
-    new pr (resolve) ->
-      if prod
+    new pr (resolve) =>
+      if @prod
         r = uglify.minify js
         throw r.error if r.error
         resolve r.code
@@ -34,28 +33,29 @@ module.exports =
         resolve js
 
   js: (file) ->
-    fs.readFileAsync(file, 'utf8').then @jsfilter
+    fs.readFileAsync(file, 'utf8').then (js) => @jsfilter js
 
   coffee: (file) ->
     coffee = fs.readFileSync file, 'utf8'
     js = coffeescript.compile coffee,
       bare: true
       filename: file
-      map: not prod
-      inlineMap: not prod
+      map: not @prod
+      inlineMap: not @prod
     @jsfilter js
 
   cssfilter: (css) ->
-    new pr (resolve) ->
-      resolve if prod then uglifycss.processString(css) else css
+    new pr (resolve) =>
+      resolve if @prod then uglifycss.processString(css) else css
 
   styl: (file) ->
     styl.renderAsync fs.readFileSync(file, 'utf8'),
       filename: file
-    .then @cssfilter
+    .then (css) =>
+      @cssfilter css
 
   css: (file) ->
-    fs.readFileAsync(file, 'utf8').then @cssfilter
+    fs.readFileAsync(file, 'utf8').then (css) => @cssfilter css
 
   svg: (file) ->
     log 'svg:', file
