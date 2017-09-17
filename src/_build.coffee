@@ -14,9 +14,12 @@ uglifycss = require 'uglifycss'
 prod = process.env.NODE_ENV
 
 module.exports =
+  src: __dirname
+  dist: "#{__dirname}/../dist"
+
   pug: (file, opts) ->
     out = file.replace /\.pug$/i, '.html'
-    out = out.replace /\/src\//, '/dist/'
+    out = out.replace new RegExp(@src, 'i'), @dist
     opts.pretty = not prod
     fs.writeFileAsync out, pug.renderFile file, opts
 
@@ -72,8 +75,8 @@ module.exports =
       .define 'inline-url', styl.url paths: [dir]
       .render (err, css) -> resolve(css)
 
-  auto: ->
-    exec "find '#{__dirname}' -type f -print0", (err, stdout, stderr) =>
+  main: ->
+    exec "find '#{@src}' -type f -print0", (err, stdout, stderr) =>
       pug_files = []
       other_files = []
 
