@@ -14,10 +14,12 @@ uglifycss = require 'uglifycss'
 module.exports =
   prod: process.env.NODE_ENV
   dist: "#{__dirname}/../dist"
+  vars: {}
 
-  pug: (dir, file, opts) ->
+  pug: (dir, file) ->
     out = file.replace /\.pug$/i, '.html'
     out = out.replace new RegExp(dir, 'i'), @dist
+    opts = @vars
     opts.pretty = not @prod
     mkdirp.sync @dist
     fs.writeFileAsync out, pug.renderFile file, opts
@@ -72,38 +74,37 @@ module.exports =
           display: inline-block
       """
       .set 'filename', file
-      .define 'inline-url', styl.url paths: [dir]
+      .define 'inline-url', styl.url()
       .render (err, css) -> resolve(css)
 
-  crawl: (dir, pug) ->
-    execAsync("find '#{dir}' -type f -print0").then (stdout) ->
+  crawl: (root, pug) ->
+    execAsync("find '#{root}' -type f -print0").then (stdout) =>
       pug_files = []
       other_files = []
 
       stdout.split('\0').forEach (f) =>
         return unless f
-        { dir, name, ext } = path.parse f
+        { name, ext } = path.parse f
         ext = ext.replace /^\./, ''
+        f = path.resolve path.resolve(), f
         if name.match(/^_/) or not this[ext]
           log "skip: #{f}"
         else if ext is 'pug'
           pug_files.push f
         else
-          other_files.push [f, dir, name, ext]
+          other_files.push [ f, name, ext ]
 
-      pr.reduce other_files, (vars, [f, dir, name, ext]) =>
+      pr.each other_files, ([f, name, ext]) =>
         log 'reduce:', f
-        vars[ext] = {} unless vars[ext]
+        @vars[ext] = {} unless @vars[ext]
         this[ext](f).then (r) =>
           log "#{ext}: returned #{r.length} chars"
-          vars[ext][name] = r
-          vars
-      , {}
-      .then (vars) =>
+          @vars[ext][name] = r
+      .then =>
         if pug
           pr.each pug_files, (f) =>
             log 'pug:', f
-            @pug dir, f, vars
+            @pug root, f
       .then ->
         log 'done'
       .catch console.error
