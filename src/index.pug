@@ -1,4 +1,10 @@
 extends _base
 
-append content
-  div 'Hello!'
+append head
+  style !{svg.github}
+  title Example index.html
+
+append body
+  div Hello!
+  .github-svg
+  script !{coffee.main}
