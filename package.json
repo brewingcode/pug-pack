@@ -13,18 +13,15 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "bluebird": "^3.5.0",
     "coffee-script": "^1.12.7",
     "image-size": "^0.6.1",
     "mkdirp": "^0.5.1",
     "pug": "^2.0.0-rc.3",
-    "sprintf-js": "^1.1.1",
     "stylus": "^0.54.5",
     "uglify-js": "^3.0.28",
-    "uglifycss": "^0.0.27"
-  },
-  "dependencies": {
+    "uglifycss": "^0.0.27",
     "yargs": "^8.0.2"
   }
 }
