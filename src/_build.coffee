@@ -21,6 +21,7 @@ module.exports =
     out = file.replace /\.pug$/i, '.html'
     out = out.replace new RegExp(@src, 'i'), @dist
     opts.pretty = not prod
+    mkdirp.sync @dist
     fs.writeFileAsync out, pug.renderFile file, opts
 
   jsfilter: (js) ->
