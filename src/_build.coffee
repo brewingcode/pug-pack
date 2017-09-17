@@ -13,16 +13,15 @@ uglifycss = require 'uglifycss'
 
 module.exports =
   prod: process.env.NODE_ENV
-  dist: "#{__dirname}/../dist"
+  dist: "#{__dirname}/dist"
   vars: {}
 
   pug: (dir, file) ->
     out = file.replace /\.pug$/i, '.html'
     out = out.replace new RegExp(dir, 'i'), @dist
-    opts = @vars
-    opts.pretty = not @prod
+    @vars.pretty = not @prod
     mkdirp.sync @dist
-    fs.writeFileAsync out, pug.renderFile file, opts
+    fs.writeFileAsync out, pug.renderFile file, @vars
 
   jsfilter: (js) ->
     new pr (resolve) =>
@@ -78,19 +77,18 @@ module.exports =
       .render (err, css) -> resolve(css)
 
   crawl: (root, pug) ->
-    execAsync("find '#{root}' -type f -print0").then (stdout) =>
+    execAsync("find '#{path.resolve path.resolve(), root}' -type f -print0").then (stdout) =>
       pug_files = []
       other_files = []
 
       stdout.split('\0').forEach (f) =>
         return unless f
-        { name, ext } = path.parse f
+        { dir, name, ext } = path.parse f
         ext = ext.replace /^\./, ''
-        f = path.resolve path.resolve(), f
         if name.match(/^_/) or not this[ext]
           log "skip: #{f}"
         else if ext is 'pug'
-          pug_files.push f
+          pug_files.push [ dir, f ]
         else
           other_files.push [ f, name, ext ]
 
@@ -102,9 +100,9 @@ module.exports =
           @vars[ext][name] = r
       .then =>
         if pug
-          pr.each pug_files, (f) =>
+          pr.each pug_files, ([dir, f]) =>
             log 'pug:', f
-            @pug root, f
+            @pug dir, f
       .then ->
         log 'done'
       .catch console.error
