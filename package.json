@@ -7,6 +7,9 @@
     "build": "coffee -r ./src/_build -e '_build.main()'",
     "prod": "NODE_ENV=production npm run build"
   },
+  "bin": {
+    "static-page": "src/_cli.coffee"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -20,5 +23,8 @@
     "stylus": "^0.54.5",
     "uglify-js": "^3.0.28",
     "uglifycss": "^0.0.27"
+  },
+  "dependencies": {
+    "yargs": "^8.0.2"
   }
 }
