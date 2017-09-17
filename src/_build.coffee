@@ -8,17 +8,16 @@ uglify = require 'uglify-js'
 styl = pr.promisifyAll require 'stylus'
 imgsize = require 'image-size'
 uglifycss = require 'uglifycss'
-{ exec } = require 'child_process'
+{ execAsync } = pr.promisifyAll require 'child_process'
 { log } = console
 
 module.exports =
   prod: process.env.NODE_ENV
-  src: __dirname
   dist: "#{__dirname}/../dist"
 
-  pug: (file, opts) ->
+  pug: (dir, file, opts) ->
     out = file.replace /\.pug$/i, '.html'
-    out = out.replace new RegExp(@src, 'i'), @dist
+    out = out.replace new RegExp(dir, 'i'), @dist
     opts.pretty = not @prod
     mkdirp.sync @dist
     fs.writeFileAsync out, pug.renderFile file, opts
@@ -76,8 +75,8 @@ module.exports =
       .define 'inline-url', styl.url paths: [dir]
       .render (err, css) -> resolve(css)
 
-  main: ->
-    exec "find '#{@src}' -type f -print0", (err, stdout, stderr) =>
+  crawl: (dir, pug) ->
+    execAsync("find '#{dir}' -type f -print0").then (stdout) ->
       pug_files = []
       other_files = []
 
@@ -101,9 +100,13 @@ module.exports =
           vars
       , {}
       .then (vars) =>
-        pr.each pug_files, (f) =>
-          log 'pug:', f
-          @pug f, vars
+        if pug
+          pr.each pug_files, (f) =>
+            log 'pug:', f
+            @pug dir, f, vars
       .then ->
         log 'done'
       .catch console.error
+
+  self: ->
+    @crawl __dirname, true
