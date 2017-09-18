@@ -3,7 +3,7 @@
 build = require './_build'
 
 paths = []
-process.argv.forEach (a) ->
+process.argv.slice(2).forEach (a) ->
   if a in ['-p', '--prod', '--production']
     build.prod = true
   else if a in ['-h', '--help']
