@@ -59,22 +59,19 @@ module.exports =
 
   svg: (file) ->
     log 'svg:', file
-    # actually returns the svg as a CSS class
     new pr (resolve) ->
-      data = new Buffer(fs.readFileSync file, 'utf8')
-      size = imgsize data
-      { dir, name } = path.parse file
-      styl """
-        .#{name}-svg
-          background-image: inline-url("#{file}", "utf8")
-          background-size: cover
-          width: #{size.width}px
-          height: #{size.height}px
-          display: inline-block
-      """
-      .set 'filename', file
-      .define 'inline-url', styl.url()
-      .render (err, css) -> resolve(css)
+      { name } = path.parse file
+
+      plugins = []
+      plugins.push
+        addClassesToSVGElement:
+          classNames: [name]
+      plugins.push
+        removeDimensions: true
+
+      new svgo { plugins }
+      .optimize fs.readFileSync(file, 'utf8'), (svg) ->
+        resolve svg.data
 
   crawl: (root, pug) ->
     execAsync("find '#{path.resolve path.resolve(), root}' -type f -print0").then (stdout) =>
