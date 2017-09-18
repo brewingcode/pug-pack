@@ -6,14 +6,14 @@ pug = require 'pug'
 coffeescript = require 'coffee-script'
 uglify = require 'uglify-js'
 styl = pr.promisifyAll require 'stylus'
-imgsize = require 'image-size'
+svgo = require 'svgo'
 uglifycss = require 'uglifycss'
 { execAsync } = pr.promisifyAll require 'child_process'
 { log } = console
 
 module.exports =
   prod: process.env.NODE_ENV
-  dist: "#{__dirname}/dist"
+  dist: "#{__dirname}/../dist"
   vars: {}
 
   pug: (dir, file) ->
