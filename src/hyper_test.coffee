@@ -1,6 +1,7 @@
 { h, app } = hyperapp
 
 app
+  root: document.getElementById 'app'
   state:
     count: 0
   view: (state, actions) ->
