@@ -29,6 +29,7 @@ to pug as a single large object, organized by names and extensions:
     src/bootstrap.css
     src/moment.js
     src/jquery.js
+    src/data.yml
 
 The above files would be parsed into an object like so:
 
@@ -45,9 +46,14 @@ The above files would be parsed into an object like so:
       "js": {
         "moment": "/* moment's js */",
         "jquery": "/* jquery's js */"
+      },
+      "yml": {
+        "data": {
+          "some": ["more", "complicated", "data", "of", "your", "own"],
+          "answer": 42
+        }
       }
     }
-
 
 This object is then passed to Pug's `render()` function, so that you can
 inject whichever files you choose into your final `.html` file(s). See the
@@ -55,6 +61,9 @@ example files:
 
 * [index.pug](src/index.pug)
 * [hyper.pug](src/hyper.pug)
+
+The following file types are supported: `.js`, `.coffee`, `.css`, `.styl`,
+`.svg`, `.html`, `.json`, `.yml`.
 
 # CLI
 
