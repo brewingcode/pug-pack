@@ -28,7 +28,7 @@ if argv.w or argv.watch
 
   nodemon
     watch: src
-    ext: 'pug js coffee css styl svg'
+    ext: '*'
     exec: quote args
     verbose: true
   .on 'log', ({type, message, colour}) ->
