@@ -16,7 +16,7 @@ default: ./static-page ./src ./dist
 """
   process.exit()
 
-if argv.p or argv.prod or argv.production or process.env.NODE_ENV is 'production'
+if argv.p or argv.prod or argv.production
   build.prod = true
 
 src = if argv._.length > 0 then argv._[0] else './src'
