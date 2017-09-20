@@ -1,7 +1,6 @@
 # static-page
 
-Compile your `src` directory to your `dist` directory, with everything crammed
-into single .html files.
+A poor man's webpack for lazy whitespace lovers
 
 # pug
 
