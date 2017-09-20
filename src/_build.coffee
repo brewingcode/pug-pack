@@ -9,6 +9,7 @@ styl = pr.promisifyAll require 'stylus'
 svgo = require 'svgo'
 uglifycss = require 'uglifycss'
 htmlmin = require 'html-minifier'
+yaml = require 'js-yaml'
 { execAsync } = pr.promisifyAll require 'child_process'
 { log } = console
 
@@ -78,6 +79,14 @@ module.exports =
     fs.readFileAsync(file, 'utf8').then (html) =>
       if @prod then htmlmin.minify html else html
 
+  json: (file) ->
+    fs.readFileAsync(file, 'utf8').then (s) ->
+      JSON.parse(s)
+
+  yml: (file) ->
+    new pr (resolve) ->
+      resolve yaml.safeLoad fs.readFileSync(file, 'utf8')
+
   crawl: (root, pug) ->
     execAsync("find '#{path.resolve path.resolve(), root}' -type f -print0").then (stdout) =>
       pug_files = []
@@ -98,7 +107,10 @@ module.exports =
         log 'reduce:', f
         @vars[ext] = {} unless @vars[ext]
         this[ext](f).then (r) =>
-          log "#{ext}: returned #{r.length} chars"
+          if ext.match /^json|yml$/
+            log "#{ext}: returned", if r then "an object" else "nothing"
+          else
+            log "#{ext}: returned #{r.length} chars"
           @vars[ext][name] = r
       .then =>
         if pug
