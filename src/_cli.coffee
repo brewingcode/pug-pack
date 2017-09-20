@@ -4,40 +4,32 @@ build = require './_build'
 nodemon = require 'nodemon'
 { quote } = require 'shell-quote'
 fs = require 'fs'
+argv = require('minimist')(process.argv.slice(2))
 
-paths = []
-watch =
-  run: false
-  args: []
-
-process.argv.slice(2).forEach (a) ->
-  if a in ['-p', '--prod', '--production']
-    build.prod = true
-    watch.args.push a
-  else if a in ['-h', '--help']
-    console.log """
+if argv.h or argv.help
+  console.log """
 usage: ./static-page [src] [dist]
   [-p | --prod | --production]
   [-w | --watch]"
 
 default: ./static-page ./src ./dist
 """
-    process.exit()
-  else if a in ['-w', '--watch']
-    watch.run = true
-  else
-    paths.push a
-    watch.args.push a
+  process.exit()
 
-src = if paths.length > 0 then paths[0] else './src'
-build.dist = if paths.length > 1 then paths[1] else './dist'
+if argv.p or argv.prod or argv.production or process.env.NODE_ENV is 'production'
+  build.prod = true
 
-if watch.run > 0
-  watch.args.unshift "#{__dirname}/_cli.coffee"
+src = if argv._.length > 0 then argv._[0] else './src'
+build.dist = if argv._.length > 1 then argv._[1] else './dist'
+
+if argv.w or argv.watch
+  args = [ "#{__dirname}/_cli.coffee", src, build.dist ]
+  args.push '-p' if build.prod
+
   nodemon
     watch: src
     ext: 'pug js coffee css styl svg'
-    exec: quote watch.args
+    exec: quote args
     verbose: true
   .on 'log', ({type, message, colour}) ->
     if type is 'detail'
