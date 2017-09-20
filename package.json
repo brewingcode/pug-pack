@@ -16,6 +16,7 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "coffee-script": "^1.12.7",
+    "html-minifier": "^3.5.5",
     "mkdirp": "^0.5.1",
     "nodemon": "^1.12.1",
     "pug": "^2.0.0-rc.3",

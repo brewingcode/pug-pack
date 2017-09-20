@@ -8,6 +8,7 @@ uglify = require 'uglify-js'
 styl = pr.promisifyAll require 'stylus'
 svgo = require 'svgo'
 uglifycss = require 'uglifycss'
+htmlmin = require 'html-minifier'
 { execAsync } = pr.promisifyAll require 'child_process'
 { log } = console
 
@@ -72,6 +73,10 @@ module.exports =
       new svgo { plugins }
       .optimize fs.readFileSync(file, 'utf8'), (svg) ->
         resolve svg.data
+
+  html: (file) ->
+    fs.readFileAsync(file, 'utf8').then (html) =>
+      if @prod then htmlmin.minify html else html
 
   crawl: (root, pug) ->
     execAsync("find '#{path.resolve path.resolve(), root}' -type f -print0").then (stdout) =>
