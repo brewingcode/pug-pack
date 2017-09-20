@@ -8,8 +8,17 @@ append head
 
 
 append body
-  div Hello!
+  h1 Hello!
+
+  h4 Here is an svg
   div !{svg.github}
+
+  h4 Here is a link to the other demo page
   div
     a(href="hyper.html") Hyperapp demo
+
+  h4 Here is a demo of a random unstyled chunk of HTML
+  div !{html['github-fragment']}
+
   script !{coffee.main}
+
