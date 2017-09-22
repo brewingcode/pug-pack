@@ -2,16 +2,22 @@ extends _base
 
 append head
   title Hyperapp is really cool
-  style
-    :inject(file="bootstrap.css")
+  :inject(file="bootstrap.css")
 
 append body
   div This is a small test of Hyperapp
   #app
   a(href="index.html") Back to index
+
   include:inject hyperapp.js
-  include:inject hyper_test.coffee
+  :inject(file="hyper_test.coffee")
 
   ul
     each v,k in data["test.json"]
       li key #{k} has value #{v}
+
+  :inject(file="nested/foo.coffee")
+
+  ul
+    each v,k in data["nested/test.json"]
+      li yet another key, this time called #{k} that corresponds to #{v}
