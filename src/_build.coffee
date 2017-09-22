@@ -16,13 +16,17 @@ yaml = require 'js-yaml'
 module.exports =
   prod: process.env.NODE_ENV
   dist: "#{__dirname}/../dist"
-  vars: {}
+  vars:
+    filters:
+      inject: (text, options) ->
+        log 'inject:', text.replace(/\n/g, '').slice(0, 60) + '...', options
 
   pug: (dir, file) ->
     out = file.replace /\.pug$/i, '.html'
     out = out.replace new RegExp(dir, 'i'), @dist
-    @vars.pretty = not @prod
     mkdirp.sync @dist
+    @vars.baseDir = dir
+    @vars.pretty = not @prod
     fs.writeFileAsync out, pug.renderFile file, @vars
 
   jsfilter: (js) ->
