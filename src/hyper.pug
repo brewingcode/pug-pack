@@ -11,3 +11,7 @@ append body
   a(href="index.html") Back to index
   include:inject hyperapp.js
   include:inject hyper_test.coffee
+
+  ul
+    each v,k in data["test.json"]
+      li key #{k} has value #{v}
