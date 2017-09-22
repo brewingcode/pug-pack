@@ -13,13 +13,13 @@ yaml = require 'js-yaml'
 { execAsync } = pr.promisifyAll require 'child_process'
 { log } = console
 
-module.exports =
+module.exports = self =
   prod: process.env.NODE_ENV
   dist: "#{__dirname}/../dist"
   vars:
     filters:
       inject: (text, options) ->
-        log 'inject:', text.replace(/\n/g, '').slice(0, 60) + '...', options
+        log 'inject:', self.vars.baseDir, text.replace(/\n/g, '').slice(0, 60) + '...', options
 
   pug: (dir, file) ->
     out = file.replace /\.pug$/i, '.html'
