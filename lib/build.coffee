@@ -32,14 +32,17 @@ module.exports = self =
             if not options.file
               throw new Error ":inject() is missing 'file' attribute: #{options.filename}"
             { srcname, ext } = self.parsename options.file
-            out = self.vars.src[srcname]
+            out = self.vars.src[srcname] or
+              throw new Error "no content found for #{srcname}"
         else
           if ext is 'pug'
             ext = options.ext
-          else if ext is 'svg'
-            out = self.vars.src[srcname]
+          if ext is 'svg'
+            out = self.vars.src[srcname] or
+              throw new Error "no content found for #{srcname}"
           else
-            out = self.exts[ext].call(self, text)
+            out = self.exts[ext].call(self, text) or
+              throw new Error "no content found for extension #{ext}"
 
         if ext in ['js', 'coffee']
           "<script>\n#{out}\n</script>"
