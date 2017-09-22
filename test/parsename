@@ -1,4 +1,4 @@
-build = require '../src/_build'
+build = require '../lib/build'
 { log } = console
 
 for x in [

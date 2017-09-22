@@ -1,6 +1,6 @@
 #!/usr/bin/env coffee
 
-build = require './_build'
+build = require './build'
 nodemon = require 'nodemon'
 { quote } = require 'shell-quote'
 fs = require 'fs'
@@ -23,7 +23,7 @@ src = if argv._.length > 0 then argv._[0] else './src'
 build.dist = if argv._.length > 1 then argv._[1] else './dist'
 
 if argv.w or argv.watch
-  args = [ "#{__dirname}/_cli.coffee", src, build.dist ]
+  args = [ "#{__dirname}/cli.coffee", src, build.dist ]
   args.push '-p' if build.prod
 
   nodemon
