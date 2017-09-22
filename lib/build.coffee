@@ -168,14 +168,7 @@ module.exports = self =
             @pug f, srcname
     .catch console.error
 
-  self: (handlePug) ->
-    @crawl("#{__dirname}/../src", handlePug).then ->
-      if handlePug
-        execAsync("find '#{__dirname}/../test' -name '*.pug' -print0")
-      else
-        pr.resolve ''
-    .then (stdout) ->
-      stdout.split('\0').forEach (f) ->
-        return unless f
-        { name } = path.parse f
-        self.pug f, "#{name}.html"
+  self: (testPug) ->
+    @crawl("#{__dirname}/../src").then =>
+      if testPug
+        @crawl("#{__dirname}/../test", true)
