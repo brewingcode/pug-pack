@@ -17,139 +17,156 @@ module.exports = self =
   prod: process.env.NODE_ENV
   dist: "#{__dirname}/../dist"
   vars:
-    data: {}
+    src: {}
     filters:
       inject: (text, options) ->
         log 'inject:', text.replace(/\n/g, '').slice(0, 60) + '...', options
-        { ext } = path.parse options.filename
-        ext = ext.replace /^\./, ''
+        { ext, srcname } = self.parsename options.filename
         if not text
           # we need to read from ... something
           if ext isnt 'pug'
-            out = self.transform options.filename
+            out = self.vars.src[srcname]
           else
             if not options.file
               throw new Error ":inject() is missing 'file' attribute: #{options.filename}"
-            file = "#{self.vars.basedir}/#{options.file}"
-            { ext } = path.parse file
-            ext = ext.replace /^\./, ''
-            out = self.transform file
+            { srcname, ext } = self.parsename options.file
+            out = self.vars.src[srcname]
         else
           if ext is 'pug'
             ext = options.ext
-          out = self.transform ext, text
+          else if ext is 'svg'
+            out = self.vars.src[srcname]
+          else
+            out = self.exts[ext].call(self, text)
 
         if ext in ['js', 'coffee']
-          "<script>#{out}</script>"
+          "<script>\n#{out}\n</script>"
         else if ext in ['css', 'styl']
-          "<style>#{out}</style>"
+          "<style>\n#{out}\n</style>"
         else
           out
 
-  pug: (dir, file) ->
-    out = file.replace /\.pug$/i, '.html'
-    out = out.replace new RegExp(dir, 'i'), @dist
-    mkdirp.sync @dist
-    @vars.basedir = dir
-    @vars.pretty = not @prod
-    fs.writeFileAsync out, pug.renderFile file, @vars
+  # replacement for path.parse(), but in the context of this module
+  parsename: (f) ->
+    parts = path.parse f
+    parts.ext = parts.ext.replace /^\./, ''
+    parts.absfile = path.resolve @basedir, f
+    parts.absdir = path.resolve @basedir
+    parts.srcname = parts.absfile.replace(new RegExp(parts.absdir, 'i'), '').replace(/^\//, '')
+    parts
 
+  pug: (file) ->
+    outfile = file.replace /\.pug$/i, '.html'
+    { srcname } = @parsename outfile
+    outfile = @dist + '/' + srcname
+
+    mkdirp.sync @dist
+    @vars.pretty = not @prod
+    fs.writeFileAsync outfile, pug.renderFile file, @vars
+
+  # call as either transform(filename) or transform(ext, text)
   transform: (args...) ->
-    # call as either transform(filename) or transform(ext, text)
     if args.length is 1
       filename = args[0]
       s = fs.readFileSync filename, 'utf8'
-      { ext } = path.parse filename
-      ext = ext.replace /^\./, ''
-      filename = filename.replace new RegExp(@vars.basedir+'/', 'i'), '' # for source maps
+      { ext } = @parsename filename
     else
       [ ext, s ] = args
       filename = 'inline'
 
-    exts =
-      js: =>
-        if @prod
-          r = uglify.minify s
-          throw r.error if r.error
-          r.code
-        else
-          s
+    if ext is 'svg'
+      @exts[ext].call(this, s, filename)
+    else
+      try
+        pr.resolve @exts[ext].call(this, s, filename)
+      catch err
+        console.error 'transform error:', args
+        throw err
 
-      coffee: =>
-        js = coffeescript.compile s,
-          bare: true
-          filename: filename
-          map: not @prod
-          inlineMap: not @prod
-        @transform 'js', js
+  # each of these takes the same two arguments:
+  # - some text content
+  # - the filename, purely for reference (sourcemaps, etc)
+  # all of them are syncronous, EXCEPT for:
+  # - svg
+  exts:
+    js: (s) ->
+      log 'js:', s.replace(/\n/g, '').slice(0,30) + '...'
+      if @prod
+        r = uglify.minify s
+        throw r.error if r.error
+        r.code
+      else
+        s
 
-      css: =>
-        if @prod
-          uglifycss.processString(s)
-        else
-          s
+    coffee: (s, filename) ->
+      log 'coffee:', s, filename
+      js = coffeescript.compile s,
+        bare: true
+        filename: filename
+        map: not @prod
+        inlineMap: not @prod
+      @exts.js js
 
-      styl: => @transform 'css', styl.render s
+    css: (s) ->
+      if @prod
+        uglifycss.processString s
+      else
+        s
 
-      svg: =>
-        return 'n/a'
-        log 'svg:', file
-        new pr (resolve) ->
-          { name } = path.parse file
+    styl: (s) -> @exts.css styl.render s
 
-          plugins = []
-          plugins.push
-            addClassesToSVGElement:
-              classNames: [name]
-          plugins.push
-            removeDimensions: true
+    svg: (s, filename) ->
+      new pr (resolve) ->
+        { name } = self.parsename filename
 
-          new svgo { plugins }
-          .optimize fs.readFileSync(file, 'utf8'), (svg) ->
+        plugins = []
+        plugins.push
+          addClassesToSVGElement:
+            classNames: [name]
+        plugins.push
+          removeDimensions: true
+
+        new svgo { plugins }
+          .optimize s, (svg) ->
             resolve svg.data
 
-      html: =>
-        if @prod
-          htmlmin.minify(s)
-        else
-          s
+    html: (s) ->
+      if @prod
+        htmlmin.minify(s)
+      else
+        s
 
-    try
-      exts[ext]()
-    catch err
-      console.error 'transform error:', args
-      throw err
+    json: (s) -> JSON.parse s
 
-  json: (text) -> JSON.parse text
+    yml: (s) -> yaml.load s
 
-  yml: (text) -> yaml.load text
+  crawl: (root) ->
+    @basedir = path.resolve root
 
-  crawl: (root, pug) ->
-    execAsync("find '#{path.resolve path.resolve(), root}' -type f -print0").then (stdout) =>
+    execAsync("find '#{path.resolve path.resolve(), @basedir}' -type f -print0").then (stdout) =>
       pug_files = []
       other_files = []
 
       stdout.split('\0').forEach (f) =>
         return unless f
-        { dir, name, ext } = path.parse f
-        ext = ext.replace /^\./, ''
+        { name, ext } = @parsename f
         if name.match(/^_/)
           log "skip: #{f}"
         else if ext is 'pug'
-          pug_files.push [ dir, f ]
-        else if ext in ['json', 'yml']
-          other_files.push [ f, ext ]
+          pug_files.push f
+        else if @exts[ext]
+          other_files.push f
 
-      pr.each other_files, ([f, ext]) =>
+      pr.each other_files, (f) =>
         log 'reading:', f
-        name = f.replace new RegExp(root+'/', 'i'), ''
-        unless @vars.data[name]
-          @vars.data[name] = this[ext](fs.readFileSync f, 'utf8')
+        { srcname } = @parsename f
+        unless @vars.src[srcname]
+          @transform(f).then (out) =>
+            @vars.src[srcname] = out
       .then =>
-        if pug
-          pr.each pug_files, ([dir, f]) =>
-            log 'pug:', f
-            @pug dir, f
+        pr.each pug_files, (f) =>
+          log 'f:', f
+          @pug(f).then -> log 'written'
     .then ->
       log 'done'
     .catch console.error
