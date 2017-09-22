@@ -12,12 +12,14 @@ htmlmin = require 'html-minifier'
 yaml = require 'js-yaml'
 { execAsync } = pr.promisifyAll require 'child_process'
 
-{ log } = console
-#log = -> 0
+log = ->
+  if self.verbose
+    console.log.apply(null, arguments)
 
 module.exports = self =
   prod: process.env.NODE_ENV
   dist: "#{__dirname}/../dist"
+  verbose: false
   vars:
     src: {}
     filters:
@@ -149,11 +151,13 @@ module.exports = self =
 
       stdout.split('\0').forEach (f) =>
         return unless f
-        { name, ext } = @parsename f
+        { name, ext, srcname } = @parsename f
         if name.match(/^_/)
           log "skip: #{f}"
+          @vars.src[srcname] = null
         else if ext is 'pug'
           pug_files.push f
+          @vars.src[srcname] = null
         else if @exts[ext]
           other_files.push f
 
