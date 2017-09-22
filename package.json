@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "nodemon -w src -w lib -e pug,js,coffee,styl,css,svg,json,yml -x 'npm run build'",
-    "build": "coffee -r ./lib/build -e 'build.self()'",
+    "build": "coffee -r ./lib/build -e 'build.self true'",
     "prod": "NODE_ENV=production npm run build"
   },
   "bin": {
