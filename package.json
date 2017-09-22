@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "nodemon -w src -e pug,js,coffee,styl,css,svg -x 'npm run build'",
-    "build": "coffee -r ./src/_build -e '_build.self()'",
+    "start": "nodemon -w src -w lib -e pug,js,coffee,styl,css,svg,json,yml -x 'npm run build'",
+    "build": "coffee -r ./lib/build -e 'build.self()'",
     "prod": "NODE_ENV=production npm run build"
   },
   "bin": {
-    "static-page": "src/_cli.coffee"
+    "static-page": "lib/cli.coffee"
   },
-  "main": "src/_build.coffee",
+  "main": "lib/build.coffee",
   "keywords": [],
   "author": "",
   "license": "ISC",
