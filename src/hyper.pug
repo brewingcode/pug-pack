@@ -13,11 +13,11 @@ append body
   :inject(file="hyper_test.coffee")
 
   ul
-    each v,k in data["test.json"]
+    each v,k in src["test.json"]
       li key #{k} has value #{v}
 
   :inject(file="nested/foo.coffee")
 
   ul
-    each v,k in data["nested/test.json"]
+    each v,k in src["nested/test.json"]
       li yet another key, this time called #{k} that corresponds to #{v}
