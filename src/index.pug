@@ -4,12 +4,11 @@ append head
   :inject(file='bootstrap.css')
   style
     include:inject github.svg
-  style
-    :inject(inline ext="styl")
-      .github-svg
-        width: 30px
-      .svg-straight-up > svg
-        width: 60px
+  :inject(inline ext="styl")
+    .github-svg
+      width: 30px
+    .svg-straight-up > svg
+      width: 60px
   title Example index.html
 
 append body
@@ -28,12 +27,9 @@ append body
   h4 Here is a demo of a random unstyled chunk of HTML
   include:inject github-fragment.html
 
-  script
-    include:inject main.coffee
+  include:inject main.coffee
 
-  script
-    include:inject jquery.js
+  include:inject jquery.js
 
-  script
-    :inject(ext="coffee")
-      (document).ready -> console.log "this is coffeescript!"
+  :inject(ext="coffee")
+    $(document).ready -> console.log "this is coffeescript!"

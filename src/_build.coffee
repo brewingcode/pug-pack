@@ -26,18 +26,25 @@ module.exports = self =
         if not text
           # we need to read from ... something
           if ext isnt 'pug'
-            return self.transform options.filename
-          if not options.file
-            throw new Error ":inject() is missing 'file' attribute: #{options.filename}"
-
-          file = "#{self.vars.basedir}/#{options.file}"
-          { ext } = path.parse file
-          ext = ext.replace /^\./, ''
-          return self.transform file
+            out = self.transform options.filename
+          else
+            if not options.file
+              throw new Error ":inject() is missing 'file' attribute: #{options.filename}"
+            file = "#{self.vars.basedir}/#{options.file}"
+            { ext } = path.parse file
+            ext = ext.replace /^\./, ''
+            out = self.transform file
         else
           if ext is 'pug'
             ext = options.ext
-          return self.transform ext, text
+          out = self.transform ext, text
+
+        if ext in ['js', 'coffee']
+          "<script>#{out}</script>"
+        else if ext in ['css', 'styl']
+          "<style>#{out}</style>"
+        else
+          out
 
   pug: (dir, file) ->
     out = file.replace /\.pug$/i, '.html'
