@@ -11,7 +11,8 @@ uglifycss = require 'uglifycss'
 htmlmin = require 'html-minifier'
 yaml = require 'js-yaml'
 { execAsync } = pr.promisifyAll require 'child_process'
-{ log } = console
+# { log } = console
+log = -> 0
 
 module.exports = self =
   prod: process.env.NODE_ENV
