@@ -92,13 +92,10 @@ first, and then compile your own `src` files. Any file naming collisions will
 override the default files from this package, so if you have
 `src/bootstrap.js`, that is the Bootstrap CSS that will be used.
 
-This package's `.pug` files are _not_ included when `static-page` is called,
-because you wouldn't want the demo `index.html` and `hyper.html` files in your
-`dist` directory.
-
 The CLI also includes `-p` to minify all files as much as possible, and `-w`
 to use Nodemon to re-build your `dist` directory anytime any file in `src`
-is modified.
+is modified. `-l` is for listing all the files involved, and `-v` is for
+verbose output.
 
 The CLI is [here](lib/cli.coffee).
 
