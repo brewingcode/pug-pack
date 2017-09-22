@@ -5,7 +5,7 @@ mkdirp = require 'mkdirp'
 pug = require 'pug'
 coffeescript = require 'coffee-script'
 uglify = require 'uglify-js'
-styl = pr.promisifyAll require 'stylus'
+styl = require 'stylus'
 svgo = require 'svgo'
 uglifycss = require 'uglifycss'
 htmlmin = require 'html-minifier'
@@ -17,6 +17,7 @@ module.exports = self =
   prod: process.env.NODE_ENV
   dist: "#{__dirname}/../dist"
   vars:
+    data: {}
     filters:
       inject: (text, options) ->
         log 'inject:', text.replace(/\n/g, '').slice(0, 60) + '...', options
@@ -25,86 +26,96 @@ module.exports = self =
         if not text
           # we need to read from ... something
           if ext isnt 'pug'
-            return self[ext](options.filename)
+            return self.transform options.filename
           if not options.file
             throw new Error ":inject() is missing 'file' attribute: #{options.filename}"
 
-          file = "#{self.vars.baseDir}/#{options.file}"
+          file = "#{self.vars.basedir}/#{options.file}"
           { ext } = path.parse file
           ext = ext.replace /^\./, ''
-          return self[ext](fs.readFileSync file, 'utf8')
+          return self.transform file
         else
-          return self[ext](text)
+          if ext is 'pug'
+            ext = options.ext
+          return self.transform ext, text
 
   pug: (dir, file) ->
     out = file.replace /\.pug$/i, '.html'
     out = out.replace new RegExp(dir, 'i'), @dist
     mkdirp.sync @dist
-    @vars.baseDir = dir
+    @vars.basedir = dir
     @vars.pretty = not @prod
     fs.writeFileAsync out, pug.renderFile file, @vars
 
-  jsfilter: (js) ->
-    new pr (resolve) =>
-      if @prod
-        r = uglify.minify js
-        throw r.error if r.error
-        resolve r.code
-      else
-        resolve js
+  transform: (args...) ->
+    # call as either transform(filename) or transform(ext, text)
+    if args.length is 1
+      filename = args[0]
+      s = fs.readFileSync filename, 'utf8'
+      { ext } = path.parse filename
+      ext = ext.replace /^\./, ''
+      filename = filename.replace new RegExp(@vars.basedir+'/', 'i'), '' # for source maps
+    else
+      [ ext, s ] = args
+      filename = 'inline'
 
-  js: (file) ->
-    fs.readFileAsync(file, 'utf8').then (js) => @jsfilter js
+    exts =
+      js: =>
+        if @prod
+          r = uglify.minify s
+          throw r.error if r.error
+          r.code
+        else
+          s
 
-  coffee: (file) ->
-    coffee = fs.readFileSync file, 'utf8'
-    js = coffeescript.compile coffee,
-      bare: true
-      filename: file
-      map: not @prod
-      inlineMap: not @prod
-    @jsfilter js
+      coffee: =>
+        js = coffeescript.compile s,
+          bare: true
+          filename: filename
+          map: not @prod
+          inlineMap: not @prod
+        @transform 'js', js
 
-  cssfilter: (css) ->
-    new pr (resolve) =>
-      resolve if @prod then uglifycss.processString(css) else css
+      css: =>
+        if @prod
+          uglifycss.processString(s)
+        else
+          s
 
-  styl: (file) ->
-    styl.renderAsync fs.readFileSync(file, 'utf8'),
-      filename: file
-    .then (css) =>
-      @cssfilter css
+      styl: => @transform 'css', styl.render s
 
-  css: (file) ->
-    fs.readFileAsync(file, 'utf8').then (css) => @cssfilter css
+      svg: =>
+        return 'n/a'
+        log 'svg:', file
+        new pr (resolve) ->
+          { name } = path.parse file
 
-  svg: (file) ->
-    log 'svg:', file
-    new pr (resolve) ->
-      { name } = path.parse file
+          plugins = []
+          plugins.push
+            addClassesToSVGElement:
+              classNames: [name]
+          plugins.push
+            removeDimensions: true
 
-      plugins = []
-      plugins.push
-        addClassesToSVGElement:
-          classNames: [name]
-      plugins.push
-        removeDimensions: true
+          new svgo { plugins }
+          .optimize fs.readFileSync(file, 'utf8'), (svg) ->
+            resolve svg.data
 
-      new svgo { plugins }
-      .optimize fs.readFileSync(file, 'utf8'), (svg) ->
-        resolve svg.data
+      html: =>
+        if @prod
+          htmlmin.minify(s)
+        else
+          s
 
-  html: (file) ->
-    fs.readFileAsync(file, 'utf8').then (html) =>
-      if @prod then htmlmin.minify html else html
+    try
+      exts[ext]()
+    catch err
+      console.error 'transform error:', args
+      throw err
 
-  json: (file) ->
-    fs.readFileAsync(file, 'utf8').then (s) ->
-      JSON.parse(s)
+  json: (text) -> JSON.parse text
 
-  yml: (file) ->
-    new pr (resolve) ->
-      resolve yaml.safeLoad fs.readFileSync(file, 'utf8')
+  yml: (text) -> yaml.load text
 
   crawl: (root, pug) ->
     execAsync("find '#{path.resolve path.resolve(), root}' -type f -print0").then (stdout) =>
@@ -115,30 +126,26 @@ module.exports = self =
         return unless f
         { dir, name, ext } = path.parse f
         ext = ext.replace /^\./, ''
-        if name.match(/^_/) or not this[ext]
+        if name.match(/^_/)
           log "skip: #{f}"
         else if ext is 'pug'
           pug_files.push [ dir, f ]
-        else
-          other_files.push [ f, name, ext ]
+        else if ext in ['json', 'yml']
+          other_files.push [ f, ext ]
 
-      pr.each other_files, ([f, name, ext]) =>
-        log 'reduce:', f
-        @vars[ext] = {} unless @vars[ext]
-        this[ext](f).then (r) =>
-          if ext.match /^json|yml$/
-            log "#{ext}: returned", if r then "an object" else "nothing"
-          else
-            log "#{ext}: returned #{r.length} chars"
-          @vars[ext][name] = r
+      pr.each other_files, ([f, ext]) =>
+        log 'reading:', f
+        name = f.replace new RegExp(root+'/', 'i'), ''
+        unless @vars.data[name]
+          @vars.data[name] = this[ext](fs.readFileSync f, 'utf8')
       .then =>
         if pug
           pr.each pug_files, ([dir, f]) =>
             log 'pug:', f
             @pug dir, f
-      .then ->
-        log 'done'
-      .catch console.error
+    .then ->
+      log 'done'
+    .catch console.error
 
   self: ->
     @crawl __dirname, true
