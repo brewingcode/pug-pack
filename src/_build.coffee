@@ -19,7 +19,22 @@ module.exports = self =
   vars:
     filters:
       inject: (text, options) ->
-        log 'inject:', self.vars.baseDir, text.replace(/\n/g, '').slice(0, 60) + '...', options
+        log 'inject:', text.replace(/\n/g, '').slice(0, 60) + '...', options
+        { ext } = path.parse options.filename
+        ext = ext.replace /^\./, ''
+        if not text
+          # we need to read from ... something
+          if ext isnt 'pug'
+            return self[ext](options.filename)
+          if not options.file
+            throw new Error ":inject() is missing 'file' attribute: #{options.filename}"
+
+          file = "#{self.vars.baseDir}/#{options.file}"
+          { ext } = path.parse file
+          ext = ext.replace /^\./, ''
+          return self[ext](fs.readFileSync file, 'utf8')
+        else
+          return self[ext](text)
 
   pug: (dir, file) ->
     out = file.replace /\.pug$/i, '.html'
