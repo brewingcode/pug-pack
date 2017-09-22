@@ -39,5 +39,4 @@ if argv.w or argv.watch
       console.log colour
   .on 'quit', -> process.exit()
 else
-  build.crawl(__dirname, false).then ->
-    build.crawl src, true
+  build.self().then -> build.crawl src, true
