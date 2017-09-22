@@ -1,22 +1,39 @@
 extends _base
 
 append head
-  style !{css.bootstrap}
-  style.
-    svg.github { width: 30px }
+  :inject(file='bootstrap.css')
+  style
+    include:inject github.svg
+  style
+    :inject(inline ext="styl")
+      .github-svg
+        width: 30px
+      .svg-straight-up > svg
+        width: 60px
   title Example index.html
 
 append body
   h1 Hello!
 
-  h4 Here is an svg
-  div !{svg.github}
+  h4 Here is an svg from inlined css
+  svg.github-svg
 
-  h4 Here is a link to the other demo page
+  h4 Here is an svg straight-up, twice as large as above
+  .svg-straight-up
+  include:inject github.svg
+
   div
     a(href="hyper.html") Hyperapp demo
 
   h4 Here is a demo of a random unstyled chunk of HTML
-  div !{html['github-fragment']}
+  include:inject github-fragment.html
 
-  script !{coffee.main}
+  script
+    include:inject main.coffee
+
+  script
+    include:inject jquery.js
+
+  script
+    :inject(ext="coffee" inline)
+      (document).ready -> console.log "this is coffeescript!"
