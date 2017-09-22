@@ -2,11 +2,12 @@ extends _base
 
 append head
   title Hyperapp is really cool
-  style !{css.bootstrap}
+  style
+    :inject(file="bootstrap.css")
 
 append body
   div This is a small test of Hyperapp
   #app
   a(href="index.html") Back to index
-  script !{js.hyperapp}
-  script !{coffee.hyper_test}
+  include:inject hyperapp.js
+  include:inject hyper_test.coffee
