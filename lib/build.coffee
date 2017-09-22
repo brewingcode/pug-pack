@@ -11,8 +11,9 @@ uglifycss = require 'uglifycss'
 htmlmin = require 'html-minifier'
 yaml = require 'js-yaml'
 { execAsync } = pr.promisifyAll require 'child_process'
-# { log } = console
-log = -> 0
+
+{ log } = console
+#log = -> 0
 
 module.exports = self =
   prod: process.env.NODE_ENV
@@ -51,19 +52,16 @@ module.exports = self =
   parsename: (f) ->
     parts = path.parse f
     parts.ext = parts.ext.replace /^\./, ''
-    parts.absfile = path.resolve @basedir, f
-    parts.absdir = path.resolve @basedir
+    parts.absfile = path.resolve @vars.basedir, f
+    parts.absdir = path.resolve @vars.basedir
     parts.srcname = parts.absfile.replace(new RegExp(parts.absdir, 'i'), '').replace(/^\//, '')
     parts
 
-  pug: (file) ->
-    outfile = file.replace /\.pug$/i, '.html'
-    { srcname } = @parsename outfile
-    outfile = @dist + '/' + srcname
-
+  pug: (file, outfile) ->
+    log 'pug:', file, outfile, @vars.basedir, @dist
     mkdirp.sync @dist
     @vars.pretty = not @prod
-    fs.writeFileAsync outfile, pug.renderFile file, @vars
+    fs.writeFileAsync "#{@dist}/#{outfile}", pug.renderFile file, @vars
 
   # call as either transform(filename) or transform(ext, text)
   transform: (args...) ->
@@ -91,7 +89,6 @@ module.exports = self =
   # - svg
   exts:
     js: (s) ->
-      log 'js:', s.replace(/\n/g, '').slice(0,30) + '...'
       if @prod
         r = uglify.minify s
         throw r.error if r.error
@@ -100,7 +97,6 @@ module.exports = self =
         s
 
     coffee: (s, filename) ->
-      log 'coffee:', s, filename
       js = coffeescript.compile s,
         bare: true
         filename: filename
@@ -141,10 +137,10 @@ module.exports = self =
 
     yml: (s) -> yaml.load s
 
-  crawl: (root) ->
-    @basedir = path.resolve root
+  crawl: (root, handlePug) ->
+    @vars.basedir = path.resolve root
 
-    execAsync("find '#{path.resolve path.resolve(), @basedir}' -type f -print0").then (stdout) =>
+    execAsync("find '#{@vars.basedir}' -type f -print0").then (stdout) =>
       pug_files = []
       other_files = []
 
@@ -165,12 +161,21 @@ module.exports = self =
           @transform(f).then (out) =>
             @vars.src[srcname] = out
       .then =>
-        pr.each pug_files, (f) =>
-          log 'f:', f
-          @pug(f).then -> log 'written'
-    .then ->
-      log 'done'
+        if handlePug
+          pr.each pug_files, (f) =>
+            outfile = f.replace /\.pug$/i, '.html'
+            { srcname } = @parsename outfile
+            @pug f, srcname
     .catch console.error
 
-  self: ->
-    @crawl __dirname, true
+  self: (handlePug) ->
+    @crawl("#{__dirname}/../src", handlePug).then ->
+      if handlePug
+        execAsync("find '#{__dirname}/../test' -name '*.pug' -print0")
+      else
+        pr.resolve ''
+    .then (stdout) ->
+      stdout.split('\0').forEach (f) ->
+        return unless f
+        { name } = path.parse f
+        self.pug f, "#{name}.html"

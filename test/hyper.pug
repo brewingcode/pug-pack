@@ -1,4 +1,4 @@
-extends _base
+extends /_base
 
 append head
   title Hyperapp is really cool
@@ -9,7 +9,7 @@ append body
   #app
   a(href="index.html") Back to index
 
-  include:inject hyperapp.js
+  include:inject /hyperapp.js
   :inject(file="hyper_test.coffee")
 
   ul
