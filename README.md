@@ -9,9 +9,9 @@ pug-pack
 
 The above will compile your `src` directory into your `dist` directory, with
 assets (from both `pug-pack` and your own package) inlined into the resulting
-`.html` files. Each .html file is entirely self-contained to bring network
-request down to a sublime one-per-page. Cleanly-formatted languages (
-[.pug](https://pugjs.org/api/getting-started.html),
+`.html` files. Each `.html` file is entirely self-contained, in order to bring
+network requests down to a sublime one-per-page. Cleanly-formatted languages
+([.pug](https://pugjs.org/api/getting-started.html),
 [.coffee](http://coffeescript.org/), [.styl](http://stylus-lang.com/), and
 [.yml](http://www.yaml.org/start.html)) are supported, but you can fall back
 on files from the last 20 years if you need (or want) to.
@@ -32,13 +32,13 @@ images. These files are passed to Pug via:
 
 * the `src` template variable
 
-* (carefully) the `include` keyword combined with the `inject` filter (see "What's
-wrong with `include`?", below)
+* (carefully) the `include` keyword combined with the `inject` filter (see
+"What's wrong with `include`?", below)
 
 See examples in [index.pug](test/index.pug) and [hyper.pug](test/hyper.pug).
 
-**Note:** To `extend` a `.pug` template from `pug-pack` (such as
-`_base.pug`), you need to use the full path to its location in your `node_modules`
+**Note:** To `extend` a `.pug` template from `pug-pack` (such as `_base.pug`),
+you need to use the full path to its location in your `node_modules`
 directory. See the "What's wrong with `include`?" section for why.
 
     extend ../node_modules/pug-pack/src/_base
@@ -103,6 +103,11 @@ is modified. `-l` is for listing all the files involved, and `-v` is for
 verbose output.
 
 The CLI is [here](lib/cli.coffee).
+
+# API
+
+You can `require('pug-pack')` yourself, if you really want to: see the
+[CLI](lib/cli.coffee) for more.
 
 # ignored files
 
