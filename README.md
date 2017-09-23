@@ -104,6 +104,11 @@ verbose output.
 
 The CLI is [here](lib/cli.coffee).
 
+# API
+
+You can `require('pug-pack')` yourself, if you really want to: see the
+[CLI](lib/cli.coffee) for more.
+
 # ignored files
 
 Any files under `src` that begin with an underscore are ignored by the
