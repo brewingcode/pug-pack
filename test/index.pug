@@ -2,11 +2,14 @@ extends ../src/_base
 
 append head
   :inject(file='bootstrap.css')
-  :inject(file='github.svg')
+  :inject(file='github.svg' css)
   :inject(ext="styl")
     .github-svg
+      // note: you need to specify both if you're using the CSS class
       width: 30px
+      height: 30px
     .svg-straight-up > svg
+      // styling the <svg> only needs one of either height or width
       width: 60px
   title Example index.html
 
@@ -14,7 +17,7 @@ append body
   h1 Hello!
 
   h4 Here is an svg from inlined css
-  svg.github-svg
+  .github-svg
 
   h4 Here is an svg straight-up, twice as large as above
   .svg-straight-up
