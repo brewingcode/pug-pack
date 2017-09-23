@@ -1,0 +1,20 @@
+build = require '../lib/build'
+{ log } = console
+
+for x in [
+  ['foo.coffee', null]
+  ['foo.coffee', '']
+  ['foo.coffee', '.']
+  ['foo.coffee', './bar']
+  ['foo.coffee', '/']
+  ['foo.coffee', '/tmp']
+  ['foo.coffee', 'src']
+  ['nested/foo.coffee', 'src']
+]
+  log x
+  build.basedir = x[1]
+  try
+    log build.parsename.apply(build, x)
+  catch err
+    log 'error: ', err.message
+  log ''

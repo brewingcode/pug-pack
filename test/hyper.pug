@@ -1,0 +1,23 @@
+extends ../src/_base
+
+append head
+  title Hyperapp is really cool
+  :inject(file="bootstrap.css")
+
+append body
+  div This is a small test of Hyperapp
+  #app
+  a(href="index.html") Back to index
+
+  :inject(file='hyperapp.js')
+  include:inject hyper_test.coffee
+
+  ul
+    each v,k in src["test.json"]
+      li key #{k} has value #{v}
+
+  :inject(file="nested/foo.coffee")
+
+  ul
+    each v,k in src["nested/test.json"]
+      li yet another key, this time called #{k} that corresponds to #{v}
