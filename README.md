@@ -2,19 +2,25 @@
 
 > Pseudo-webpack for developers who like clean formatting
 
-```
+```sh
 npm install -g pug-pack
-pug-pack
 ```
 
-The above will compile your `src` directory into your `dist` directory, with
+`pug-pack` compiles your `src` directory into your `dist` directory, with
 assets (from both `pug-pack` and your own package) inlined into the resulting
 `.html` files. Each `.html` file is entirely self-contained, in order to bring
-network requests down to a sublime one-per-page. Cleanly-formatted languages
+network requests down to just one. Cleanly-formatted languages
 ([.pug](https://pugjs.org/api/getting-started.html),
 [.coffee](http://coffeescript.org/), [.styl](http://stylus-lang.com/), and
 [.yml](http://www.yaml.org/start.html)) are supported, but you can fall back
 on files from the last 20 years if you need (or want) to.
+
+You can compile a few test files with:
+
+```sh
+pug-pack "$(npm -g root)/pug-pack/test"
+open dist/index.html
+```
 
 # pug
 
@@ -41,7 +47,9 @@ See examples in [index.pug](test/index.pug) and [hyper.pug](test/hyper.pug).
 you need to use the full path to its location in your `node_modules`
 directory. See the "What's wrong with `include`?" section for why.
 
-    extend ../node_modules/pug-pack/src/_base
+```pug
+extend ../node_modules/pug-pack/src/_base
+```
 
 # non-pug files
 
@@ -49,7 +57,7 @@ The following file types are supported: `.coffee`, `.styl`, `.yml`, `.js`,
 `.css`, `.svg`, `.html`, and `.json`.
 
 Most of these are simple transforms of text-to-text, but there are a few
-that are converted into objects, which requires a little care:
+that are converted into objects. These require a little care:
 
 ### `.yml` and `.json`
 
@@ -69,7 +77,7 @@ them:
 ```pug
 // index.pug
 ul
-  each val,key in src["people.json"]
+  each val,key in src["people.yml"]
     li #{val.name} lives in #{val.city} and their SSN is #{key}
 ```
 
@@ -79,11 +87,11 @@ SVG files are more complicated, because they can either be inlined into a
 `<style>` tag, or they can be used "raw", ie embeded straight into HTML as an
 `<svg>` element.
 
-```
-//- creates a "raw" <svg> element with a CSS class of "github-svg"
+```pug
+// creates a "raw" <svg> element with a CSS class of "github-svg"
 :inject(file="github.svg")
 
-//- creates a <style> element that declares the "github-svg" CSS class
+// creates a <style> element that declares the "github-svg" CSS class
 :inject(file="github.svg" css)
 ```
 
@@ -97,10 +105,18 @@ first, and then compile your own `src` files. Any file naming collisions will
 override the default files from this package, so if you have
 `src/bootstrap.js`, that is the Bootstrap CSS that will be used.
 
-The CLI also includes `-p` to minify all files as much as possible, and `-w`
-to use Nodemon to re-build your `dist` directory anytime any file in `src`
-is modified. `-l` is for listing all the files involved, and `-v` is for
-verbose output.
+You can override the `src` and `dist` directories, and pass other options:
+
+```
+usage:
+
+pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
+  [-v|--verbose]
+
+pug-pack [-l|--list] [-h|--help]
+
+default: pug-pack ./src ./dist
+```
 
 The CLI is [here](lib/cli.coffee).
 
@@ -130,15 +146,19 @@ _your own_ `src` directory.
 
 For example, to `include` Bootstrap from `pug-pack`, you might try:
 
-    include:inject bootstrap.css
+```pug
+include:inject bootstrap.css
+```
 
 However, because Pug defaults to finding your include files relative to the
 `.pug` file itself, Pug will not find `bootstrap.css`, unless you happen to
 have your own copy in your `src` directory. In order to `include` Bootstrap
 from `pug-pack` you would need to use:
 
+```pug
     style
       include:inject ../node_modules/pug-pack/src/bootstrap.css
+```
 
 As noted above, avoid this issue by simply using
 `:inject(file="bootstrap.ss")`, without worrying about `include`. The filter
