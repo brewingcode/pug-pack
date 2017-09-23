@@ -33,7 +33,7 @@ module.exports = self =
             out = self.vars.src[srcname] or
               throw new Error "no content found for #{srcname}"
           else
-            out = self.exts[ext].call(self, text) or
+            out = self.exts[ext](text) or
               throw new Error "no content found for extension #{ext}"
         else
           # we need to read from ... something
@@ -49,7 +49,7 @@ module.exports = self =
         if ext is 'svg'
           if options.css
             className = srcname.replace /[^\w\-\d]+/g, '-'
-            out = """
+            out = self.exts.css """
               .#{className} {
                 background-image: url('data:image/svg+xml;utf8,#{out.forCSS}');
               }
@@ -91,10 +91,10 @@ module.exports = self =
       filename = 'inline'
 
     if ext is 'svg'
-      @exts[ext].call(this, s, filename)
+      @exts[ext](s, filename)
     else
       try
-        pr.resolve @exts[ext].call(this, s, filename)
+        pr.resolve @exts[ext](s, filename)
       catch err
         console.error 'transform error:', args
         throw err
@@ -106,7 +106,7 @@ module.exports = self =
   # - svg
   exts:
     js: (s) ->
-      if @prod
+      if self.prod
         r = uglify.minify s
         throw r.error if r.error
         r.code
@@ -117,12 +117,12 @@ module.exports = self =
       js = coffeescript.compile s,
         bare: true
         filename: filename
-        map: not @prod
-        inlineMap: not @prod
+        map: not self.prod
+        inlineMap: not self.prod
       self.exts.js js
 
     css: (s) ->
-      if @prod
+      if self.prod
         csso.minify(s, comments:false).css
       else
         s
@@ -157,7 +157,7 @@ module.exports = self =
             forDOM: forDOM.data
 
     html: (s) ->
-      if @prod
+      if self.prod
         htmlmin.minify(s)
       else
         s
