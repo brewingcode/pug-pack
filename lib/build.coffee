@@ -7,7 +7,7 @@ coffeescript = require 'coffee-script'
 uglify = require 'uglify-js'
 styl = require 'stylus'
 svgo = require 'svgo'
-uglifycss = require 'uglifycss'
+csso = require 'csso'
 htmlmin = require 'html-minifier'
 yaml = require 'js-yaml'
 { execAsync } = pr.promisifyAll require 'child_process'
@@ -123,7 +123,7 @@ module.exports = self =
 
     css: (s) ->
       if @prod
-        uglifycss.processString s
+        csso.minify(s, comments:false).css
       else
         s
 

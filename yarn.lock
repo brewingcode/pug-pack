@@ -408,6 +408,19 @@ css-parse@1.7.x:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/css-parse/-/css-parse-1.7.0.tgz#321f6cf73782a6ff751111390fc05e2c657d8c9b"
 
+css-tree@1.0.0-alpha23:
+  version "1.0.0-alpha23"
+  resolved "https://registry.yarnpkg.com/css-tree/-/css-tree-1.0.0-alpha23.tgz#5129518def61e99931d9a3397c3d6758af2ff0c5"
+  dependencies:
+    mdn-data "^1.0.0"
+    source-map "^0.5.3"
+
+csso@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/csso/-/csso-3.2.0.tgz#b290b9581551904aad45bca8988af17ca0711235"
+  dependencies:
+    css-tree "1.0.0-alpha23"
+
 csso@~2.3.1:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/csso/-/csso-2.3.2.tgz#ddd52c587033f49e94b71fc55569f252e8ff5f85"
@@ -1150,6 +1163,10 @@ make-dir@^1.0.0:
 map-stream@~0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/map-stream/-/map-stream-0.1.0.tgz#e56aa94c4c8055a16404a0674b78f215f7c8e194"
+
+mdn-data@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-1.0.0.tgz#a69d9da76847b4d5834c1465ea25c0653a1fbf66"
 
 micromatch@^2.1.5:
   version "2.3.11"
@@ -1937,10 +1954,6 @@ uglify-js@^3.0.28:
 uglify-to-browserify@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz#6e0924d6bda6b5afe349e39a6d632850a0f882b7"
-
-uglifycss@^0.0.27:
-  version "0.0.27"
-  resolved "https://registry.yarnpkg.com/uglifycss/-/uglifycss-0.0.27.tgz#53553b8115de26dce57b42ba0b34e88dd80d0cde"
 
 uid-number@^0.0.6:
   version "0.0.6"

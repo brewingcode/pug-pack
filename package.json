@@ -13,6 +13,7 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "coffee-script": "^1.12.7",
+    "csso": "^3.2.0",
     "html-minifier": "^3.5.5",
     "js-yaml": "^3.10.0",
     "minimist": "^1.2.0",
@@ -22,8 +23,7 @@
     "shell-quote": "^1.6.1",
     "stylus": "^0.54.5",
     "svgo": "^0.7.2",
-    "uglify-js": "^3.0.28",
-    "uglifycss": "^0.0.27"
+    "uglify-js": "^3.0.28"
   },
   "main": "lib/build.coffee",
   "keywords": [],
