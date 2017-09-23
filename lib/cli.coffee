@@ -10,12 +10,12 @@ if argv.h or argv.help
   console.log """
 usage:
 
-./pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
+pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
   [-v|--verbose]
 
-./pug-pack [-l|--list] [-h|--help]
+pug-pack [-l|--list] [-h|--help]
 
-default: ./pug-pack ./src ./dist
+default: pug-pack ./src ./dist
 """
   process.exit()
 
