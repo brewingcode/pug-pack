@@ -5,13 +5,14 @@ append head
   :inject(file='github.svg' css)
   :inject(ext="styl")
     .github-svg
-      // note: you need to specify both if you're using the CSS class
+      /* note: you need to specify both if you're using the CSS class */
+      background-size: contain
+      background-repeat: no-repeat
       width: 30px
       height: 30px
-    .svg-straight-up > svg
-      // styling the <svg> only needs one of either height or width to
-      // maintain aspect ratio: it still might look funny unless you
-      // provide both width *and* height
+    .raw-svg > svg
+      /* styling the <svg> only needs one of either height or width to
+      maintain aspect ratio */
       width: 60px
   title Example index.html
 
@@ -25,7 +26,7 @@ append body
     Here is an svg straight-up, twice as large as above but only in
     one dimension
 
-  .svg-straight-up
+  .raw-svg
     :inject(file='github.svg')
 
   div
