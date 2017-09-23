@@ -9,7 +9,9 @@ append head
       width: 30px
       height: 30px
     .svg-straight-up > svg
-      // styling the <svg> only needs one of either height or width
+      // styling the <svg> only needs one of either height or width to
+      // maintain aspect ratio: it still might look funny unless you
+      // provide both width *and* height
       width: 60px
   title Example index.html
 
@@ -19,9 +21,12 @@ append body
   h4 Here is an svg from inlined css
   .github-svg
 
-  h4 Here is an svg straight-up, twice as large as above
+  h4.
+    Here is an svg straight-up, twice as large as above but only in
+    one dimension
+
   .svg-straight-up
-  :inject(file='github.svg')
+    :inject(file='github.svg')
 
   div
     a(href="hyper.html") Hyperapp demo
