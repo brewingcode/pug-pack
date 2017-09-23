@@ -1,0 +1,34 @@
+extends ../src/_base
+
+append head
+  :inject(file='bootstrap.css')
+  :inject(file='github.svg')
+  :inject(ext="styl")
+    .github-svg
+      width: 30px
+    .svg-straight-up > svg
+      width: 60px
+  title Example index.html
+
+append body
+  h1 Hello!
+
+  h4 Here is an svg from inlined css
+  svg.github-svg
+
+  h4 Here is an svg straight-up, twice as large as above
+  .svg-straight-up
+  :inject(file='github.svg')
+
+  div
+    a(href="hyper.html") Hyperapp demo
+
+  h4 Here is a demo of a random unstyled chunk of HTML
+  include:inject github-fragment.html
+
+  include:inject main.coffee
+
+  :inject(file='jquery.js')
+
+  :inject(ext="coffee")
+    $(document).ready -> console.log "this is coffeescript!"
