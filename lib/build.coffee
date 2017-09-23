@@ -26,7 +26,16 @@ module.exports = self =
       inject: (text, options) ->
         log 'inject:', text.replace(/\n/g, '').slice(0, 60) + '...', options
         { ext, srcname } = self.parsename options.filename
-        if not text
+        if text
+          if ext is 'pug'
+            ext = options.ext
+          if ext is 'svg'
+            out = self.vars.src[srcname] or
+              throw new Error "no content found for #{srcname}"
+          else
+            out = self.exts[ext].call(self, text) or
+              throw new Error "no content found for extension #{ext}"
+        else
           # we need to read from ... something
           if ext isnt 'pug'
             out = self.vars.src[srcname]
@@ -36,22 +45,26 @@ module.exports = self =
             { srcname, ext } = self.parsename options.file
             out = self.vars.src[srcname] or
               throw new Error "no content found for #{srcname}"
-        else
-          if ext is 'pug'
-            ext = options.ext
-          if ext is 'svg'
-            out = self.vars.src[srcname] or
-              throw new Error "no content found for #{srcname}"
+
+        if ext is 'svg'
+          if options.css
+            className = srcname.replace /[^\w\-\d]+/g, '-'
+            out.data = out.data.replace /\s+(height|width)=\d+\s+/g, ''
+            out = self.exts.styl """
+              .#{className}
+                background-image: url("data:image/svg+xml;utf8,#{encodeURIComponent(out.data)}")
+                background-size: contain
+            """
+            ext = 'css'
           else
-            out = self.exts[ext].call(self, text) or
-              throw new Error "no content found for extension #{ext}"
+            out = out.data
 
         if ext in ['js', 'coffee']
-          "<script>\n#{out}\n</script>"
+          out = "<script>\n#{out}\n</script>"
         else if ext in ['css', 'styl']
-          "<style>\n#{out}\n</style>"
-        else
-          out
+          out = "<style>\n#{out}\n</style>"
+
+        out
 
   # replacement for path.parse(), but in the context of this module
   parsename: (f) ->
@@ -107,7 +120,7 @@ module.exports = self =
         filename: filename
         map: not @prod
         inlineMap: not @prod
-      @exts.js js
+      self.exts.js js
 
     css: (s) ->
       if @prod
@@ -115,7 +128,7 @@ module.exports = self =
       else
         s
 
-    styl: (s) -> @exts.css styl.render s
+    styl: (s) -> self.exts.css styl.render s
 
     svg: (s, filename) ->
       new pr (resolve) ->
@@ -125,12 +138,9 @@ module.exports = self =
         plugins.push
           addClassesToSVGElement:
             classNames: [name]
-        plugins.push
-          removeDimensions: true
 
         new svgo { plugins }
-          .optimize s, (svg) ->
-            resolve svg.data
+          .optimize s, resolve
 
     html: (s) ->
       if @prod
