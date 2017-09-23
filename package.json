@@ -1,14 +1,14 @@
 {
-  "name": "static-page",
+  "name": "pug-pack",
   "version": "1.0.0",
-  "description": "",
+  "description": "Pseudo-webpack for developers who like clean formatting",
   "scripts": {
     "start": "nodemon -w src -w lib -e pug,js,coffee,styl,css,svg,json,yml -x 'npm run build'",
     "build": "coffee -r ./lib/build -e 'build.verbose = true; build.self true'",
     "prod": "NODE_ENV=production npm run build"
   },
   "bin": {
-    "static-page": "lib/cli.coffee"
+    "pug-pack": "lib/cli.coffee"
   },
   "main": "lib/build.coffee",
   "keywords": [],

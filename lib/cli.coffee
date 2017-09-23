@@ -8,14 +8,14 @@ argv = require('minimist')(process.argv.slice(2))
 
 if argv.h or argv.help
   console.log """
-usage: ./static-page [src] [dist]
-  [-p | --prod | --production]
-  [-w | --watch]"
-  [-v | --verbose]
+usage:
 
-./static-page [-l | --list]
+./pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
+  [-v|--verbose]
 
-default: ./static-page ./src ./dist
+./pug-pack [-l|--list] [-h|--help]
+
+default: ./pug-pack ./src ./dist
 """
   process.exit()
 
@@ -46,10 +46,10 @@ if argv.w or argv.watch
   .on 'quit', -> process.exit()
 else if argv.l or argv.list
   build.self().then ->
-    console.log '## assets from static-page'
+    console.log '## assets from pug-pack'
     console.log(f) for f in Object.keys build.vars.src
     build.crawl(src).then ->
-      console.log '## assets from static-page AND you'
+      console.log '## assets from pug-pack AND you'
       console.log(f) for f in Object.keys build.vars.src
 else
   build.self().then -> build.crawl src, true
