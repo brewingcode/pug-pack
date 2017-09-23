@@ -45,22 +45,26 @@ module.exports = self =
             { srcname, ext } = self.parsename options.file
             out = self.vars.src[srcname] or
               throw new Error "no content found for #{srcname}"
-        else
-          if ext is 'pug'
-            ext = options.ext
-          if ext is 'svg'
-            out = self.vars.src[srcname] or
-              throw new Error "no content found for #{srcname}"
+
+        if ext is 'svg'
+          if options.css
+            className = srcname.replace /[^\w\-\d]+/g, '-'
+            out.data = out.data.replace /\s+(height|width)=\d+\s+/g, ''
+            out = self.exts.styl """
+              .#{className}
+                background-image: url("data:image/svg+xml;utf8,#{encodeURIComponent(out.data)}")
+                background-size: contain
+            """
+            ext = 'css'
           else
-            out = self.exts[ext].call(self, text) or
-              throw new Error "no content found for extension #{ext}"
+            out = out.data
 
         if ext in ['js', 'coffee']
-          "<script>\n#{out}\n</script>"
+          out = "<script>\n#{out}\n</script>"
         else if ext in ['css', 'styl']
-          "<style>\n#{out}\n</style>"
-        else
-          out
+          out = "<style>\n#{out}\n</style>"
+
+        out
 
   # replacement for path.parse(), but in the context of this module
   parsename: (f) ->
@@ -134,12 +138,9 @@ module.exports = self =
         plugins.push
           addClassesToSVGElement:
             classNames: [name]
-        plugins.push
-          removeDimensions: true
 
         new svgo { plugins }
-          .optimize s, (svg) ->
-            resolve svg.data
+          .optimize s, resolve
 
     html: (s) ->
       if @prod
