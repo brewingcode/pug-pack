@@ -49,15 +49,14 @@ module.exports = self =
         if ext is 'svg'
           if options.css
             className = srcname.replace /[^\w\-\d]+/g, '-'
-            out.data = out.data.replace /\s+(height|width)=\d+\s+/g, ''
-            out = self.exts.styl """
-              .#{className}
-                background-image: url("data:image/svg+xml;utf8,#{encodeURIComponent(out.data)}")
-                background-size: contain
+            out = """
+              .#{className} {
+                background-image: url('data:image/svg+xml;utf8,#{out.forCSS}');
+              }
             """
             ext = 'css'
           else
-            out = out.data
+            out = out.forDOM
 
         if ext in ['js', 'coffee']
           out = "<script>\n#{out}\n</script>"
@@ -135,12 +134,27 @@ module.exports = self =
         { name } = self.parsename filename
 
         plugins = []
+        prs = []
+
+        plugins.push
+          removeDimensions: true
+
+        prs.push new pr (resolve) ->
+          new svgo( {plugins} ).optimize s, resolve
+
         plugins.push
           addClassesToSVGElement:
             classNames: [name]
+        plugins.push
+          removeXMLNS: true
 
-        new svgo { plugins }
-          .optimize s, resolve
+        prs.push new pr (resolve) ->
+          new svgo( {plugins} ).optimize s, resolve
+
+        pr.all(prs).then ([forCSS, forDOM]) ->
+          resolve
+            forCSS: forCSS.data
+            forDOM: forDOM.data
 
     html: (s) ->
       if @prod
