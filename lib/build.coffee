@@ -26,7 +26,16 @@ module.exports = self =
       inject: (text, options) ->
         log 'inject:', text.replace(/\n/g, '').slice(0, 60) + '...', options
         { ext, srcname } = self.parsename options.filename
-        if not text
+        if text
+          if ext is 'pug'
+            ext = options.ext
+          if ext is 'svg'
+            out = self.vars.src[srcname] or
+              throw new Error "no content found for #{srcname}"
+          else
+            out = self.exts[ext].call(self, text) or
+              throw new Error "no content found for extension #{ext}"
+        else
           # we need to read from ... something
           if ext isnt 'pug'
             out = self.vars.src[srcname]
@@ -107,7 +116,7 @@ module.exports = self =
         filename: filename
         map: not @prod
         inlineMap: not @prod
-      @exts.js js
+      self.exts.js js
 
     css: (s) ->
       if @prod
@@ -115,7 +124,7 @@ module.exports = self =
       else
         s
 
-    styl: (s) -> @exts.css styl.render s
+    styl: (s) -> self.exts.css styl.render s
 
     svg: (s, filename) ->
       new pr (resolve) ->
