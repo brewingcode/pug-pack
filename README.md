@@ -109,7 +109,7 @@ relative path from the `src` directory:
 ```
 
 ```pug
-// index.pug
+// src/index.pug
 ul
   each val,key in src["people.yml"]
     li #{val.name} lives in #{val.city} and their SSN is #{key}
@@ -146,14 +146,16 @@ SVG files are more complicated, because they can either be inlined into a
 ```
 
 Note the `css` attribute passed to the `:inject` filter: this is required to
-tell the filter to produce CSS instead of SVG.
+tell the filter to produce CSS instead of SVG. See
+[test/index.pug](test/index.pug) to see both uses of `:inject()` with an
+`.svg` file.
 
 # CLI
 
-This package comes with `pug-pack`, which will compile this package's files
-first, and then compile your own `src` files. Any file naming collisions will
-override the default files from this package, so if you have
-`src/bootstrap.js`, that is the Bootstrap CSS that will be used.
+`pug-pack` will compile the assets in its own `src` directory first, and then
+compile your own `src` files. Any file naming collisions will override the
+files from `pug-pack`, so if you have `src/bootstrap.js`, that is the
+Bootstrap CSS that will be used.
 
 You can override the `src` and `dist` directories, and/or pass other options,
 such as:
@@ -173,9 +175,11 @@ See `pug-pack --help` for more, or see the CLI [here](lib/cli.coffee).
 You can `require('pug-pack')` yourself, if you really want to. The two main
 methods are:
 
-* `.self()` will process the assets in `pug-pack`'s own `src` directory
+* `.self()` will process the assets in `pug-pack`'s own `src` directory (there
+are no `.pug` files in this directory)
 
-* `.crawl(rootDir)` will process `rootDir`
+* `.crawl(rootDir)` will process the assets in `rootDir`, which should include
+one or more `.pug` files
 
 See the [CLI](lib/cli.coffee) as an example.
 
@@ -217,8 +221,7 @@ As noted above, avoid this issue by simply using
 `:inject(file="bootstrap.ss")`, without worrying about `include`. The filter
 is smart enough to figure out where to look for files.
 
-For `extend`, you will have to use the full relative path to `pug-pack/src`,
-i.e.
+For `extend`, you will have to use the full relative path to `pug-pack/src`:
 
 ```pug
 extend ../node_modules/pug-pack/src/_base

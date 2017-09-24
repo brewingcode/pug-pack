@@ -166,8 +166,8 @@ module.exports = self =
 
     yml: (s) -> yaml.load s
 
-  crawl: (root, handlePug) ->
-    @vars.basedir = path.resolve root
+  crawl: (rootDir, handlePug) ->
+    @vars.basedir = path.resolve rootDir
 
     execAsync("find '#{@vars.basedir}' -type f -print0").then (stdout) =>
       pug_files = []
