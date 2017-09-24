@@ -6,14 +6,14 @@
 npm install -g pug-pack
 ```
 
-`pug-pack` compiles your `src` directory into your `dist` directory, with
-assets (from both `pug-pack` and your own package) inlined into the resulting
-`.html` files. Each `.html` file is entirely self-contained, in order to bring
-network requests down to just one. Cleanly-formatted languages
+`pug-pack` takes all the `.pug` templates in your `src` directory, and renders
+each one as an `.html` file in a `dist` directory. A custom `:inject()` filter
+allows you to easily inline other assets (scripts, CSS, images) into the
+`.html` files. Cleanly-formatted languages
 ([.pug](https://pugjs.org/api/getting-started.html),
 [.coffee](http://coffeescript.org/), [.styl](http://stylus-lang.com/), and
 [.yml](http://www.yaml.org/start.html)) are supported, but you can fall back
-on files from the last 20 years if you need (or want) to.
+on files from the last 20 years if you have to.
 
 You can compile a few test files with:
 
@@ -25,44 +25,75 @@ open dist/index.html
 # pug
 
 The main files in `src` are your `.pug` files: these will each end up in
-the `dist` directory at the exact path they are at:
+the `dist` directory at the exact path they are at, relative to `src`:
 
     src/index.pug       --> dist/index.html
     src/foo/bar/baz.pug --> dist/foo/bar/baz.html
 
-Each `.pug` file is compiled with template variables generated from all the
-_other_ non-pug files in the `src` directory, such as scripts, styles, and
-images. These files are passed to Pug via:
+Each `.pug` file is compiled with content generated from all the _other_
+non-pug asset files in the `src` directory, such as scripts, styles, and
+images. These assets are included in Pug templates via:
 
-* the `inject` filter
+* custom `:inject()` filter
 
-* the `src` template variable
+* `src` template variable
 
-* (carefully) the `include` keyword combined with the `inject` filter (see
-"What's wrong with `include`?", below)
+* `include` keyword combined with the `:inject()` filter (but
+[read `include and extend`](#include-and-extend))
 
-See examples in [index.pug](test/index.pug) and [hyper.pug](test/hyper.pug).
+See [`non-pug files`](#non-pug-files) for more details, or some examples in
+[test/index.pug](test/index.pug) and [test/hyper.pug](test/hyper.pug). The
+`:inject()` filter is the main workhorse, and it can either:
 
-**Note:** To `extend` a `.pug` template from `pug-pack` (such as `_base.pug`),
-you need to use the full path to its location in your `node_modules`
-directory. See the "What's wrong with `include`?" section for why.
+* read an asset file and inline it as an HTML element
+
+* transform inlined content in the template into plain HTML content
 
 ```pug
-extend ../node_modules/pug-pack/src/_base
+html
+  head
+    // this will create a <style> tag with Bootstrap
+    :inject(file="bootstrap.css")
+
+    // this will also create a <style> tag, but processed by Stylus
+    :inject(ext="styl")
+      .current-time
+        color: red
+  body
+    .container-fluid
+      p The current time is
+        span.current-time
+
+    // this will create a <script> tag with JQuery
+    :inject(file="jquery.js")
+
+    // and another <script> with Moment.js
+    :inject(file="moment.js")
+
+    // one more <script> that is compiled with CoffeeScript
+    :inject(ext="coffee")
+      $('.current-time').text moment()
 ```
 
 # non-pug files
 
 The following file types are supported: `.coffee`, `.styl`, `.yml`, `.js`,
-`.css`, `.svg`, `.html`, and `.json`.
+`.css`, `.svg`, `.html`, and `.json`. Most of these are simple transforms of
+text-to-text:
 
-Most of these are simple transforms of text-to-text, but there are a few
-that are converted into objects. These require a little care:
+```pug
+:inject(file="jquery.js")
+:inject(ext="coffee")
+  $('body').text "Hello from CoffeeScript, it is #{new Date()}"
+```
+
+However, some of these file types are converted into objects. These require a
+little care:
 
 ### `.yml` and `.json`
 
-These files are simply converted to objects, so that Pug's templating can use
-them:
+These files are simply converted to objects, which you can use via the `src`
+template variable in your Pug templates:
 
 ```yml
 # people.yml
@@ -79,6 +110,13 @@ them:
 ul
   each val,key in src["people.yml"]
     li #{val.name} lives in #{val.city} and their SSN is #{key}
+
+// you can also get at raw file content, but :inject() is better
+script.
+  !{css['jquery.js']}
+  var people = !{src['people.yml']};
+  console.log('JQuery version ' + $.fn.jquery + 'loaded');
+  console.log('The following people exist:', people);
 ```
 
 ### `.svg`
@@ -105,25 +143,29 @@ first, and then compile your own `src` files. Any file naming collisions will
 override the default files from this package, so if you have
 `src/bootstrap.js`, that is the Bootstrap CSS that will be used.
 
-You can override the `src` and `dist` directories, and pass other options:
+You can override the `src` and `dist` directories, and/or pass other options,
+such as:
 
-```
-usage:
+* `--production` will minify everything as much as possible
 
-pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
-  [-v|--verbose]
+* `--watch` will use Nodemon to re-run your build on every change to `src`
 
-pug-pack [-l|--list] [-h|--help]
+* `--verbose` for more verbose output
 
-default: pug-pack ./src ./dist
-```
+* `--list` will list all files involved in the build
 
-The CLI is [here](lib/cli.coffee).
+See `pug-pack --help` for more, or see the CLI [here](lib/cli.coffee).
 
 # API
 
-You can `require('pug-pack')` yourself, if you really want to: see the
-[CLI](lib/cli.coffee) for more.
+You can `require('pug-pack')` yourself, if you really want to. The two main
+methods are:
+
+* `.self()` will process the assets in `pug-pack`'s own `src` directory
+
+* `.crawl(rootDir)` will process `rootDir`
+
+See the [CLI](lib/cli.coffee) as an example.
 
 # ignored files
 
@@ -137,12 +179,11 @@ compilation process. Some possible uses:
 
 * misc scripts
 
-# What's wrong with `include`?
+# `include` and `extend`
 
-Due to the way `pug-pack` does a two-pass build (once in its own `src`
-directory, and again in _your_ `src` directory), `include:inject` has a
-pitfall: you can only (easily) `include:inject` files that are present in
-_your own_ `src` directory.
+Because these two keywords read files before the `:inject()` filter can look
+them up, you need to be very explicit when using these keywords to get assets
+from `pug-pack` itself.
 
 For example, to `include` Bootstrap from `pug-pack`, you might try:
 
@@ -163,3 +204,10 @@ from `pug-pack` you would need to use:
 As noted above, avoid this issue by simply using
 `:inject(file="bootstrap.ss")`, without worrying about `include`. The filter
 is smart enough to figure out where to look for files.
+
+For `extend`, you will have to use the full relative path to `pug-pack/src`,
+i.e.
+
+```pug
+extend ../node_modules/pug-pack/src/_base
+```
