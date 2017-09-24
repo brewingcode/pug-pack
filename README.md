@@ -1,6 +1,6 @@
 # pug-pack
 
-> Pseudo-webpack for developers who like clean formatting
+> Static site generator for developers who like clean formatting
 
 ```sh
 npm install -g pug-pack
@@ -52,25 +52,27 @@ See [`non-pug files`](#non-pug-files) for more details, or some examples in
 ```pug
 html
   head
-    // this will create a <style> tag with Bootstrap
+    // this will create a <style> tag with Bootstrap's CSS
     :inject(file="bootstrap.css")
 
-    // this will also create a <style> tag, but processed by Stylus
+    // this will also create a <style> tag, but with the inline Stylus
+    // transpiled to CSS
     :inject(ext="styl")
       .current-time
         color: red
+
   body
     .container-fluid
       p The current time is
         span.current-time
 
-    // this will create a <script> tag with JQuery
+    // this will create a <script> tag with JQuery's code
     :inject(file="jquery.js")
 
-    // and another <script> with Moment.js
+    // and another <script> with Moment.js's code
     :inject(file="moment.js")
 
-    // one more <script> that is compiled with CoffeeScript
+    // one more <script>, transpiled with CoffeeScript into plain JavaScript
     :inject(ext="coffee")
       $('.current-time').text moment()
 ```
@@ -111,7 +113,8 @@ ul
   each val,key in src["people.yml"]
     li #{val.name} lives in #{val.city} and their SSN is #{key}
 
-// you can also get at raw file content, but :inject() is better
+// note that `src` also has all the asset files, which can be included with
+// a !{...}, but :inject() is better
 script.
   !{css['jquery.js']}
   var people = !{src['people.yml']};
