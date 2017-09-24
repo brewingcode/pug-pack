@@ -95,10 +95,11 @@ little care:
 ### `.yml` and `.json`
 
 These files are simply converted to objects, which you can use via the `src`
-template variable in your Pug templates:
+template variable in your Pug templates. Each file is accessed via it's
+relative path from the `src` directory:
 
 ```yml
-# people.yml
+# src/people.yml
 123:
   name: Spongebob Squarepants
   location: a pineapple under the sea
@@ -112,14 +113,22 @@ template variable in your Pug templates:
 ul
   each val,key in src["people.yml"]
     li #{val.name} lives in #{val.city} and their SSN is #{key}
+```
 
-// note that `src` also has all the asset files, which can be included with
-// a !{...}, but :inject() is better
+Note that `src` also has _all_ the asset files, not just the `.yml` and
+`.json` files. You can use Pug's `!{...}` interpolation to include these
+assets directly, if you have a good reason to. For example, you declare the
+data in a `.yml` file as a client-side JavaScript variable and use it:
+
+```pug
+:inject(file="jquery.js")
 script.
-  !{css['jquery.js']}
-  var people = !{src['people.yml']};
-  console.log('JQuery version ' + $.fn.jquery + 'loaded');
-  console.log('The following people exist:', people);
+  var people = !{JSON.stringify(src['people.yml'])};
+  Object.keys(people).forEach(function(ssn) {
+    var name = people[ssn].name;
+    var city = people[ssn].city;
+    $('ul').append('<li>' + city + ' is where ' + name + 'lives!</li>');
+  });
 ```
 
 ### `.svg`
