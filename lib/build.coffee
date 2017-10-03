@@ -127,7 +127,11 @@ module.exports = self =
       else
         s
 
-    styl: (s) -> self.exts.css styl.render s
+    styl: (s) ->
+      css = styl(s)
+        .include self.vars.basedir
+        .render()
+      self.exts.css css
 
     svg: (s, filename) ->
       new pr (resolve) ->
