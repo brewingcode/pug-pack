@@ -21,6 +21,8 @@ $('body').append """
   </div>
 """
 
+$('input[placeholder="regex"]').focus()
+
 $("##{id} input").on 'input', $.debounce 250, ->
   sel = $('input[placeholder="selector"]').val()
   q = $('input[placeholder="regex"]').val()
