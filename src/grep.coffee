@@ -12,6 +12,7 @@
 `
 
 id = 'a368f23f8175'
+history = {}
 
 $('body').append """
   <div id="#{id}" style="position:fixed;top:0;z-index:9999999999;">
@@ -30,5 +31,12 @@ $("##{id} input").on 'input', $.debounce 250, ->
           $(this).css 'display', ''
         else
           $(this).css 'display', 'none'
+          history[sel] = [] unless history[sel]
+          history[sel].push this
       else
         $(this).css 'display', ''
+  else
+    for own sel, elements of history
+      for el in elements
+        $(el).css 'display', ''
+      delete history[sel]
