@@ -16,6 +16,8 @@ history = {}
 
 $('body').append """
   <div id="#{id}" style="position:fixed;top:0;z-index:9999999999;">
+    <a href="#">[x]</a>
+    <span>&nbsp;</span>
     <input type="text" placeholder="selector" value="tr"/>
     <input type="text" placeholder="regex"/>
   </div>
@@ -42,3 +44,7 @@ $("##{id} input").on 'input', $.debounce 250, ->
       for el in elements
         $(el).css 'display', ''
       delete history[sel]
+
+$("##{id} a").on 'click', ->
+  $(this).parent().remove()
+  return false
