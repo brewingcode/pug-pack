@@ -14,7 +14,7 @@
 id = 'a368f23f8175'
 
 $('body').append """
-  <div id="#{id}" style="position:fixed;top:0;z-index:9999;">
+  <div id="#{id}" style="position:fixed;top:0;z-index:9999999999;">
     <input type="text" placeholder="selector" value="tr"/>
     <input type="text" placeholder="regex"/>
   </div>
