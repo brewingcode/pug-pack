@@ -1,8 +1,6 @@
 extends ../src/_base
 
 append body
-  :inject(file="zepto-core.js")
-  :inject(file="pug.js")
   center
     table.itemlist(border='0', cellpadding='0', cellspacing='0')
       tr#15409376.athing
@@ -1062,4 +1060,5 @@ append body
         td(colspan='2')
         td.title
           a.morelink(href='news?p=2', rel='nofollow') More
+  :inject(file="jquery.js")
   :inject(file="grep.coffee")
