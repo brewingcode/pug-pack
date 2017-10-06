@@ -13,18 +13,22 @@
 
 id = 'a368f23f8175'
 
-$('body').append pug.render """
-  ##{id}(style="position:fixed;top:0;")
-    input(type="text", placeholder="searches")
+$('body').append """
+  <div id="#{id}" style="position:fixed;top:0;z-index:9999;">
+    <input type="text" placeholder="selector" value="tr"/>
+    <input type="text" placeholder="regex"/>
+  </div>
 """
 
 $("##{id} input").on 'input', $.debounce 250, ->
-  q = $(this).val()
-  $('tr').each ->
-    if q
-      if $(this).text().match new RegExp(q, 'i')
-        $(this).css 'display', ''
+  sel = $('input[placeholder="selector"]').val()
+  q = $('input[placeholder="regex"]').val()
+  if sel
+    $(sel).each ->
+      if q
+        if $(this).text().match new RegExp(q, 'i')
+          $(this).css 'display', ''
+        else
+          $(this).css 'display', 'none'
       else
-        $(this).css 'display', 'none'
-    else
-      $(this).css 'display', ''
+        $(this).css 'display', ''
