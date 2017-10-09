@@ -13,15 +13,22 @@
 
 id = 'a368f23f8175'
 history = {}
+showing = false
 
-$('body').append """
-  <div id="#{id}" style="position:fixed;top:0;z-index:9999999999;">
-    <a href="#">[x]</a>
-    <span>&nbsp;</span>
-    <input type="text" placeholder="selector" value="tr"/>
-    <input type="text" placeholder="regex"/>
-  </div>
-"""
+show = ->
+  $('body').append """
+    <div id="#{id}" style="position:fixed;top:0;z-index:9999999999;">
+      <a href="#">[x]</a>
+      <span>&nbsp;</span>
+      <input type="text" placeholder="selector" value="tr"/>
+      <input type="text" placeholder="regex"/>
+    </div>
+  """
+  showing = true
+
+hide = ->
+  $("##{id}").remove()
+  showing = false
 
 $('input[placeholder="regex"]').focus()
 
@@ -48,3 +55,5 @@ $("##{id} input").on 'input', $.debounce 250, ->
 $("##{id} a").on 'click', ->
   $(this).parent().remove()
   return false
+
+show()
