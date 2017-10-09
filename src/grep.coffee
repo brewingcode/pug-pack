@@ -26,34 +26,34 @@ show = ->
   """
   showing = true
 
+  $('input[placeholder="regex"]').focus()
+
+  $("##{id} input").on 'input', $.debounce 250, ->
+    sel = $('input[placeholder="selector"]').val()
+    q = $('input[placeholder="regex"]').val()
+    if sel
+      $(sel).each ->
+        if q
+          if $(this).text().match new RegExp(q, 'i')
+            $(this).css 'display', ''
+          else
+            $(this).css 'display', 'none'
+            history[sel] = [] unless history[sel]
+            history[sel].push this
+        else
+          $(this).css 'display', ''
+    else
+      for own sel, elements of history
+        for el in elements
+          $(el).css 'display', ''
+        delete history[sel]
+
+  $("##{id} a").on 'click', ->
+    $(this).parent().remove()
+    return false
+
 hide = ->
   $("##{id}").remove()
   showing = false
-
-$('input[placeholder="regex"]').focus()
-
-$("##{id} input").on 'input', $.debounce 250, ->
-  sel = $('input[placeholder="selector"]').val()
-  q = $('input[placeholder="regex"]').val()
-  if sel
-    $(sel).each ->
-      if q
-        if $(this).text().match new RegExp(q, 'i')
-          $(this).css 'display', ''
-        else
-          $(this).css 'display', 'none'
-          history[sel] = [] unless history[sel]
-          history[sel].push this
-      else
-        $(this).css 'display', ''
-  else
-    for own sel, elements of history
-      for el in elements
-        $(el).css 'display', ''
-      delete history[sel]
-
-$("##{id} a").on 'click', ->
-  $(this).parent().remove()
-  return false
 
 show()
