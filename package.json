@@ -5,6 +5,7 @@
   "scripts": {
     "start": "nodemon -w src -w lib -w test -e pug,js,coffee,styl,css,svg,json,yml -x 'npm run build'",
     "build": "coffee -r ./lib/build -e 'build.verbose = true; build.self true'",
+    "css-grep": "npm run prod && grep '^!function' dist/grep.html > css-grep/grep.js",
     "prod": "NODE_ENV=production npm run build"
   },
   "bin": {

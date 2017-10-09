@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "CSS Grep",
+  "description": "Greps a regex through DOM elements specified by a CSS selector",
+  "version": "1.0",
+  "browser_action": {
+    "default_title": "CSS Grep"
+  },
+  "permissions": [
+    "activeTab"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  }
+}
