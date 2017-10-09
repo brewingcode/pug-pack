@@ -4,7 +4,8 @@
   "description": "Greps a regex through DOM elements specified by a CSS selector",
   "version": "1.0",
   "browser_action": {
-    "default_title": "CSS Grep"
+    "default_title": "CSS Grep",
+    "default_icon": "inactive.png"
   },
   "permissions": [
     "activeTab"
