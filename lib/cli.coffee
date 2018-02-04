@@ -4,7 +4,8 @@ build = require './build'
 nodemon = require 'nodemon'
 { quote } = require 'shell-quote'
 fs = require 'fs'
-argv = require('minimist')(process.argv.slice(2))
+argv = require('minimist') process.argv.slice(2),
+  boolean: ['p', 'prod', 'production', 'w', 'watch', 'v', 'verbose']
 
 if argv.h or argv.help
   console.log """
