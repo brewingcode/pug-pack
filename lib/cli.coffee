@@ -45,6 +45,11 @@ if argv.w or argv.watch
     else if message
       console.log colour
   .on 'quit', -> process.exit()
+
+  livereload = require 'livereload'
+  server = livereload.createServer()
+  server.watch(build.dist)
+
 else if argv.l or argv.list
   build.self().then ->
     console.log '## assets from pug-pack'

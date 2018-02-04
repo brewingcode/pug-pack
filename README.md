@@ -175,7 +175,9 @@ such as:
 
 * `--production` will minify everything as much as possible
 
-* `--watch` will use Nodemon to re-run your build on every change to `src`
+* `--watch` will use Nodemon to re-run your build on every change to `src`,
+  and will start a livereload server on http://localhost:35729 to watch
+  `dist`
 
 * `--verbose` for more verbose output
 
