@@ -3,7 +3,20 @@
 > Static site generator for developers who like clean formatting
 
 ```sh
-npm install -g pug-pack
+yarn add pug-pack
+mkdir -p src
+cat <<EOF > src/index.pug
+extends ../node_modules/pug-pack/src/_base
+
+append head
+  :inject(file="bootstrap.css")
+
+append body
+  .container
+    p Hello from pug-pack and Bootstrap
+EOF
+./node_modules/.bin/pug-pack
+open dist/index.html
 ```
 
 `pug-pack` takes all the `.pug` templates in your `src` directory, and renders
