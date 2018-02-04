@@ -5,7 +5,7 @@ nodemon = require 'nodemon'
 { quote } = require 'shell-quote'
 fs = require 'fs'
 argv = require('minimist') process.argv.slice(2),
-  boolean: ['p', 'prod', 'production', 'w', 'watch', 'v', 'verbose']
+  boolean: ['p', 'prod', 'production', 'w', 'watch', 'v', 'verbose', 'V', 'version']
 
 if argv.h or argv.help
   console.log """
@@ -14,12 +14,17 @@ usage:
 pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
   [-v|--verbose]
 
-pug-pack [-l|--list] [-h|--help]
+pug-pack [-l|--list] [-h|--help] [-V|--version]
 
 default: pug-pack ./src ./dist
 """
   process.exit()
 
+if argv.V or argv.version
+  pkg = require('../package.json')
+  console.log pkg.version
+  process.exit()
+  
 if argv.p or argv.prod or argv.production
   build.prod = true
 
