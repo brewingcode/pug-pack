@@ -17,6 +17,7 @@
     "csso": "^3.2.0",
     "html-minifier": "^3.5.5",
     "js-yaml": "^3.10.0",
+    "livereload": "^0.6.3",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "nodemon": "^1.12.1",
