@@ -24,7 +24,7 @@ if argv.V or argv.version
   pkg = require('../package.json')
   console.log pkg.version
   process.exit()
-  
+
 if argv.p or argv.prod or argv.production
   build.prod = true
 
@@ -63,7 +63,8 @@ else if argv.l or argv.list
     console.log(f) for f in pp
     build.crawl(src).then ->
       console.log '## assets from you'
-      console.log(f) for f in Object.keys(build.vars.src).filter (x) ->
+      Object.keys(build.vars.src).filter (x) ->
         x not in pp
+      .forEach console.log
 else
   build.self().then -> build.crawl src, true
