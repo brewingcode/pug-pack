@@ -130,7 +130,7 @@ module.exports = self =
       self.exts.css css
 
     svg: (s, filename) ->
-      new pr (resolve) ->
+      pr.try ->
         { name } = self.parsename filename
 
         plugins = []
@@ -139,8 +139,8 @@ module.exports = self =
         plugins.push
           removeDimensions: true
 
-        prs.push new pr (resolve) ->
-          new svgo( {plugins} ).optimize s, resolve
+        prs.push pr.try ->
+          new svgo( {plugins} ).optimize s
 
         plugins.push
           addClassesToSVGElement:
@@ -148,13 +148,12 @@ module.exports = self =
         plugins.push
           removeXMLNS: true
 
-        prs.push new pr (resolve) ->
-          new svgo( {plugins} ).optimize s, resolve
+        prs.push pr.try ->
+          new svgo( {plugins} ).optimize s
 
         pr.all(prs).then ([forCSS, forDOM]) ->
-          resolve
-            forCSS: forCSS.data
-            forDOM: forDOM.data
+          forCSS: forCSS.data
+          forDOM: forDOM.data
 
     html: (s) ->
       if self.prod
