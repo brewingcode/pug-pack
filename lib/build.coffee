@@ -69,29 +69,29 @@ module.exports = self =
   parsename: (f) ->
     parts = path.parse f
     parts.ext = parts.ext.replace /^\./, ''
-    parts.absfile = path.resolve @vars.basedir, f
-    parts.absdir = path.resolve @vars.basedir
+    parts.absfile = path.resolve self.vars.basedir, f
+    parts.absdir = path.resolve self.vars.basedir
     parts.srcname = parts.absfile.replace(new RegExp(parts.absdir, 'i'), '').replace(/^\//, '')
     parts
 
   pug: (file, outfile) ->
-    log 'pug:', file, outfile, @vars.basedir, @dist
-    mkdirp.sync @dist
-    @vars.pretty = not @prod
-    fs.writeFileAsync "#{@dist}/#{outfile}", pug.renderFile file, @vars
+    log 'pug:', file, outfile, self.vars.basedir, self.dist
+    mkdirp.sync self.dist
+    self.vars.pretty = not self.prod
+    fs.writeFileAsync "#{self.dist}/#{outfile}", pug.renderFile file, self.vars
 
   # call as either transform(filename) or transform(ext, text)
   transform: (args...) ->
     if args.length is 1
       filename = args[0]
       s = fs.readFileSync filename, 'utf8'
-      { ext } = @parsename filename
+      { ext } = self.parsename filename
     else
       [ ext, s ] = args
       filename = 'inline'
 
     pr.try ->
-      @exts[ext](s, filename)
+      self.exts[ext](s, filename)
     .catch (err) ->
       console.error 'transform error:', err
 
@@ -167,39 +167,39 @@ module.exports = self =
     yml: (s) -> yaml.load s
 
   crawl: (rootDir, handlePug) ->
-    @vars.basedir = path.resolve rootDir
+    self.vars.basedir = path.resolve rootDir
 
-    execAsync("find '#{@vars.basedir}' -type f -print0").then (stdout) =>
+    execAsync("find '#{self.vars.basedir}' -type f -print0").then (stdout) =>
       pug_files = []
       other_files = []
 
       stdout.split('\0').forEach (f) =>
         return unless f
-        { name, ext, srcname } = @parsename f
+        { name, ext, srcname } = self.parsename f
         if name.match(/^_/)
           log "skip: #{f}"
-          @vars.src[srcname] = null
+          self.vars.src[srcname] = null
         else if ext is 'pug'
           pug_files.push f
-          @vars.src[srcname] = null
-        else if @exts[ext]
+          self.vars.src[srcname] = null
+        else if self.exts[ext]
           other_files.push f
 
       pr.each other_files, (f) =>
         log 'reading:', f
-        { srcname } = @parsename f
-        unless @vars.src[srcname]
-          @transform(f).then (out) =>
-            @vars.src[srcname] = out
+        { srcname } = self.parsename f
+        unless self.vars.src[srcname]
+          self.transform(f).then (out) =>
+            self.vars.src[srcname] = out
       .then =>
         if handlePug
           pr.each pug_files, (f) =>
             outfile = f.replace /\.pug$/i, '.html'
-            { srcname } = @parsename outfile
-            @pug f, srcname
+            { srcname } = self.parsename outfile
+            self.pug f, srcname
     .catch console.error
 
   self: (testPug) ->
-    @crawl("#{__dirname}/../src").then =>
+    self.crawl("#{__dirname}/../src").then =>
       if testPug
-        @crawl("#{__dirname}/../test", true)
+        self.crawl("#{__dirname}/../test", true)
