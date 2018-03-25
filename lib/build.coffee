@@ -90,14 +90,10 @@ module.exports = self =
       [ ext, s ] = args
       filename = 'inline'
 
-    if ext is 'svg'
+    pr.try ->
       @exts[ext](s, filename)
-    else
-      try
-        pr.resolve @exts[ext](s, filename)
-      catch err
-        console.error 'transform error:', args
-        throw err
+    .catch (err) ->
+      console.error 'transform error:', err
 
   # each of these takes the same two arguments:
   # - some text content
