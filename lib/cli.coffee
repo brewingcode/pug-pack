@@ -1,8 +1,7 @@
 #!/usr/bin/env coffee
 
 build = require './build'
-nodemon = require 'nodemon'
-{ quote } = require 'shell-quote'
+browserSync = require 'browser-sync'
 fs = require 'fs'
 argv = require('minimist') process.argv.slice(2),
   boolean: ['p', 'prod', 'production', 'w', 'watch', 'v', 'verbose', 'V', 'version']
@@ -35,26 +34,14 @@ src = if argv._.length > 0 then argv._[0] else './src'
 build.dist = if argv._.length > 1 then argv._[1] else './dist'
 
 if argv.w or argv.watch
-  args = [ "#{__dirname}/cli.coffee", src, build.dist ]
-  args.push '-p' if build.prod
-  args.push '-v' if build.verbose
-
-  nodemon
-    watch: src
-    ext: '*'
-    exec: quote args
-    verbose: true
-  .on 'log', ({type, message, colour}) ->
-    if type is 'detail'
-      if fs.existsSync message
-        console.log colour
-    else if message
-      console.log colour
-  .on 'quit', -> process.exit()
-
-  livereload = require 'livereload'
-  server = livereload.createServer()
-  server.watch(build.dist)
+  bs = browserSync.create()
+  build.self().then ->
+    bs.watch('./src/**/*').on 'change', (args...) ->
+      build.self().then ->
+        bs.reload(args...)
+    bs.init
+      server: './dist'
+      host: process.env.HOST or '127.0.0.1'
 
 else if argv.l or argv.list
   build.self().then ->
