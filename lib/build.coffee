@@ -76,9 +76,10 @@ module.exports = self =
 
   pug: (file, outfile) ->
     log 'pug:', file, outfile, self.vars.basedir, self.dist
-    mkdirp.sync self.dist
+    destFile = path.join self.dist, outfile
+    mkdirp.sync path.dirname destFile
     self.vars.pretty = not self.prod
-    fs.writeFileAsync "#{self.dist}/#{outfile}", pug.renderFile file, self.vars
+    fs.writeFileAsync destFile, pug.renderFile file, self.vars
 
   # call as either transform(filename) or transform(ext, text)
   transform: (args...) ->
