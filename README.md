@@ -15,7 +15,7 @@ append body
   .container
     p Hello from pug-pack and Bootstrap
 EOF
-./node_modules/.bin/pug-pack
+npx pug-pack
 open dist/index.html
 ```
 
@@ -61,6 +61,9 @@ See [`non-pug files`](#non-pug-files) for more details, or some examples in
 * read an asset file and inline it as an HTML element
 
 * transform inlined content in the template into plain HTML content
+
+* injected content can be asyncronously generated, which is not possible with
+standard `pug`
 
 ```pug
 html
@@ -167,20 +170,20 @@ tell the filter to produce CSS instead of SVG. See
 
 `pug-pack` will compile the assets in its own `src` directory first, and then
 compile your own `src` files. Any file naming collisions will override the
-files from `pug-pack`, so if you have `src/bootstrap.js`, that is the
-Bootstrap CSS that will be used.
+files from `pug-pack` in favor of your version, so if you have
+`src/bootstrap.css`, that is the Bootstrap CSS that will be used.
 
 You can override the `src` and `dist` directories, and/or pass other options,
 such as:
 
-* `--production` will minify everything as much as possible
+* `--production`/`-p` will minify everything as much as possible
 
-* `--watch` will use `browser-sync` watch `src` and re-run your build on every
-  change
+* `--watch`/`w` will use `browser-sync` to watch `src` and re-run your build
+on every change
 
-* `--verbose` for more verbose output
+* `--verbose`/`-v` for more verbose output
 
-* `--list` will list all files involved in the build
+* `--list`/`-l` will list all files involved in the build
 
 See `pug-pack --help` for more, or see the CLI [here](lib/cli.coffee).
 
@@ -190,7 +193,8 @@ You can `require('pug-pack')` yourself, if you really want to. The two main
 methods are:
 
 * `.self()` will process the assets in `pug-pack`'s own `src` directory (there
-are no `.pug` files in this directory)
+are no public `.pug` files in this directory, only .pug files prefixed with `_`
+to denote they are skipped for compilation to .html)
 
 * `.crawl(rootDir)` will process the assets in `rootDir`, which should include
 one or more `.pug` files
