@@ -35,7 +35,7 @@ build.dist = if argv._.length > 1 then argv._[1] else './dist'
 
 fullBuild = ->
   build.self().then ->
-    build.crawl(src, true)
+    build.crawl(src)
 
 if argv.w or argv.watch
   fullBuild().then ->
@@ -54,7 +54,7 @@ else if argv.l or argv.list
     console.log '## assets from pug-pack'
     pp = Object.keys build.vars.src
     console.log(f) for f in pp
-    build.crawl(src).then ->
+    build.crawl(src, true).then ->
       console.log '## assets from you'
       Object.keys(build.vars.src).filter (x) ->
         x not in pp
