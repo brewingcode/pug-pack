@@ -41,13 +41,13 @@ if argv.w or argv.watch
   fullBuild().then ->
     bs = browserSync.create()
 
-    bs.watch './src/**/*', null, (e) ->
+    bs.watch src+'/**/*', null, (e) ->
       if e is 'change'
         build.vars.src = {}
         fullBuild().then -> bs.reload()
 
     bs.init
-      server: './dist'
+      server: build.dist
       host: process.env.HOST or '127.0.0.1'
 
 else if argv.l or argv.list
