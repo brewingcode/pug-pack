@@ -33,12 +33,18 @@ if argv.v or argv.verbose
 src = if argv._.length > 0 then argv._[0] else './src'
 build.dist = if argv._.length > 1 then argv._[1] else './dist'
 
-if argv.w or argv.watch
-  bs = browserSync.create()
+fullBuild = ->
   build.self().then ->
-    bs.watch('./src/**/*').on 'change', (args...) ->
-      build.self().then ->
-        bs.reload(args...)
+    build.crawl(src, true)
+
+if argv.w or argv.watch
+  fullBuild().then ->
+    bs = browserSync.create()
+
+    bs.watch './src/**/*', null, (e) ->
+      if e is 'change'
+        fullBuild().then -> bs.reload()
+
     bs.init
       server: './dist'
       host: process.env.HOST or '127.0.0.1'
@@ -54,4 +60,4 @@ else if argv.l or argv.list
         x not in pp
       .forEach console.log
 else
-  build.self().then -> build.crawl src, true
+  fullBuild()
