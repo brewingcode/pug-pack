@@ -168,8 +168,10 @@ module.exports = self =
 
   # crawls the filesystem and always does one thing, and usually does a second:
   # 1. find all non-pug files to transform into pug variable (sync AND async)
-  # 2. (handlePug) do the pug compilation, which CANNOT do async
-  crawl: (rootDir, handlePug) ->
+  # 2. do the pug compilation, which CANNOT do async...unless you want set
+  # `skipPug`, because you're just dumping info about what happened in stage
+  # 1, for example
+  crawl: (rootDir, skipPug) ->
     self.vars.basedir = path.resolve rootDir
 
     execAsync("find '#{self.vars.basedir}' -type f -print0").then (stdout) =>
@@ -195,7 +197,7 @@ module.exports = self =
           self.transform(f).then (out) =>
             self.vars.src[srcname] = out
       .then =>
-        if handlePug
+        unless skipPug
           pr.each pug_files, (f) =>
             outfile = f.replace /\.pug$/i, '.html'
             { srcname } = self.parsename outfile
