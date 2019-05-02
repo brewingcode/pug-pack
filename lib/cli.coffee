@@ -43,6 +43,7 @@ if argv.w or argv.watch
 
     bs.watch './src/**/*', null, (e) ->
       if e is 'change'
+        build.vars.src = {}
         fullBuild().then -> bs.reload()
 
     bs.init
