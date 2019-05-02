@@ -166,6 +166,9 @@ module.exports = self =
 
     yml: (s) -> yaml.load s
 
+  # crawls the filesystem and always does one thing, and usually does a second:
+  # 1. find all non-pug files to transform into pug variable (sync AND async)
+  # 2. (handlePug) do the pug compilation, which CANNOT do async
   crawl: (rootDir, handlePug) ->
     self.vars.basedir = path.resolve rootDir
 
