@@ -59,6 +59,6 @@ else if argv.l or argv.list
       console.log '## assets from you'
       Object.keys(build.vars.src).filter (x) ->
         x not in pp
-      .forEach console.log
+      .forEach (x) -> console.log x
 else
   fullBuild()
