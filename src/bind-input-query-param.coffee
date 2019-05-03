@@ -30,28 +30,32 @@ do ->
     key = cacheKey(sel)
     if cache[key]
       throw new Error '.setup() called twice for selector:', sel
-    if not document.querySelector(sel)
+
+    el = -> document.querySelector(sel)
+    if not el()
       throw new Error 'no element found for selector:', sel
+
     if fn and typeof fn isnt 'function'
       throw new Error "second argument must be a function instead of:", fn
+
     delay = if delay then +delay else 300
 
     cache[key] =
-      val: document.querySelector(sel).value
+      val: el().value
       timer: null
       readParam: false
 
-    document.querySelector(sel).onfocus = ->
+    el().onfocus = ->
       # set the input value from the query param, but only on first focus,
       # so that any "placeholder" attribute is still visible
       if not cache[key].readParam and params.has(paramKey(sel))
         cache[key].readParam = true
         val = params.get(paramKey(sel))
-        if val isnt document.querySelector(sel).value
-          document.querySelector(sel).value = val
+        if val isnt el().value
+          el().value = val
 
-    document.querySelector(sel).onkeyup = (e) ->
-      val = document.querySelector(sel).value
+    el().onkeyup = (e) ->
+      val = el().value
 
       # update the query string all the time, and do it immediately
       if /\S/.test(val)
@@ -65,7 +69,7 @@ do ->
       window.history.replaceState({}, '', "#{window.location.pathname}#{query}")
 
       # depending on what key was pressed or whether the input value has changed,
-      # we either fire the binding immediately or after a short debounce
+      # we either fire the js function immediately or after a short debounce
       update = (ms) ->
         cache[key].val = val
         if fn
