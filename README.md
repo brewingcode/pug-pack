@@ -201,19 +201,10 @@ one or more `.pug` files
 
 See the [CLI](lib/cli.coffee) as an example.
 
-# ignored files
-
-Any files under `src` that begin with an underscore are ignored by the
-compilation process. Some possible uses:
-
-* `.pug` files that don't map to an `.html` file, for instance shared headers
-  and footers
-
-* re-useable modules (`.coffee`, `.styl`, or `.js`)
-
-* misc scripts
-
 # `include` and `extend`
+
+**tl;dr** Use `:inject(file=...)` instead of `include`, and be careful when
+using `extend` with .pug files outside your `src` directory.
 
 Because these two keywords read files before the `:inject()` filter can look
 them up, you need to be very explicit when using these keywords to get assets
@@ -243,4 +234,20 @@ For `extend`, you will have to use the full relative path to `pug-pack/src`:
 
 ```pug
 extend ../node_modules/pug-pack/src/_base
+```
+
+# helpers
+
+## bind-input-query-param
+
+[This](./src/bind-input-query-params.coffee) is a function to bind \<input>
+elements to url query params, with a few extra conveniences around that. After
+`:inject`ing it, simply call `bindInputQueryParam('#your-element-id')`, eg:
+
+```pug
+input#query
+:inject(file="bind-input-query-param.coffee")
+:inject(ext="coffee")
+  bindInputQueryParam '#query', ->
+    console.log 'the url query string was updated, look at it!'
 ```
