@@ -10,13 +10,7 @@
 #   - the <input> value has changed (after waiting a debounce delay)
 #   - the <input> receives an Enter keypress, then the binding fires immediately
 #
-# Example pug:
-#
-#   input#query
-#   :inject(file="bind-input-query-param.coffee")
-#   :inject(ext="coffee")
-#     bindInputQueryParam '#query', ->
-#       console.log 'the query was updated, look at the url!'
+# See the readme for an example
 
 do ->
   params = new URLSearchParams(window.location.search)
