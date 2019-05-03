@@ -63,9 +63,7 @@ do ->
         query = "?#{params}"
       else
         params.delete paramKey(sel)
-        size = 0
-        size++ for p in params.keys()
-        query = if size > 0 then "?#{params}" else ""
+        query = if "#{params}".length then "?#{params}" else ""
       window.history.replaceState({}, '', "#{window.location.pathname}#{query}")
 
       # depending on what key was pressed or whether the input value has changed,
