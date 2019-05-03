@@ -26,12 +26,7 @@ do ->
 
   window.bindInputQueryParam = (sel, fn, delay) ->
     # sets up everything to bind an element's value to a query param, and
-    # optionall to a function
-    #
-    # NOTE: this checks the query param in the current url, and if it does not
-    # match what's in the .value, the .value will be updated to match the
-    # query param
-
+    # optionally to a js function
     key = cacheKey(sel)
     if cache[key]
       throw new Error '.setup() called twice for selector:', sel
@@ -41,15 +36,19 @@ do ->
       throw new Error "second argument must be a function instead of:", fn
     delay = if delay then +delay else 300
 
-    # set the input value from the query param, if needed
-    if params.has(paramKey(sel))
-      val = params.get(paramKey(sel))
-      if val isnt document.querySelector(sel).value
-        document.querySelector(sel).value = val
-
     cache[key] =
       val: document.querySelector(sel).value
       timer: null
+      readParam: false
+
+    document.querySelector(sel).onfocus = ->
+      # set the input value from the query param, but only on first focus,
+      # so that any "placeholder" attribute is still visible
+      if not cache[key].readParam and params.has(paramKey(sel))
+        cache[key].readParam = true
+        val = params.get(paramKey(sel))
+        if val isnt document.querySelector(sel).value
+          document.querySelector(sel).value = val
 
     document.querySelector(sel).onkeyup = (e) ->
       val = document.querySelector(sel).value
