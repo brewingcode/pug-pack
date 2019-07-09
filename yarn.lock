@@ -498,7 +498,7 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-coffeescript@^2.3.2:
+coffeescript@^2, coffeescript@^2.3.2:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/coffeescript/-/coffeescript-2.4.1.tgz#815fd337df0a34d49e74a98a6ebea9c3e7930f70"
   integrity sha512-34GV1aHrsMpTaO3KfMJL40ZNuvKDR/g98THHnE9bQj8HjMaZvSrLik99WWqyMhRtbe8V5hpx5iLgdcSvM/S2wg==
@@ -1495,6 +1495,12 @@ jsonfile@^3.0.0:
   integrity sha1-pezG9l9T9mLEQVx2daAzHQmS7GY=
   optionalDependencies:
     graceful-fs "^4.1.6"
+
+jstransformer-coffeescript@zdenko/jstransformer-coffeescript:
+  version "0.1.1"
+  resolved "https://codeload.github.com/zdenko/jstransformer-coffeescript/tar.gz/090a2f6c5ef5ed241a7c994597b967bbfc0a0915"
+  dependencies:
+    coffeescript "^2"
 
 jstransformer@1.0.0:
   version "1.0.0"
