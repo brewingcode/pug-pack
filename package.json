@@ -1,6 +1,6 @@
 {
   "name": "pug-pack",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Pseudo-webpack for developers who like clean formatting",
   "scripts": {
     "start": "nodemon -w src -w lib -w test -e pug,js,coffee,styl,css,svg,json,yml -x 'npm run build'",
