@@ -53,12 +53,13 @@ if argv.w or argv.watch
 else if argv.l or argv.list
   build.self().then ->
     console.log '## assets from pug-pack'
-    pp = Object.keys build.vars.src
-    console.log(f) for f in pp
+    baseAssets = Object.keys build.vars.src
+    for k in baseAssets
+      console.log k, build.vars.files[k]
     build.crawl(src, true).then ->
       console.log '## assets from you'
       Object.keys(build.vars.src).filter (x) ->
-        x not in pp
-      .forEach (x) -> console.log x
+        x not in baseAssets
+      .forEach (x) -> console.log x, build.vars.files[x]
 else
   fullBuild()

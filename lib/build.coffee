@@ -22,6 +22,7 @@ module.exports = self =
   verbose: false
   vars:
     src: {}
+    files: {}
     filters:
       inject: (text, options) ->
         log 'inject:', text.replace(/\n/g, '').slice(0, 60) + '...', options
@@ -72,6 +73,7 @@ module.exports = self =
     parts.absfile = path.resolve self.vars.basedir, f
     parts.absdir = path.resolve self.vars.basedir
     parts.srcname = parts.absfile.replace(new RegExp(parts.absdir, 'i'), '').replace(/^\//, '')
+    self.vars.files[parts.srcname] = parts.absfile
     parts
 
   pug: (file, outfile) ->
