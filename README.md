@@ -51,9 +51,6 @@ images. These assets are included in Pug templates via:
 
 * `src` template variable
 
-* `include` keyword combined with the `:inject()` filter (but
-[read `include and extend`](#include-and-extend))
-
 See [`non-pug files`](#non-pug-files) for more details, or some examples in
 [test/index.pug](test/index.pug) and [test/hyper.pug](test/hyper.pug). The
 `:inject()` filter is the main workhorse, and it can either:
@@ -235,6 +232,34 @@ For `extend`, you will have to use the full relative path to `pug-pack/src`:
 ```pug
 extend ../node_modules/pug-pack/src/_base
 ```
+
+# Additional JSTransformers in Pug
+
+### coffeescript
+
+`pug-pack` includes a [CoffeeScript v2 jstransformer](https://github.com/zdenko/jstransformer-coffeescript),
+which can be used in .pug as follows:
+
+```
+script
+  :coffeescript(bare=true)
+    foo = -> "this is foo"
+
+script.
+  console.log("foo says:", foo());
+```
+
+Note that:
+
+- this is simply an alternative to `:inject(ext="cofffee")`
+
+- `pug` itself comes with the `coffee-script` filter, which is CoffeeScript v1
+
+- this jstransformer is `coffeescript` (without the hyphen), and is CoffeeScript v2
+
+- syntax hightlighting doesn't play well with the custom `:inject` filter,
+  so for inlining more than a few lines of CoffeeScript, this jstransformer
+  is preferable
 
 # helpers
 

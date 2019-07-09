@@ -17,6 +17,7 @@
     "csso": "^3.5.1",
     "html-minifier": "^3.5.21",
     "js-yaml": "^3.12.0",
+    "jstransformer-coffeescript": "zdenko/jstransformer-coffeescript",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "pug": "^2.0.3",
