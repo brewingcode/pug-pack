@@ -13,7 +13,7 @@ usage:
 pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
   [-v|--verbose]
 
-pug-pack [-l|--list] [-h|--help] [-V|--version]
+pug-pack [-l|--list] [-i|--init] [-h|--help] [-V|--version]
 
 default: pug-pack ./src ./dist
 """
@@ -61,5 +61,39 @@ else if argv.l or argv.list
       Object.keys(build.vars.src).filter (x) ->
         x not in baseAssets
       .forEach (x) -> console.log x, build.vars.files[x]
+
+else if argv.i or argv.init
+  if fs.fs.existsSync 'package.json'
+    pkg = require 'package.json'
+    touched = 0
+
+    update = (name, cmd) ->
+      if pkg.scripts[name]
+        console.warn "'#{name}' run-script already exists"
+        return 0
+      else
+        pkg.scripts[name] = cmd
+        return 1
+
+    touched += update 'dev', 'pug-pack --watch'
+    touched += update 'build', 'pug-pack --production'
+    if touched > 0
+      console.log 'package.json updated with "dev" and/or "build" run-scripts'
+      fs.writeFileSync 'package.json', JSON.stringify pkg, null, '  '
+  else
+    console.warn 'no package.json file found, run-scripts not written'
+
+  if fs.existsSync "#{src}/index.pug"
+    console.warn "warning: #{src}/index.pug already exists, not modifying it"
+  else
+    fs.writeFileSync "#{src}/index.pug", """
+      extends ../node_modules/pug-pack/src/_base
+      append head
+        :inject(file="bootstrap.css")
+      append body
+        .container
+          p Hello from pug-pack and Bootstrap
+    """
+
 else
   fullBuild()
