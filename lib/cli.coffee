@@ -3,8 +3,11 @@
 build = require './build'
 browserSync = require 'browser-sync'
 fs = require 'fs'
+path = require 'path'
+mkdirp = require 'mkdirp'
 argv = require('minimist') process.argv.slice(2),
-  boolean: ['p', 'prod', 'production', 'w', 'watch', 'v', 'verbose', 'V', 'version']
+  boolean: ['p', 'prod', 'production', 'w', 'watch', 'v', 'verbose', 'V', 'version',
+    'init', 'i']
 
 if argv.h or argv.help
   console.log """
@@ -13,7 +16,7 @@ usage:
 pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
   [-v|--verbose]
 
-pug-pack [-l|--list] [-h|--help] [-V|--version]
+pug-pack [-l|--list] [-i|--init] [-h|--help] [-V|--version]
 
 default: pug-pack ./src ./dist
 """
@@ -61,5 +64,47 @@ else if argv.l or argv.list
       Object.keys(build.vars.src).filter (x) ->
         x not in baseAssets
       .forEach (x) -> console.log x, build.vars.files[x]
+
+else if argv.i or argv.init
+  if fs.existsSync './package.json'
+    pkg = JSON.parse fs.readFileSync './package.json'
+    touched = 0
+
+    update = (name, cmd) ->
+      if pkg.scripts[name]
+        console.warn "'#{name}' run-script already exists"
+        return 0
+      else
+        pkg.scripts[name] = cmd
+        return 1
+
+    touched += update 'dev', 'pug-pack --watch'
+    touched += update 'build', 'pug-pack --production'
+    if touched > 0
+      fs.writeFileSync 'package.json', JSON.stringify pkg, null, '  '
+      console.log 'package.json updated with "dev" and/or "build" run-scripts'
+  else
+    console.warn 'no package.json file found, run-scripts not written'
+
+  if not fs.existsSync src
+    mkdirp.sync src
+
+  if fs.existsSync "#{src}/base.pug"
+    console.warn "#{src}/_base.pug already exists, not modifying it"
+  else
+    fs.copyFileSync "#{__dirname}/../src/_base.pug", "#{src}/_base.pug"
+
+  if fs.existsSync "#{src}/index.pug"
+    console.warn "#{src}/index.pug already exists, not modifying it"
+  else
+    fs.writeFileSync "#{src}/index.pug", """
+      extends _base
+      append head
+        :inject(file="bootstrap.css")
+      append body
+        .container-fluid
+          p Hello from pug-pack and Bootstrap
+    """
+
 else
   fullBuild()

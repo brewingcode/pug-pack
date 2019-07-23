@@ -182,6 +182,12 @@ on every change
 
 * `--list`/`-l` will list all files involved in the build
 
+* `--init`/`-i` will initialize `pug-pack` in the current directory:
+
+  - add a "dev" and "build" run-script to package.json
+
+  - write a bare-bones `src/index.pug` file, as per the quickstart above
+
 See `pug-pack --help` for more, or see the CLI [here](lib/cli.coffee).
 
 # API
