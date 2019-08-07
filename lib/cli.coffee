@@ -71,6 +71,7 @@ else if argv.i or argv.init
     touched = 0
 
     update = (name, cmd) ->
+      pkg.scripts ?= {}
       if pkg.scripts[name]
         console.warn "'#{name}' run-script already exists"
         return 0
