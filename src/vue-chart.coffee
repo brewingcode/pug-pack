@@ -2,6 +2,20 @@ chart = null
 
 commify = (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
 
+bucketize = (points, count, unit) ->
+  return [] unless points.length > 0
+  points.sort (a,b) -> +a.t - +b.t
+  ref = points[0].t.clone().add(count, unit)
+  buckets = [points.shift()]
+  points.forEach (p) ->
+    if p.t.isSameOrBefore(ref)
+      buckets[buckets.length-1].y += p.y
+    else
+      buckets.push
+        t: ref
+        y: p.y
+      ref.add(count, unit)
+  return buckets
 
 drawChart = ->
   if not chart
