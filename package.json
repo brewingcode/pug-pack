@@ -3,11 +3,12 @@
   "version": "1.6.1",
   "description": "Pseudo-webpack for developers who like clean formatting",
   "scripts": {
-    "dev": "lib/cli.coffee -w",
-    "build": "lib/cli.coffee -p"
+    "dev": "coffee lib/cli.coffee -w",
+    "build": "coffee lib/cli.coffee -p"
   },
   "bin": {
-    "pug-pack": "lib/cli.coffee"
+    "pug-pack": "lib/cli.coffee",
+    "tsc": "lib/time-series-chart.coffee"
   },
   "dependencies": {
     "bluebird": "^3.5.5",
