@@ -44,7 +44,9 @@ drawChart = _.debounce ->
   if app.groupBy
     m = app.groupBy.match(app.regex)
     data = bucketize(data, m[1], m[2])
+
   if not chart
+    Chart.defaults.global.defaultFontSize = 16
     config.data.datasets[0].data = data
     chart = new Chart document.getElementById('chart'), config
   else
@@ -52,9 +54,9 @@ drawChart = _.debounce ->
     chart.update()
 
   app.stats =
+    'Number of Dates': data.length
     'First Date': min(data).t.format('MMM D, YYYY h:mm:ssa')
     'Last Date': max(data).t.format('MMM D, YYYY h:mm:ssa')
-    'Number of Dates': data.length
 
 , 300
 
