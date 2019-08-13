@@ -12,9 +12,13 @@ html
     #app
       v-app
         v-container(fluid)
-          v-row(xs12)
-            v-col
-              p chart settings go here
+          v-row
+            v-col(xs6)
+              v-text-field(label="Group By", placeholder="30 minutes, 1 h, etc."
+                           v-model="groupBy" :rules="[momentable]")
+            v-col(xs6)
+              v-text-field(label="Most Recent", placeholder="1 week, 1 y, etc."
+                           v-model="mostRecent" :rules="[momentable]")
           v-row(xs12)
             v-col
               canvas#chart
@@ -23,4 +27,5 @@ html
     :inject(file="vuetify.js")
     :inject(file="moment.js")
     :inject(file="chart.js")
+    :inject(file="lodash-custom.js")
     :inject(file="vue-chart.coffee" bare)
