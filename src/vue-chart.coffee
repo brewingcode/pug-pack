@@ -12,7 +12,7 @@ bucketize = (points, count, unit) ->
       buckets[buckets.length-1].y += p.y
     else
       buckets.push
-        t: ref
+        t: ref.clone()
         y: p.y
       ref.add(count, unit)
   return buckets
