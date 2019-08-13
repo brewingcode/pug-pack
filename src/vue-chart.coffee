@@ -38,16 +38,12 @@ mostRecent = (points, count, unit) ->
 
 drawChart = _.debounce ->
   data = points
-  console.log "starting with #{data.length}"
   if app.mostRecent
     m = app.mostRecent.match(app.regex)
     data = mostRecent(data, m[1], m[2])
-    console.log "most recent is #{data.length}"
   if app.groupBy
     m = app.groupBy.match(app.regex)
-    console.log m
     data = bucketize(data, m[1], m[2])
-    console.log "bucketized into #{data.length}"
   if not chart
     config.data.datasets[0].data = data
     chart = new Chart document.getElementById('chart'), config
