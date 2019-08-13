@@ -85,7 +85,6 @@ config =
         ticks:
           callback: (v) -> commify(v)
       }]
-    onClick: -> drawChart()
 
 app = new Vue
   el: '#app'
