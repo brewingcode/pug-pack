@@ -19,7 +19,13 @@ html
             v-col(xs6)
               v-text-field(label="Most Recent", placeholder="1 week, 1 y, etc."
                            v-model="mostRecent" :rules="[momentable]")
-          v-row(xs12)
+
+          v-row(v-if="stats")
+            v-col(xs2 v-for="(v,k) of stats")
+              b.text-no-wrap(v-html="k + ':'")
+              span &nbsp;
+              span.text-no-wrap(v-html="v")
+          v-row
             v-col
               canvas#chart
 

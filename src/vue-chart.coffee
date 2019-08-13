@@ -2,6 +2,19 @@ chart = null
 
 commify = (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
 
+max = (arr) ->
+  # each element has a .t property than can be coerced to a number
+  arr.reduce (prev, curr) ->
+    if +prev.t > +curr.t then prev else curr
+  , {}
+
+min = (arr) ->
+  # each element has a .t property than can be coerced to a number
+  arr.reduce (prev, curr) ->
+    if +prev.t < +curr.t then prev else curr
+  , {}
+
+momentFormat = 'MMM D'
 bucketize = (points, count, unit) ->
   return [] unless points.length > 0
   points.sort (a,b) -> +a.t - +b.t
@@ -19,9 +32,7 @@ bucketize = (points, count, unit) ->
 
 mostRecent = (points, count, unit) ->
   return [] unless points.length > 0
-  latest = points.reduce (prev, curr) ->
-    if +prev.t > +curr.t then prev else curr
-  , {}
+  latest = max(points)
   cutoff = latest.t.clone().subtract(count, unit)
   return points.filter (p) -> p.t.isSameOrAfter(cutoff)
 
@@ -43,6 +54,12 @@ drawChart = _.debounce ->
   else
     chart.data.datasets[0].data = data
     chart.update()
+
+  app.stats =
+    'First Date': min(data).t.format('MMM D, YYYY h:mm:ssa')
+    'Last Date': max(data).t.format('MMM D, YYYY h:mm:ssa')
+    'Number of Dates': data.length
+
 , 300
 
 points = [1..90].map (i) ->
@@ -82,6 +99,7 @@ app = new Vue
     groupBy: null
     mostRecent: null
     regex: /^\s*(\d+)\s*([a-z]+)\s*$/i
+    stats: {}
 
   mounted: -> drawChart()
 
