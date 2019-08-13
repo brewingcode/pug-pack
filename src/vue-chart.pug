@@ -1,0 +1,26 @@
+doctype html
+html
+  head
+    title vue-chart
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    :inject(file="md-icons.css")
+    :inject(file="vuetify.css")
+    :inject(file="chart.css")
+  body
+    #app
+      v-app
+        v-container(fluid)
+          v-row(xs12)
+            v-col
+              p chart settings go here
+          v-row(xs12)
+            v-col
+              canvas#chart
+
+    :inject(file="vue-dev.js")
+    :inject(file="vuetify.js")
+    :inject(file="moment.js")
+    :inject(file="chart.js")
+    :inject(file="vue-chart.coffee")
