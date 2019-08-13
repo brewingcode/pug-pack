@@ -17,6 +17,14 @@ bucketize = (points, count, unit) ->
       ref.add(count, unit)
   return buckets
 
+mostRecent = (points, count, unit) ->
+  return [] unless points.length > 0
+  latest = points.reduce (prev, curr) ->
+    if +prev.t > +curr.t then prev else curr
+  , {}
+  cutoff = latest.t.clone().subtract(count, unit)
+  return points.filter (p) -> p.t.isSameOrAfter(cutoff)
+
 drawChart = ->
   if not chart
     config.data.datasets[0].data = points
