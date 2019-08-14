@@ -37,12 +37,12 @@ mostRecent = (points, count, unit) ->
 
 widthCheck = ->
   meta = chart.getDatasetMeta(0).data
-  maxWidth = max meta.map (d) -> d._model.width
-  if maxWidth < 1
+  sum = meta.reduce (acc, cur) ->
+    acc + cur._model.width
+  , 0
+  if sum / meta.length < 1
     chart.options.scales.xAxes[0].barThickness = 3
-  else
-    delete chart.options.scales.xAxes[0].barThickness
-  chart.update()
+    chart.update()
 
 drawChart = _.debounce ->
   if typeof globalPoints[0]?.t is 'string'
@@ -67,6 +67,7 @@ drawChart = _.debounce ->
     config.data.datasets[0].data = data
     chart = new Chart document.getElementById('chart'), config
   else
+    delete chart.options.scales.xAxes[0].barThickness
     chart.data.datasets[0].data = data
     chart.update()
 
