@@ -73,10 +73,13 @@ drawChart = _.debounce ->
 
   widthCheck()
 
-  app.stats =
-    'Number of Dates': data.length
-    'First Date': min(data).t.format('MMM D, YYYY h:mm:ssa')
-    'Last Date': max(data).t.format('MMM D, YYYY h:mm:ssa')
+  if data.length > 0
+    app.stats =
+      'Number of Dates': data.length
+      'First Date': min(data).t.format('MMM D, YYYY h:mm:ssa')
+      'Last Date': max(data).t.format('MMM D, YYYY h:mm:ssa')
+  else
+    app.stats = {}
 , 300
 
 randomPoints = [1..500].map (i) ->
