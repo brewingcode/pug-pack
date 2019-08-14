@@ -20,6 +20,9 @@ html
               v-text-field(label="Most Recent", placeholder="1 week, 1 y, etc."
                            v-model="mostRecent" :rules="[momentable]" ref="mr")
 
+          v-row
+            v-col.text-center(xs6)
+              v-checkbox(label="Use random data" v-model="useRandomData")
           v-row(v-if="stats")
             v-col(xs2 v-for="(v,k) of stats" :key="k")
               b.text-no-wrap(v-html="k + ':'")
