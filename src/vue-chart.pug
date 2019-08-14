@@ -23,6 +23,9 @@ html
           v-row
             v-col.text-center(xs6)
               v-checkbox(label="Use random data" v-model="useRandomData")
+          v-row(v-if="points.length === 0")
+            v-col
+              p No data points
           v-row(v-if="stats")
             v-col(xs2 v-for="(v,k) of stats" :key="k")
               b.text-no-wrap(v-html="k + ':'")
