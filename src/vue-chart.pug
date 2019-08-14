@@ -21,7 +21,7 @@ html
                            v-model="mostRecent" :rules="[momentable]")
 
           v-row(v-if="stats")
-            v-col(xs2 v-for="(v,k) of stats")
+            v-col(xs2 v-for="(v,k) of stats" :key="k")
               b.text-no-wrap(v-html="k + ':'")
               span &nbsp;
               span.text-no-wrap(v-html="v")
