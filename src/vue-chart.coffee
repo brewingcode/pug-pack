@@ -52,10 +52,13 @@ drawChart = _.debounce ->
 
   data = globalPoints
 
-  if app.mostRecent
+  if app.$refs.mr.hasError or app.$refs.gb.hasError
+    return
+
+  if app.mostRecent and not app.$refs.mr.hasError
     m = app.mostRecent.match(app.regex)
     data = mostRecent(data, m[1], m[2])
-  if app.groupBy
+  if app.groupBy and not app.$refs.gb.hasError
     m = app.groupBy.match(app.regex)
     data = bucketize(data, m[1], m[2])
 
