@@ -50,7 +50,7 @@ drawChart = _.debounce ->
       p.t = moment(p.t)
       p.y = +p.y
 
-  data = globalPoints
+  data = if app.useRandomData then randomPoints else globalPoints
 
   if app.$refs.mr.hasError or app.$refs.gb.hasError
     return
@@ -78,6 +78,14 @@ drawChart = _.debounce ->
     'First Date': min(data).t.format('MMM D, YYYY h:mm:ssa')
     'Last Date': max(data).t.format('MMM D, YYYY h:mm:ssa')
 , 300
+
+randomPoints = [1..500].map (i) ->
+  t = moment("2019-08-01", 'YYYY-MM-D')
+  t.add(Math.random()*i, 'days')
+  return
+    t: t
+    y: Math.floor(Math.random() * 100000)
+randomPoints.sort (a,b) -> +a.t - +b.t
 
 globalPoints = []
 
@@ -109,6 +117,7 @@ app = new Vue
   data: ->
     groupBy: null
     mostRecent: null
+    useRandomData: false
     regex: /^\s*(\d+)\s*([a-z]+)\s*$/i
     stats: {}
 
@@ -117,6 +126,7 @@ app = new Vue
   watch:
     groupBy: -> drawChart()
     mostRecent: -> drawChart()
+    useRandomData: -> drawChart()
 
   methods:
     momentable: (v) ->
