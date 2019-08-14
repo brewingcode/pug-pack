@@ -14,7 +14,6 @@ min = (arr) ->
     if +prev.t < +curr.t then prev else curr
   , {}
 
-momentFormat = 'MMM D'
 bucketize = (points, count, unit) ->
   return [] unless points.length > 0
   points.sort (a,b) -> +a.t - +b.t
@@ -37,7 +36,12 @@ mostRecent = (points, count, unit) ->
   return points.filter (p) -> p.t.isSameOrAfter(cutoff)
 
 drawChart = _.debounce ->
-  data = points
+  data = globalPoints.map (p) ->
+    if typeof p.t is 'string'
+      p.t = moment(p.t)
+      p.y = +p.y
+    return p
+
   if app.mostRecent
     m = app.mostRecent.match(app.regex)
     data = mostRecent(data, m[1], m[2])
@@ -57,15 +61,9 @@ drawChart = _.debounce ->
     'Number of Dates': data.length
     'First Date': min(data).t.format('MMM D, YYYY h:mm:ssa')
     'Last Date': max(data).t.format('MMM D, YYYY h:mm:ssa')
-
 , 300
 
-points = [1..90].map (i) ->
-  t = moment("2019-08-01", 'YYYY-MM-D')
-  t.add(i, 'days')
-  return
-    t: t
-    y: Math.floor(Math.random() * 100000)
+globalPoints = []
 
 config =
   type: 'bar'
