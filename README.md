@@ -267,7 +267,7 @@ Note that:
   so for inlining more than a few lines of CoffeeScript, this jstransformer
   is preferable
 
-# helpers
+# helpers and other tools
 
 ## bind-input-query-param
 
@@ -282,3 +282,14 @@ input#query
   bindInputQueryParam '#query', ->
     console.log 'the url query string was updated, look at it!'
 ```
+
+## vue-chart.pug
+
+An interactive chart for slicing up time-series data. Uses Vuetify and
+Chart.js, see both the [pug](./src/vue-chart.pug) and the
+[js](./src/vue-chart.coffee).
+
+## tsc
+
+This is a command-line tool to feed newline-based timestamps into
+vue-chart.pug on your local machine.
