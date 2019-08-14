@@ -36,11 +36,12 @@ mostRecent = (points, count, unit) ->
   return points.filter (p) -> p.t.isSameOrAfter(cutoff)
 
 drawChart = _.debounce ->
-  data = globalPoints.map (p) ->
-    if typeof p.t is 'string'
+  if typeof globalPoints[0]?.t is 'string'
+    globalPoints.forEach (p) ->
       p.t = moment(p.t)
       p.y = +p.y
-    return p
+
+  data = globalPoints
 
   if app.mostRecent
     m = app.mostRecent.match(app.regex)
