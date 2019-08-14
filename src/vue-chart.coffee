@@ -134,7 +134,10 @@ app = new Vue
   computed:
     dataSize: -> filesize(JSON.stringify(@points).length)
 
-  mounted: -> drawChart()
+  mounted: ->
+    bindInputQueryParam '#mr', null, null, (v) => @mostRecent = v
+    bindInputQueryParam '#gb', null, null, (v) => @groupBy = v
+    drawChart()
 
   watch:
     groupBy: -> drawChart()

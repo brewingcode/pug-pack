@@ -15,10 +15,10 @@ html
           v-row
             v-col(xs6)
               v-text-field(label="Group By", placeholder="30 minutes, 1 h, etc."
-                           v-model="groupBy" :rules="[momentable]" ref="gb")
+                           v-model="groupBy" :rules="[momentable]" ref="gb" id="gb")
             v-col(xs6)
               v-text-field(label="Most Recent", placeholder="1 week, 1 y, etc."
-                           v-model="mostRecent" :rules="[momentable]" ref="mr")
+                           v-model="mostRecent" :rules="[momentable]" ref="mr" id="mr")
 
           v-row(v-if="points.length === 0")
             v-col
@@ -53,4 +53,5 @@ html
     :inject(file="chart.js")
     :inject(file="lodash-custom.js")
     :inject(file="filesize.js")
+    :inject(file="bind-input-query-param.coffee")
     :inject(file="vue-chart.coffee" bare)
