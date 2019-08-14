@@ -41,6 +41,11 @@ html
           v-row
             v-col
               canvas#chart
+      .text-center
+        v-dialog(v-model="pasteError.show" @keydown.esc="pasteError.show = false")
+          v-card
+            v-card-title(primary-title) Error pasting data from clipboard
+            v-card-text(v-html="pasteError.text")
 
     :inject(file="vue-dev.js")
     :inject(file="vuetify.js")

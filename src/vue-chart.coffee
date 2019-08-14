@@ -126,6 +126,9 @@ app = new Vue
     stats: null
     tooltip: false
     copyResult: ''
+    pasteError:
+      show: false
+      text: ''
 
   computed:
     dataSize: -> filesize(JSON.stringify(@points).length)
@@ -158,8 +161,14 @@ app = new Vue
       @tooltip = true
       setTimeout (=> @tooltip = false), 1000
 
-    pbpaste: =>
+    pbpaste: ->
       navigator.clipboard.readText().then (text) =>
-        globalPoints = JSON.parse(text)
-        drawChart()
+        try
+          globalPoints = JSON.parse(text)
+          throw new Error "JSON must be an array" unless globalPoints.length > 0
+          throw new Error "Array objects must have a `t` and `y` property" if globalPoints.find (p) -> not p.t or not p.y
+          drawChart()
+        catch e
+          @pasteError.show = true
+          @pasteError.text = e.message
 
