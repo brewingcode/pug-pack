@@ -50,34 +50,34 @@ drawChart = _.debounce ->
       p.t = moment(p.t)
       p.y = +p.y
 
-  data = if app.useRandomData then randomPoints else globalPoints
-
   if app.$refs.mr.hasError or app.$refs.gb.hasError
     return
 
+  app.points = if app.useRandomData then randomPoints else globalPoints
+
   if app.mostRecent and not app.$refs.mr.hasError
     m = app.mostRecent.match(app.regex)
-    data = mostRecent(data, m[1], m[2])
+    app.points = mostRecent(app.points, m[1], m[2])
   if app.groupBy and not app.$refs.gb.hasError
     m = app.groupBy.match(app.regex)
-    data = bucketize(data, m[1], m[2])
+    app.points = bucketize(app.points, m[1], m[2])
 
   if not chart
     Chart.defaults.global.defaultFontSize = 16
-    config.data.datasets[0].data = data
+    config.data.datasets[0].data = app.points
     chart = new Chart document.getElementById('chart'), config
   else
     delete chart.options.scales.xAxes[0].barThickness
-    chart.data.datasets[0].data = data
+    chart.data.datasets[0].data = app.points
     chart.update()
 
   widthCheck()
 
-  if data.length > 0
+  if app.points.length > 0
     app.stats =
-      'Number of Dates': data.length
-      'First Date': min(data).t.format('MMM D, YYYY h:mm:ssa')
-      'Last Date': max(data).t.format('MMM D, YYYY h:mm:ssa')
+      'Number of Dates': app.points.length
+      'First Date': min(app.points).t.format('MMM D, YYYY h:mm:ssa')
+      'Last Date': max(app.points).t.format('MMM D, YYYY h:mm:ssa')
   else
     app.stats = {}
 , 300
@@ -122,6 +122,7 @@ app = new Vue
     mostRecent: null
     useRandomData: false
     regex: /^\s*(\d+)\s*([a-z]+)\s*$/i
+    points: [1] # this will get correctly set on first drawChart()
     stats: {}
 
   mounted: -> drawChart()
