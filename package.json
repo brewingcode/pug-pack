@@ -23,6 +23,7 @@
     "pug": "^2.0.4",
     "stylus": "^0.54.5",
     "svgo": "^1.2.2",
+    "tmp": "^0.1.0",
     "uglify-es": "^3.3.9"
   },
   "main": "lib/build.coffee",

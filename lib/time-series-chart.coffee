@@ -3,6 +3,8 @@
 fs = require 'fs'
 argv = require('minimist') process.argv.slice(2)
 moment = require 'moment'
+tmp = require 'tmp'
+{ execSync } = require 'child_process'
 
 content = ''
 if not process.stdin.isTTY
@@ -36,4 +38,13 @@ if points.length is 0
   console.error "no data points found"
   process.exit(1)
 
-console.log "graphing #{points.length} data points:", points.map (p) -> [ p.t.format(), p.y ]
+chartFile = "#{__dirname}/../dist/vue-chart.html"
+if not fs.existsSync(chartFile)
+  console.error "'#{chartFile}' does not exist, run `pug-pack -p` and try again"
+  process.exit(2)
+
+dir = tmp.dirSync()
+chartHtml = fs.readFileSync(chartFile).toString().replace /(globalPoints\s*=\s*)\[\]/, '$1' + JSON.stringify(points)
+fs.writeFileSync "#{dir.name}/vue-chart.html", chartHtml
+console.log "graphing #{points.length} points via #{dir.name}"
+execSync "open '#{dir.name}/vue-chart.html'"
