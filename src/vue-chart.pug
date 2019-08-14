@@ -15,10 +15,10 @@ html
           v-row
             v-col(xs6)
               v-text-field(label="Group By", placeholder="30 minutes, 1 h, etc."
-                           v-model="groupBy" :rules="[momentable]")
+                           v-model="groupBy" :rules="[momentable]" ref="gb")
             v-col(xs6)
               v-text-field(label="Most Recent", placeholder="1 week, 1 y, etc."
-                           v-model="mostRecent" :rules="[momentable]")
+                           v-model="mostRecent" :rules="[momentable]" ref="mr")
 
           v-row(v-if="stats")
             v-col(xs2 v-for="(v,k) of stats" :key="k")
