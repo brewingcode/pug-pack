@@ -157,3 +157,9 @@ app = new Vue
       @copyResult = text
       @tooltip = true
       setTimeout (=> @tooltip = false), 1000
+
+    pbpaste: =>
+      navigator.clipboard.readText().then (text) =>
+        globalPoints = JSON.parse(text)
+        drawChart()
+

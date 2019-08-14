@@ -22,8 +22,10 @@ html
 
           v-row(v-if="points.length === 0")
             v-col
-              p No data points
-              v-checkbox(label="Use random data" v-model="useRandomData")
+              span No data points:&nbsp;
+              v-btn(small @click="useRandomData = true") Use random data
+              span &nbsp;or&nbsp;
+              v-btn(small @click="pbpaste") Use data from clipboard
 
           v-row(v-if="stats")
             v-col(xs2 v-for="(v,k) of stats" :key="k")
