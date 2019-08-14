@@ -79,7 +79,7 @@ drawChart = _.debounce ->
       'First Date': min(app.points).t.format('MMM D, YYYY h:mm:ssa')
       'Last Date': max(app.points).t.format('MMM D, YYYY h:mm:ssa')
   else
-    app.stats = {}
+    app.stats = null
 , 300
 
 randomPoints = [1..500].map (i) ->
@@ -123,7 +123,9 @@ app = new Vue
     useRandomData: false
     regex: /^\s*(\d+)\s*([a-z]+)\s*$/i
     points: [1] # this will get correctly set on first drawChart()
-    stats: {}
+    stats: null
+    tooltip: false
+    copyResult: ''
 
   computed:
     dataSize: -> filesize(JSON.stringify(@points).length)
@@ -146,6 +148,12 @@ app = new Vue
       return true
 
     pbcopy: ->
-      navigator.clipboard.writeText(JSON.stringify(@points)).then ->
-        console.log 'done'
-      , console.error
+      navigator.clipboard.writeText(JSON.stringify(@points)).then =>
+        @tip('copied')
+      , =>
+        @tip('copy failed')
+
+    tip: (text) ->
+      @copyResult = text
+      @tooltip = true
+      setTimeout (=> @tooltip = false), 1000
