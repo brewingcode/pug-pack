@@ -18,7 +18,7 @@ do ->
   cacheKey = (sel) -> btoa(sel)
   paramKey = (sel) -> sel.replace /[^\w-_\.]/g, ''
 
-  window.bindInputQueryParam = (sel, fn, delay) ->
+  window.bindInputQueryParam = (sel, fn, delay, init) ->
     # sets up everything to bind an element's value to a query param, and
     # optionally to a js function
     key = cacheKey(sel)
@@ -31,6 +31,15 @@ do ->
 
     if fn and typeof fn isnt 'function'
       throw new Error "second argument must be a function instead of:", fn
+
+    if init and typeof init isnt 'function'
+      throw new Error "fourth argument must be a function instead of:", init
+
+    if params.has(paramKey(sel))
+      if init
+        init(params.get(paramKey(sel)))
+      else
+        el().value = params.get(paramKey(sel))
 
     delay = if delay then +delay else 300
 
