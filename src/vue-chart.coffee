@@ -125,6 +125,9 @@ app = new Vue
     points: [1] # this will get correctly set on first drawChart()
     stats: {}
 
+  computed:
+    dataSize: -> filesize(JSON.stringify(@points).length)
+
   mounted: -> drawChart()
 
   watch:
@@ -141,3 +144,8 @@ app = new Vue
       b = a.clone().add(m[1], m[2])
       return "Moment does not understand '#{m[1]}, #{m[2]}' for .add()" if +a is +b
       return true
+
+    pbcopy: ->
+      navigator.clipboard.writeText(JSON.stringify(@points)).then ->
+        console.log 'done'
+      , console.error

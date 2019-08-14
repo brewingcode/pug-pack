@@ -30,6 +30,9 @@ html
               b.text-no-wrap(v-html="k + ':'")
               span &nbsp;
               span.text-no-wrap(v-html="v")
+          v-row(v-if="stats")
+            v-col
+              v-btn(small @click="pbcopy") Copy {{dataSize}} to clipboard
           v-row
             v-col
               canvas#chart
@@ -39,4 +42,5 @@ html
     :inject(file="moment.js")
     :inject(file="chart.js")
     :inject(file="lodash-custom.js")
+    :inject(file="filesize.js")
     :inject(file="vue-chart.coffee" bare)
