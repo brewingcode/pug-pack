@@ -63,28 +63,45 @@ app = new Vue
         .reverse()
         .value()
 
-    commonGames: ->
+    commonPlays: ->
       ids = _.intersection ...@selected.map (player) -> player.plays
-      games = []
-      @plays.forEach (play) ->
-        if play.id in ids
-          players = _(play.players)
-            .map (p) -> p.name
-            .sortBy (p) -> p.toLowerCase()
-            .join '<br>'
+      @plays.filter (play) -> play.id in ids
 
-          games.push
-            name: play.item.name
-            gameid: play.item.objectid
-            playid: play.id
-            date: play.date
-            players: players
-            location: play.location
-      return games
+    commonGames: ->
+      @commonPlays.map (play) ->
+        players = _(play.players)
+          .map (p) -> p.name
+          .sortBy (p) -> p.toLowerCase()
+          .join '<br>'
+
+        return
+          name: play.item.name
+          gameid: play.item.objectid
+          playid: play.id
+          date: play.date
+          players: players
+          location: play.location
 
     stats: ->
-      return
-        'Number of games': @commonGames.length
+      stats =
+        'Number of games': @commonPlays.length
 
+      winners = {}
+      @commonPlays.forEach (play) ->
+        if Array.isArray(play.players)
+          play.players.forEach (player) ->
+            winners[player.name] ?= 0
+            winners[player.name]++ if +player.win is 1
 
+      _(winners)
+        .keys()
+        .map (k) =>
+          name: k
+          count: winners[k]
+          pct: Math.floor(winners[k]/@commonPlays.length*100)
+        .sortBy (w) -> +w.count
+        .reverse()
+        .each (w) ->
+          stats[w.name] = w.count + ' (' + w.pct + '%)'
 
+      return stats
