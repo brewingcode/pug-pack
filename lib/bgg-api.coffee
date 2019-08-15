@@ -24,8 +24,7 @@ fixXml = (n) ->
     return n
   else
     log 'scalar:', n
-    x = parseFloat(n)
-    return if isNaN(x) then n else x
+    return n
 
 onePage = (username, page) ->
   url = "https://www.boardgamegeek.com/xmlapi2/plays?username=#{username}&page=#{page or 1}"
