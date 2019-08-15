@@ -19,7 +19,6 @@ app = new Vue
       ]
     plays: bgg.plays.play
     selected: []
-    stats: {}
 
   computed:
     players: ->
@@ -46,4 +45,29 @@ app = new Vue
         .reverse()
         .value()
 
-    commonGames: -> []
+    commonGames: ->
+      return [] if @selected.length < 2
+      ids = _.intersection ...@selected.map (player) -> player.plays
+      games = []
+      @plays.forEach (play) ->
+        if play.id in ids
+          players = _(play.players)
+            .map (p) -> p.name
+            .sortBy (p) -> p.toLowerCase()
+            .join '<br>'
+
+          games.push
+            name: play.item.name
+            date: play.date
+            players: players
+            location: play.location
+      return games
+
+    stats: ->
+      return unless @commonGames.length > 0
+
+      return
+        'Number of games together': @commonGames.length
+
+
+

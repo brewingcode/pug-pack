@@ -13,8 +13,9 @@ html
       v-app
         v-container(fluid)
           v-row
-            v-col(sm)
-              .headline.text-center Select the players you want
+            v-col(md="4")
+              h2.text-center Select the players you want
+              span &nbsp;
               v-data-table(:items="players"
                            item-key="name"
                            v-model="selected"
@@ -22,18 +23,24 @@ html
                            hide-default-footer
                            disable-pagination
                            show-select)
-            v-col(sm)
-              .headline.text-center Stats about games between your players
-              v-simple-table
-                template(v-slot:default)
-                  tr(v-for="(v,k) in stats" :key="k")
-                    td.font-weight-bold(v-text="k")
-                    td(v-text="v")
-              v-data-table(:items="commonGames"
-                           item-key="id"
-                           :headers="headers.games"
-                           hide-default-footer
-                           disable-pagination)
+            v-col(md="8")
+              h2.text-center Details
+              h3.text-center(v-if="selected.length < 2") Select two or more players
+              template(v-else)
+                h3.text-center Quick stats
+                v-simple-table(style="width:50%; margin:auto;")
+                  template(v-slot:default)
+                    tr(v-for="(v,k) in stats" :key="k")
+                      td.font-weight-bold(v-text="k")
+                      td(v-text="v")
+                h3.text-center Full list
+                v-data-table(:items="commonGames"
+                             item-key="id"
+                             :headers="headers.games"
+                             hide-default-footer
+                             disable-pagination)
+                  template(v-slot:item.players="{item}")
+                    span(v-html="item.players")
 
     :inject(file="vue-dev.js")
     :inject(file="vuetify.js")
