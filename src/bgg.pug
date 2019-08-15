@@ -42,9 +42,9 @@ html
                   template(v-slot:item.players="{item}")
                     span.text-no-wrap(v-html="item.players")
                   template(v-slot:item.name="{item}")
-                    a(:href="'https://boardgamegeek.com/boardgame/' + item.gameid" target="_blank") {{item.name}}
+                    a(:href="'https://boardgamegeek.com/boardgame/' + item.gameid") {{item.name}}
                   template(v-slot:item.date="{item}")
-                    a.text-no-wrap(:href="'https://boardgamegeek.com/play/details/' + item.playid" target="_blank") {{item.date}}
+                    a.text-no-wrap(:href="'https://boardgamegeek.com/play/details/' + item.playid") {{item.date}}
 
     :inject(file="vue-dev.js")
     :inject(file="vuetify.js")
