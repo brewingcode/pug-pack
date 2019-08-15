@@ -12,11 +12,13 @@ html
     script#app(type="text/x-template")
       v-app
         v-container(fluid)
-          v-row
-            v-col
-              v-data-table(:items="players" item-key="name" :headers="headers")
-                template(v-slot:item.plays="{ item }")
-                  span {{item.play.length}} games
+          v-data-table(:items="players"
+                       item-key="name"
+                       :headers="headers"
+                       hide-default-footer
+                       disable-pagination)
+            template(v-slot:item.plays="{ item }")
+              span {{item.play.length}} games
 
     :inject(file="vue-dev.js")
     :inject(file="vuetify.js")
