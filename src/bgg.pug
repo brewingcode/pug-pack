@@ -12,13 +12,28 @@ html
     script#app(type="text/x-template")
       v-app
         v-container(fluid)
-          v-data-table(:items="players"
-                       item-key="name"
-                       :headers="headers"
-                       hide-default-footer
-                       disable-pagination)
-            template(v-slot:item.plays="{ item }")
-              span {{item.play.length}} games
+          v-row
+            v-col(sm)
+              .headline.text-center Select the players you want
+              v-data-table(:items="players"
+                           item-key="name"
+                           v-model="selected"
+                           :headers="headers.players"
+                           hide-default-footer
+                           disable-pagination
+                           show-select)
+            v-col(sm)
+              .headline.text-center Stats about games between your players
+              v-simple-table
+                template(v-slot:default)
+                  tr(v-for="(v,k) in stats" :key="k")
+                    td.font-weight-bold(v-text="k")
+                    td(v-text="v")
+              v-data-table(:items="commonGames"
+                           item-key="id"
+                           :headers="headers.games"
+                           hide-default-footer
+                           disable-pagination)
 
     :inject(file="vue-dev.js")
     :inject(file="vuetify.js")
