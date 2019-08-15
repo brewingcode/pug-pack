@@ -55,6 +55,8 @@ app = new Vue
 
           games.push
             name: play.item.name
+            gameid: play.item.objectid
+            playid: play.id
             date: play.date
             players: players
             location: play.location
