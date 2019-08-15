@@ -1,15 +1,17 @@
 commify = (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
 
+dataVersion = 1
 load = ->
   if data = localStorage.getItem('bgg')
-    JSON.parse(data)
-  else
-    {}
+    data = JSON.parse(data)
+    return data if data.version is dataVersion
+  return {}
 
 save = ->
   data = JSON.stringify
     plays: app.plays
     selected: app.selected
+    version: dataVersion
   localStorage.setItem('bgg', data)
 
 app = new Vue
