@@ -6,11 +6,20 @@ app = new Vue
   vuetify: new Vuetify()
 
   data: ->
-    headers: [
-      { text: 'Player Name', value: 'name' }
-      { text: 'Number of Games Played', value: 'count' }
-    ]
+    headers:
+      players: [
+        { text: 'Player Name', value: 'name' }
+        { text: 'Number of Games Played', value: 'count' }
+      ]
+      games: [
+        { text: 'Game', value: 'name' }
+        { text: 'Date', value: 'date' }
+        { text: 'Players', value: 'players' }
+        { text: 'Location', value: 'location'}
+      ]
     plays: bgg.plays.play
+    selected: []
+    stats: {}
 
   computed:
     players: ->
@@ -37,3 +46,4 @@ app = new Vue
         .reverse()
         .value()
 
+    commonGames: -> []
