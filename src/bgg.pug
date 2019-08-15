@@ -1,0 +1,27 @@
+doctype html
+html
+  head
+    title boardgamegeek
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    :inject(file="md-icons.css")
+    :inject(file="vuetify.css")
+    :inject(file="chart.css")
+  body
+    script#app(type="text/x-template")
+      v-app
+        v-container(fluid)
+          v-row
+            v-col
+              v-data-table(:items="players" item-key="name" :headers="headers")
+                template(v-slot:item.plays="{ item }")
+                  span {{item.play.length}} games
+
+    :inject(file="vue-dev.js")
+    :inject(file="vuetify.js")
+    :inject(file="moment.js")
+    :inject(file="chart.js")
+    script.
+      var bgg = !{JSON.stringify(src['bgg.json'])};
+    :inject(file="bgg.coffee" bare)
