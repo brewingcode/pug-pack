@@ -37,8 +37,11 @@ html
                 v-data-table(:items="commonGames"
                              item-key="playid"
                              :headers="headers.games"
+                             :custom-filter="filterGames"
                              hide-default-footer
                              disable-pagination)
+                  template(v-slot:top)
+                    v-text-field(v-model="gameFilter" label="Filter by game")
                   template(v-slot:item.players="{item}")
                     span.text-no-wrap(v-html="item.players")
                   template(v-slot:item.name="{item}")
