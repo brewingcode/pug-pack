@@ -1,11 +1,24 @@
 commify = (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
 
+load = ->
+  if data = localStorage.getItem('bgg')
+    JSON.parse(data)
+  else
+    {}
+
+save = ->
+  data = JSON.stringify
+    plays: app.plays
+    selected: app.selected
+  localStorage.setItem('bgg', data)
+
 app = new Vue
   el: '#app'
   template:'#app'
   vuetify: new Vuetify()
 
   data: ->
+    saved = load()
     headers:
       players: [
         { text: 'Player Name', value: 'name' }
@@ -17,8 +30,12 @@ app = new Vue
         { text: 'Players', value: 'players' }
         { text: 'Location', value: 'location'}
       ]
-    plays: bgg.plays.play
-    selected: []
+    plays: saved.plays or bgg.plays.play
+    selected: saved.selected or []
+
+  watch:
+    plays: -> save()
+    selected: -> save()
 
   computed:
     players: ->
