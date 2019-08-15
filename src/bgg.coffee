@@ -24,13 +24,16 @@ app = new Vue
         else if play.players?.player
           addName play.players.player
 
-      players = Object.keys(names).map (k) ->
-        name: k
-        plays: names[k]
-        count: commify names[k].length
-      .filter (p) ->
-        p.count > 10
+      return _(names)
+        .keys()
+        .map (k) ->
+          name: k
+          plays: names[k]
+          count: commify names[k].length
+        .filter (p) ->
+          p.count > 10
+        .sortBy (p) ->
+          +p.count
+        .reverse()
+        .value()
 
-      players.sort (a,b) -> b.count - a.count
-
-      return players
