@@ -1,6 +1,7 @@
 # https://boardgamegeek.com/wiki/page/BGG_XML_API2
 
 { execSync } = require 'child_process'
+fs = require 'fs'
 
 fixXml = (n) ->
   log = -> 0 # console.log
