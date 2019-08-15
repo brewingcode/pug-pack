@@ -10,6 +10,7 @@ save = ->
   data = JSON.stringify
     plays: app.plays
     selected: app.selected
+    gameFilter: app.gameFilter
     version: dataVersion
   localStorage.setItem('bgg', data)
 
@@ -26,17 +27,32 @@ app = new Vue
         { text: 'Number of Games Played', value: 'count' }
       ]
       games: [
-        { text: 'Game', value: 'name' }
+        {
+          text: 'Game'
+          value: 'name'
+          filter: (v) =>
+            if @gameFilter
+              console.log 'filter:', v, @gameFilter
+              v.toLowerCase().includes(@gameFilter.toLowerCase())
+            else
+              true
+        }
         { text: 'Date', value: 'date' }
         { text: 'Players', value: 'players' }
         { text: 'Location', value: 'location'}
       ]
     plays: saved.plays or bgg.plays.play
     selected: saved.selected or []
+    gameFilter: saved.gameFilter or ''
 
   watch:
     plays: -> save()
     selected: -> save()
+    gameFilter: -> save()
+
+  methods:
+    filterGames: (v, search, item) ->
+      item.name.toLowerCase().includes(v.toLowerCase())
 
   computed:
     players: ->
@@ -83,11 +99,15 @@ app = new Vue
           location: play.location
 
     stats: ->
+      games = @commonPlays
+      if @gameFilter
+        games = games.filter (g) => g.item.name.toLowerCase().includes(@gameFilter.toLowerCase())
+
       stats =
-        'Number of games': @commonPlays.length
+        'Number of games': games.length
 
       winners = {}
-      @commonPlays.forEach (play) ->
+      games.forEach (play) ->
         if Array.isArray(play.players)
           play.players.forEach (player) ->
             winners[player.name] ?= 0
@@ -98,7 +118,7 @@ app = new Vue
         .map (k) =>
           name: k
           count: winners[k]
-          pct: Math.floor(winners[k]/@commonPlays.length*100)
+          pct: Math.floor(winners[k]/games.length*100)
         .sortBy (w) -> +w.count
         .reverse()
         .each (w) ->
