@@ -44,7 +44,6 @@ app = new Vue
         .value()
 
     commonGames: ->
-      return [] if @selected.length < 2
       ids = _.intersection ...@selected.map (player) -> player.plays
       games = []
       @plays.forEach (play) ->
@@ -63,7 +62,7 @@ app = new Vue
 
     stats: ->
       return
-        'Number of games together': @commonGames.length
+        'Number of games': @commonGames.length
 
 
 
