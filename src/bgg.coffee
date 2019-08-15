@@ -62,8 +62,6 @@ app = new Vue
       return games
 
     stats: ->
-      return unless @commonGames.length > 0
-
       return
         'Number of games together': @commonGames.length
 
