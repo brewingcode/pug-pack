@@ -38,8 +38,6 @@ app = new Vue
           name: k
           plays: names[k]
           count: commify names[k].length
-        .filter (p) ->
-          p.count > 10
         .sortBy (p) ->
           +p.count
         .reverse()
