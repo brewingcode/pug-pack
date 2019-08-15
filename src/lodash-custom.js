@@ -1,7 +1,7 @@
 /**
  * @license
  * Lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash -d -c include="debounce,uniq,intersection,value,sortBy,keys,values,map,each,filter,reverse"`
+ * Build: `lodash -d -c include="debounce,uniq,intersection,value,sortBy,keys,values,map,each,filter,reverse,join"`
  * Copyright JS Foundation and other contributors <https://js.foundation/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -834,6 +834,7 @@
   /* Built-in method references for those with the same name as other `lodash` methods. */
   var nativeGetSymbols = Object.getOwnPropertySymbols,
       nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined,
+      nativeJoin = arrayProto.join,
       nativeKeys = overArg(Object.keys, Object),
       nativeMax = Math.max,
       nativeMin = Math.min,
@@ -4344,6 +4345,25 @@
   });
 
   /**
+   * Converts all elements in `array` into a string separated by `separator`.
+   *
+   * @static
+   * @memberOf _
+   * @since 4.0.0
+   * @category Array
+   * @param {Array} array The array to convert.
+   * @param {string} [separator=','] The element separator.
+   * @returns {string} Returns the joined string.
+   * @example
+   *
+   * _.join(['a', 'b', 'c'], '~');
+   * // => 'a~b~c'
+   */
+  function join(array, separator) {
+    return array == null ? '' : nativeJoin.call(array, separator);
+  }
+
+  /**
    * Gets the last element of `array`.
    *
    * @static
@@ -6234,6 +6254,7 @@
   lodash.isString = isString;
   lodash.isSymbol = isSymbol;
   lodash.isTypedArray = isTypedArray;
+  lodash.join = join;
   lodash.last = last;
   lodash.stubArray = stubArray;
   lodash.stubFalse = stubFalse;
