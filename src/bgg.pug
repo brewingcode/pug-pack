@@ -25,7 +25,7 @@ html
                            show-select)
             v-col(md="8")
               h2.text-center Details
-              h3.text-center(v-if="selected.length < 2") Select two or more players
+              h3.text-center(v-if="selected.length < 1") Select one or more players
               template(v-else)
                 h3.text-center Quick stats
                 v-simple-table(style="width:50%; margin:auto;")
