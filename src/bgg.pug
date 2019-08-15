@@ -35,12 +35,16 @@ html
                       td(v-text="v")
                 h3.text-center Full list
                 v-data-table(:items="commonGames"
-                             item-key="id"
+                             item-key="playid"
                              :headers="headers.games"
                              hide-default-footer
                              disable-pagination)
                   template(v-slot:item.players="{item}")
-                    span(v-html="item.players")
+                    span.text-no-wrap(v-html="item.players")
+                  template(v-slot:item.name="{item}")
+                    a(:href="'https://boardgamegeek.com/boardgame/' + item.gameid" target="_blank") {{item.name}}
+                  template(v-slot:item.date="{item}")
+                    a.text-no-wrap(:href="'https://boardgamegeek.com/play/details/' + item.playid" target="_blank") {{item.date}}
 
     :inject(file="vue-dev.js")
     :inject(file="vuetify.js")
