@@ -6,7 +6,6 @@ load = ->
     data = JSON.parse(data)
     return data if data.version is dataVersion
   return {}
-
 save = ->
   data = JSON.stringify
     plays: app.plays
@@ -50,6 +49,8 @@ app = new Vue
           play.players.forEach addName
         else if play.players?.player
           addName play.players.player
+        else
+          addName name:'(no players)'
 
       return _(names)
         .keys()
