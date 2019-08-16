@@ -151,11 +151,13 @@ app = new Vue
         'Number of games': games.length
 
       winners = {}
+      selected = @selected.map (x) -> x.name
       games.forEach (play) ->
         if Array.isArray(play.players)
           play.players.forEach (player) ->
-            winners[player.name] ?= 0
-            winners[player.name]++ if +player.win is 1
+            if player.name in selected
+              winners[player.name] ?= 0
+              winners[player.name]++ if +player.win is 1
 
       _(winners)
         .keys()
