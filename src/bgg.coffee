@@ -122,6 +122,6 @@ app = new Vue
         .sortBy (w) -> +w.count
         .reverse()
         .each (w) ->
-          stats[w.name] = w.count + ' (' + w.pct + '%)'
+          stats["#{w.name} wins"] = w.count + ' (' + w.pct + '%)'
 
       return stats
