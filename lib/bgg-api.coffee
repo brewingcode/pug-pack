@@ -26,9 +26,7 @@ fixXml = (n) ->
     log 'scalar:', n
     return n
 
-onePage = (username, page) ->
-  url = "https://www.boardgamegeek.com/xmlapi2/plays?username=#{username}&page=#{page or 1}"
-  resp = execSync("curl -qsS '#{url}'")
+parseResponse = (resp) ->
   try
     json = execSync('xq .', { input:resp })
     fixXml JSON.parse(json)
@@ -37,6 +35,14 @@ onePage = (username, page) ->
     fs.writeFileSync(f, resp)
     console.error "unable to parse api response (see #{f}):", e
     return null
+
+onePage = (username, page) ->
+  url = "https://www.boardgamegeek.com/xmlapi2/plays?username=#{username}&page=#{page or 1}"
+  parseResponse execSync("curl -qsS '#{url}'")
+
+oneThing = (id) ->
+  url = "https://www.boardgamegeek.com/xmlapi2/thing?id=#{id}"
+  parseResponse execSync("curl -qsS '#{url}'")
 
 allPlays = (username) ->
   first = onePage(username)
@@ -52,7 +58,7 @@ allPlays = (username) ->
   delete first.page
   return first
 
-module.exports = { fixXml, onePage, allPlays }
+module.exports = { fixXml, onePage, allPlays, oneThing }
 
 unless module.parent
   [ username ] = process.argv.slice(2)
