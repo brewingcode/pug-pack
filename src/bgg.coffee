@@ -64,7 +64,7 @@ app = new Vue
         { text: 'Players', value: 'players' }
         { text: 'Location', value: 'location'}
       ]
-    plays: saved.plays or bgg.plays.play
+    plays: saved.plays or []
     selected: saved.selected or []
     gameFilter: saved.gameFilter or ''
     username: saved.username or ''
@@ -76,10 +76,10 @@ app = new Vue
     selected: -> save()
     gameFilter: -> save()
     username: ->
-      save()
       if @username
         @plays = []
         @usernameErrors = []
+        save()
         getUser()
 
   methods:
