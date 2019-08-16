@@ -157,6 +157,8 @@ module.exports = self =
         pr.all(prs).then ([forCSS, forDOM]) ->
           forCSS: forCSS.data
           forDOM: forDOM.data
+      .catch (e) ->
+        console.error e.stack
 
     html: (s) ->
       if self.prod
@@ -207,6 +209,6 @@ module.exports = self =
     .catch console.error
 
   self: (testPug) ->
-    self.crawl("#{__dirname}/../src").then =>
+    self.crawl("#{__dirname}/../src", true).then =>
       if testPug
-        self.crawl("#{__dirname}/../test", true)
+        self.crawl("#{__dirname}/../test", false)

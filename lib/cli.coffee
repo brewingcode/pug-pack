@@ -88,16 +88,19 @@ else if argv.i or argv.init
     console.warn 'no package.json file found, run-scripts not written'
 
   if not fs.existsSync src
+    console.log "creating 'src' directory"
     mkdirp.sync src
 
   if fs.existsSync "#{src}/base.pug"
     console.warn "#{src}/_base.pug already exists, not modifying it"
   else
+    console.log "writing 'src/_base.pug' as an example default layout"
     fs.copyFileSync "#{__dirname}/../src/_base.pug", "#{src}/_base.pug"
 
   if fs.existsSync "#{src}/index.pug"
     console.warn "#{src}/index.pug already exists, not modifying it"
   else
+    console.log "writing 'src/index.pug' as an example index file"
     fs.writeFileSync "#{src}/index.pug", """
       extends _base
       append head
@@ -106,6 +109,8 @@ else if argv.i or argv.init
         .container-fluid
           p Hello from pug-pack and Bootstrap
     """
+
+  console.log "run 'pug-pack -w' to build and view the example index file in 'dist/index.html'"
 
 else
   fullBuild()
