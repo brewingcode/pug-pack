@@ -16,6 +16,7 @@ html
             v-col
               v-text-field(v-model="username"
                            ref="u"
+                           id="u"
                            label="boardgamegeek.com username"
                            :error-messages="usernameErrors"
                            :disabled="isLoading"
@@ -62,4 +63,5 @@ html
     :inject(file="moment.js")
     :inject(file="chart.js")
     :inject(file="lodash-custom.js")
+    :inject(file="bind-input-query-param.coffee")
     :inject(file="bgg.coffee" bare)

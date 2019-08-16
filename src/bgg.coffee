@@ -71,6 +71,9 @@ app = new Vue
     usernameErrors: []
     isLoading: false
 
+  mounted: ->
+    bindInputQueryParam '#u', null, null, (v) => @username = v if v
+
   watch:
     plays: -> save()
     selected: -> save()
