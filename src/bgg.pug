@@ -30,6 +30,8 @@ html
                            hide-default-footer
                            disable-pagination
                            show-select)
+                template(v-slot:item.count="{item}")
+                  span(v-text="commify(item.count)")
             v-col(md="8")
               h2.text-center Details
               h3.text-center(v-if="selected.length < 1") Select one or more players
