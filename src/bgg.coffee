@@ -129,7 +129,6 @@ app = new Vue
 
     commonGames: ->
       @commonPlays.map (play) ->
-        console.log 'hello?'
         players = _(play.players)
           .map (p) -> p.name
           .sortBy (p) -> p.toLowerCase()

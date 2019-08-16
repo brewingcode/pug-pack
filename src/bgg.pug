@@ -12,7 +12,7 @@ html
       v-app
         v-container(fluid)
           v-row
-            v-col
+            v-col(xs="12")
               v-text-field(v-model="username"
                            ref="u"
                            id="u"
@@ -20,7 +20,7 @@ html
                            :error-messages="usernameErrors"
                            :loading="isLoading")
           v-row
-            v-col(md="4")
+            v-col(md="4" sm="12" xs="12")
               h2.text-center Select the players you want
               span &nbsp;
               v-data-table(:items="players"
@@ -32,7 +32,7 @@ html
                            show-select)
                 template(v-slot:item.count="{item}")
                   span(v-text="commify(item.count)")
-            v-col(md="8")
+            v-col(md="8" sm="12" xs="12")
               h2.text-center Details
               h3.text-center(v-if="selected.length < 1") Select one or more players
               template(v-else)
