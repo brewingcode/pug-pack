@@ -1,4 +1,3 @@
-commify = (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
 
 dataVersion = 2
 load = ->
@@ -60,7 +59,6 @@ app = new Vue
           value: 'name'
           filter: (v) =>
             if @gameFilter
-              console.log 'filter:', v, @gameFilter
               v.toLowerCase().includes(@gameFilter.toLowerCase())
             else
               true
@@ -98,6 +96,8 @@ app = new Vue
     filterGames: (v, search, item) ->
       item.name.toLowerCase().includes(v.toLowerCase())
 
+    commify: (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
+
   computed:
     players: ->
       names = {}
@@ -117,7 +117,7 @@ app = new Vue
         .map (k) ->
           name: k
           plays: names[k]
-          count: commify names[k].length
+          count: names[k].length
         .sortBy (p) ->
           +p.count
         .reverse()
