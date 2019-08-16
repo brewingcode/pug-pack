@@ -36,10 +36,15 @@ onePage = (username, page) ->
     f = '/tmp/failed-bgg-parse.txt'
     fs.writeFileSync(f, resp)
     console.error "unable to parse api response (see #{f}):", e
-    process.exit(2)
+    return null
 
 allPlays = (username) ->
   first = onePage(username)
+  if not first or first.div?.class is 'messagebox error'
+    return
+      plays:
+        play = []
+      error: first.div['#text']
   totalpages = Math.floor(+first.plays.total / 100) + 1
   if totalpages > 1
     [2 .. totalpages].forEach (page) ->

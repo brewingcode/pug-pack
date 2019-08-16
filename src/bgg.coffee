@@ -8,11 +8,34 @@ load = ->
   return {}
 save = ->
   data = JSON.stringify
+    username: app.username
     plays: app.plays
     selected: app.selected
     gameFilter: app.gameFilter
     version: dataVersion
   localStorage.setItem('bgg', data)
+
+getUser = _.debounce ->
+  app.isLoading = true
+  fetch "https://do.brewingcode.net:2083/bgg/#{app.username}"
+    .then (resp) ->
+      resp.json()
+    .then (json) ->
+      if json.error
+        app.usernameErrors = [ "Error getting user: #{json.error}" ]
+      else if json.plays?.play
+        app.plays = json.plays?.play
+      else
+        app.usernameErrors = [ 'No games found for that user' ]
+        app.plays = []
+    .catch (e) ->
+      console.error e
+      app.usernameErrors = [ "Unknown error: #{e.message}" ]
+    .finally ->
+      app.isLoading = false
+      if app.usernameErrors.length > 0
+        app.$nextTick(app.$refs.u.focus)
+, 500
 
 app = new Vue
   el: '#app'
@@ -44,11 +67,20 @@ app = new Vue
     plays: saved.plays or bgg.plays.play
     selected: saved.selected or []
     gameFilter: saved.gameFilter or ''
+    username: saved.username or ''
+    usernameErrors: []
+    isLoading: false
 
   watch:
     plays: -> save()
     selected: -> save()
     gameFilter: -> save()
+    username: ->
+      save()
+      if @username
+        @plays = []
+        @usernameErrors = []
+        getUser()
 
   methods:
     filterGames: (v, search, item) ->

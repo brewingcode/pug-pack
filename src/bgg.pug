@@ -13,6 +13,14 @@ html
       v-app
         v-container(fluid)
           v-row
+            v-col
+              v-text-field(v-model="username"
+                           ref="u"
+                           label="boardgamegeek.com username"
+                           :error-messages="usernameErrors"
+                           :disabled="isLoading"
+                           :loading="isLoading")
+          v-row
             v-col(md="4")
               h2.text-center Select the players you want
               span &nbsp;
@@ -31,8 +39,8 @@ html
                 v-simple-table(style="width:50%; margin:auto;")
                   template(v-slot:default)
                     tr(v-for="(v,k) in stats" :key="k")
-                      td.font-weight-bold(v-text="k")
-                      td(v-text="v + ':'")
+                      td.font-weight-bold(v-text="k + ':'")
+                      td(v-text="v")
                 h3.text-center Full list
                 v-data-table(:items="commonGames"
                              item-key="playid"
