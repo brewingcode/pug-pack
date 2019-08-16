@@ -1,6 +1,6 @@
 commify = (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
 
-dataVersion = 1
+dataVersion = 2
 load = ->
   if data = localStorage.getItem('bgg')
     data = JSON.parse(data)
@@ -81,6 +81,8 @@ app = new Vue
     username: ->
       if @username
         @plays = []
+        @selected = []
+        @gameFilter = ''
         @usernameErrors = []
         save()
         getUser()
@@ -120,6 +122,7 @@ app = new Vue
 
     commonGames: ->
       @commonPlays.map (play) ->
+        console.log 'hello?'
         players = _(play.players)
           .map (p) -> p.name
           .sortBy (p) -> p.toLowerCase()
