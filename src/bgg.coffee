@@ -18,7 +18,7 @@ save = ->
 getUser = _.debounce ->
   app.isLoading = true
   app.controller = new AbortController()
-  fetch "https://do.brewingcode.net:2083/bgg/#{app.username}",
+  fetch "https://do.brewingcode.net:2083/bgg/#{app.username.trim()}",
     signal: app.controller.signal
   .then (resp) ->
     resp.json()
@@ -86,7 +86,7 @@ app = new Vue
     gameFilter: -> save()
     username: (v) ->
       @usernameErrors = []
-      if @username
+      if @username and @username.match(/\S/)
         @controller.abort() if @controller
         @plays = []
         @selected = []
