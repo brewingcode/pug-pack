@@ -17,24 +17,29 @@ save = ->
 
 getUser = _.debounce ->
   app.isLoading = true
-  fetch "https://do.brewingcode.net:2083/bgg/#{app.username}"
-    .then (resp) ->
-      resp.json()
-    .then (json) ->
-      if json.error
-        app.usernameErrors = [ "Error getting user: #{json.error}" ]
-      else if json.plays?.play
-        app.plays = json.plays?.play
-      else
-        app.usernameErrors = [ 'No games found for that user' ]
-        app.plays = []
-    .catch (e) ->
-      console.error e
-      app.usernameErrors = [ "Unknown error: #{e.message}" ]
-    .finally ->
-      app.isLoading = false
-      if app.usernameErrors.length > 0
-        app.$nextTick(app.$refs.u.focus)
+  app.controller = new AbortController()
+  fetch "https://do.brewingcode.net:2083/bgg/#{app.username}",
+    signal: app.controller.signal
+  .then (resp) ->
+    resp.json()
+  .then (json) ->
+    if json.error
+      app.usernameErrors = [ "Error getting user: #{json.error}" ]
+    else if json.plays?.play
+      app.plays = json.plays?.play
+    else
+      app.usernameErrors = [ 'No games found for that user' ]
+      app.plays = []
+  .catch (e) ->
+    if e.name is 'AbortError'
+      return
+    console.error e
+    app.usernameErrors = [ "Unknown error: #{e.message}" ]
+  .finally ->
+    app.isLoading = false
+    app.controller = null
+    if app.usernameErrors.length > 0
+      app.$nextTick(app.$refs.u.focus)
 , 500
 
 app = new Vue
@@ -70,6 +75,7 @@ app = new Vue
     username: saved.username or ''
     usernameErrors: []
     isLoading: false
+    controller: null
 
   mounted: ->
     bindInputQueryParam '#u', null, null, (v) => @username = v if v
@@ -78,12 +84,13 @@ app = new Vue
     plays: -> save()
     selected: -> save()
     gameFilter: -> save()
-    username: ->
+    username: (v) ->
+      @usernameErrors = []
       if @username
+        @controller.abort() if @controller
         @plays = []
         @selected = []
         @gameFilter = ''
-        @usernameErrors = []
         save()
         getUser()
 
