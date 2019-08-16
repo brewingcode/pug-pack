@@ -1,7 +1,7 @@
 /**
  * @license
  * Lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash -d -c include="debounce,uniq,intersection,value,sortBy,keys,values,map,each,filter,reverse,join"`
+ * Build: `lodash -d -c include="debounce,uniq,intersection,value,sortBy,keys,values,map,each,filter,reverse,join,partition"`
  * Copyright JS Foundation and other contributors <https://js.foundation/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -275,6 +275,27 @@
       case 3: return func.call(thisArg, args[0], args[1], args[2]);
     }
     return func.apply(thisArg, args);
+  }
+
+  /**
+   * A specialized version of `baseAggregator` for arrays.
+   *
+   * @private
+   * @param {Array} [array] The array to iterate over.
+   * @param {Function} setter The function to set `accumulator` values.
+   * @param {Function} iteratee The iteratee to transform keys.
+   * @param {Object} accumulator The initial aggregated object.
+   * @returns {Function} Returns `accumulator`.
+   */
+  function arrayAggregator(array, setter, iteratee, accumulator) {
+    var index = -1,
+        length = array == null ? 0 : array.length;
+
+    while (++index < length) {
+      var value = array[index];
+      setter(accumulator, value, iteratee(value), array);
+    }
+    return accumulator;
   }
 
   /**
@@ -1724,6 +1745,24 @@
   }
 
   /**
+   * Aggregates elements of `collection` on `accumulator` with keys transformed
+   * by `iteratee` and values set by `setter`.
+   *
+   * @private
+   * @param {Array|Object} collection The collection to iterate over.
+   * @param {Function} setter The function to set `accumulator` values.
+   * @param {Function} iteratee The iteratee to transform keys.
+   * @param {Object} accumulator The initial aggregated object.
+   * @returns {Function} Returns `accumulator`.
+   */
+  function baseAggregator(collection, setter, iteratee, accumulator) {
+    baseEach(collection, function(value, key, collection) {
+      setter(accumulator, value, iteratee(value), collection);
+    });
+    return accumulator;
+  }
+
+  /**
    * The base implementation of `_.assign` without support for multiple sources
    * or `customizer` functions.
    *
@@ -3005,6 +3044,23 @@
    */
   function copySymbolsIn(source, object) {
     return copyObject(source, getSymbolsIn(source), object);
+  }
+
+  /**
+   * Creates a function like `_.groupBy`.
+   *
+   * @private
+   * @param {Function} setter The function to set accumulator values.
+   * @param {Function} [initializer] The accumulator object initializer.
+   * @returns {Function} Returns the new aggregator function.
+   */
+  function createAggregator(setter, initializer) {
+    return function(collection, iteratee) {
+      var func = isArray(collection) ? arrayAggregator : baseAggregator,
+          accumulator = initializer ? initializer() : {};
+
+      return func(collection, setter, getIteratee(iteratee, 2), accumulator);
+    };
   }
 
   /**
@@ -4905,6 +4961,46 @@
   }
 
   /**
+   * Creates an array of elements split into two groups, the first of which
+   * contains elements `predicate` returns truthy for, the second of which
+   * contains elements `predicate` returns falsey for. The predicate is
+   * invoked with one argument: (value).
+   *
+   * @static
+   * @memberOf _
+   * @since 3.0.0
+   * @category Collection
+   * @param {Array|Object} collection The collection to iterate over.
+   * @param {Function} [predicate=_.identity] The function invoked per iteration.
+   * @returns {Array} Returns the array of grouped elements.
+   * @example
+   *
+   * var users = [
+   *   { 'user': 'barney',  'age': 36, 'active': false },
+   *   { 'user': 'fred',    'age': 40, 'active': true },
+   *   { 'user': 'pebbles', 'age': 1,  'active': false }
+   * ];
+   *
+   * _.partition(users, function(o) { return o.active; });
+   * // => objects for [['fred'], ['barney', 'pebbles']]
+   *
+   * // The `_.matches` iteratee shorthand.
+   * _.partition(users, { 'age': 1, 'active': false });
+   * // => objects for [['pebbles'], ['barney', 'fred']]
+   *
+   * // The `_.matchesProperty` iteratee shorthand.
+   * _.partition(users, ['active', false]);
+   * // => objects for [['barney', 'pebbles'], ['fred']]
+   *
+   * // The `_.property` iteratee shorthand.
+   * _.partition(users, 'active');
+   * // => objects for [['fred'], ['barney', 'pebbles']]
+   */
+  var partition = createAggregator(function(result, value, key) {
+    result[key ? 0 : 1].push(value);
+  }, function() { return [[], []]; });
+
+  /**
    * Creates an array of elements, sorted in ascending order by the results of
    * running each element in a collection thru each iteratee. This method
    * performs a stable sort, that is, it preserves the original sort order of
@@ -6220,6 +6316,7 @@
   lodash.memoize = memoize;
   lodash.mixin = mixin;
   lodash.negate = negate;
+  lodash.partition = partition;
   lodash.property = property;
   lodash.reverse = reverse;
   lodash.sortBy = sortBy;
