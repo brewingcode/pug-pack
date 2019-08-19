@@ -5,13 +5,13 @@ pr = require 'bluebird'
 fs = require 'fs'
 mkdirp = require 'mkdirp'
 knex = require 'knex'
+moment = require 'moment'
 
 datadir = '/tmp/bgg'
 
 dbh = null
-db = ->
-  return dbh if dbh
-  mkdirp.sync(datadir)
+db = (args...) -> if args.length then dbh(args...) else dbh
+do ->
   dbh = await knex
     client: 'sqlite3'
     connection:
@@ -23,11 +23,9 @@ db = ->
       if not t
         dbh.schema.createTable 'users', (t) -> cols(t)
   await makeTable 'users', (t) ->
-    t.string 'bgg_name'
+    t.string('bgg_name').notNullable().unique()
     t.json 'all_plays'
     t.timestamps true, true
-
-  return dbh
 
 fixXml = (n) ->
   log = -> 0 # console.log
@@ -52,49 +50,80 @@ fixXml = (n) ->
     log 'scalar:', n
     return n
 
-parseResponse = (resp) ->
+fetchUrl = (url) ->
   new pr (resolve) ->
+    console.log "fetchUrl:", url
+    resp = await execAsync("curl -qsS '#{url}'")
     try
       json = execSync('xq .', { input:resp })
-      resolve fixXml JSON.parse(json)
+      resp = fixXml JSON.parse(json)
+      if resp.div?.class is 'messagebox error'
+        console.error "api error:", url, resp.div['#text']
+      resolve resp
+
     catch e
-      f = '/tmp/failed-bgg-parse.txt'
+      f = "/tmp/failed-bgg-parse-#{moment().valueOf()}"
       fs.writeFileSync(f, resp)
-      console.error "unable to parse api response (see #{f}):", e
-      resolve null
+      console.error "response parse failure (see #{f}):", e
+      throw e
 
 onePage = (username, page) ->
-  url = "https://www.boardgamegeek.com/xmlapi2/plays?username=#{username}&page=#{page or 1}"
-  await parseResponse await execAsync("curl -qsS '#{url}'")
+  (await fetchUrl "https://www.boardgamegeek.com/xmlapi2/plays?username=#{username}&page=#{page or 1}").plays
 
 oneThing = (id) ->
-  url = "https://www.boardgamegeek.com/xmlapi2/thing?id=#{id}"
-  await parseResponse execAsync("curl -qsS '#{url}'")
+  (await fetchUrl "https://www.boardgamegeek.com/xmlapi2/thing?id=#{id}").items
 
 allPlays = (username) ->
   first = await onePage(username)
-  if not first or first.div?.class is 'messagebox error'
+  if not first.play
     return
-      plays:
-        play = []
       error: first.div['#text']
-  totalpages = Math.floor(+first.plays.total / 100) + 1
+  totalpages = Math.floor(+first.total / 100) + 1
   if totalpages > 1
     prs = await pr.all [2 .. totalpages].map (page) ->
       await onePage(username, page)
     prs.forEach (page, i) ->
-      if not page.plays?.play
+      if not page.play
         console.error "no plays on page #{i}"
       else
-        first.plays.play.push ...page.plays.play
+        first.play.push ...page.play
   delete first.page
   return first
 
-module.exports = { fixXml, onePage, allPlays, oneThing, db }
+cachedPlays = (username, age) ->
+  age ?= 60
+  console.log "cachedPlays:", username, age
+
+  rows = await db('users').select().where(bgg_name:username)
+  if rows.length is 1
+    if moment.utc(rows[0].updated_at).isBefore(moment().subtract(age, 'minutes'))
+      console.log 'stale row'
+      plays = await allPlays(username)
+      await db('users').where
+        bgg_name:username
+      .update
+        all_plays:JSON.stringify(plays)
+    else
+      console.log 'fresh row'
+      plays = JSON.parse(rows[0].all_plays)
+  else
+    console.log 'no row'
+    plays = await allPlays(username)
+    await db('users').insert
+      all_plays:JSON.stringify(plays)
+      bgg_name:username
+
+  return plays
+
+module.exports = { fixXml, onePage, allPlays, oneThing, db, cachedPlays }
 
 unless module.parent
-  [ username ] = process.argv.slice(2)
+  [ username, age ] = process.argv.slice(2)
   unless username
     console.error "username required"
     process.exit(1)
-  do -> console.log JSON.stringify await allPlays(username)
+  pr.delay(300).then ->
+    plays = await cachedPlays username, if age then +age else null
+    console.log "#{plays.total} plays found"
+  .finally ->
+    db()?.destroy()
