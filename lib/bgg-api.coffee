@@ -4,6 +4,30 @@ pr = require 'bluebird'
 { execSync, execAsync } = pr.promisifyAll require 'child_process'
 fs = require 'fs'
 mkdirp = require 'mkdirp'
+knex = require 'knex'
+
+datadir = '/tmp/bgg'
+
+dbh = null
+db = ->
+  return dbh if dbh
+  mkdirp.sync(datadir)
+  dbh = await knex
+    client: 'sqlite3'
+    connection:
+      filename: "#{datadir}/db.sqlite"
+    useNullAsDefault: true
+
+  makeTable = (t, cols) ->
+    dbh.schema.hasTable('users').then (t) ->
+      if not t
+        dbh.schema.createTable 'users', (t) -> cols(t)
+  await makeTable 'users', (t) ->
+    t.string 'bgg_name'
+    t.json 'all_plays'
+    t.timestamps true, true
+
+  return dbh
 
 fixXml = (n) ->
   log = -> 0 # console.log
@@ -66,7 +90,7 @@ allPlays = (username) ->
   delete first.page
   return first
 
-module.exports = { fixXml, onePage, allPlays, oneThing }
+module.exports = { fixXml, onePage, allPlays, oneThing, db }
 
 unless module.parent
   [ username ] = process.argv.slice(2)
