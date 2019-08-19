@@ -18,13 +18,19 @@ do ->
       filename: "#{datadir}/db.sqlite"
     useNullAsDefault: true
 
-  makeTable = (t, cols) ->
-    dbh.schema.hasTable('users').then (t) ->
+  makeTable = (name, cols) ->
+    dbh.schema.hasTable(name).then (t) ->
       if not t
-        dbh.schema.createTable 'users', (t) -> cols(t)
+        dbh.schema.createTable name, (t) -> cols(t)
+
   await makeTable 'users', (t) ->
     t.string('bgg_name').notNullable().unique()
     t.json 'all_plays'
+    t.timestamps true, true
+  await makeTable 'remap_names', (t) ->
+    t.string('bgg_name').notNullable()
+    t.string('from_api')
+    t.string('change_to')
     t.timestamps true, true
 
 fixXml = (n) ->
@@ -110,7 +116,40 @@ cachedPlays = (username, age) ->
 
   return plays
 
-module.exports = { fixXml, onePage, allPlays, oneThing, db, cachedPlays }
+fixNames = (username) ->
+  rows = if username
+    await db('users').select().where(bgg_name:username)
+  else
+    await db('users').select()
+
+  console.log "remapping #{rows.length} users"
+  await pr.all rows.map (row) ->
+    remap_rows = await db('remap_names').select().where(bgg_name:row.bgg_name)
+    console.log "#{row.bgg_name} has #{remap_rows.length} remaps"
+    return unless remap_rows.length > 0
+
+    remap = {}
+    remap_rows.forEach (x) -> remap[x.from_api] = x.change_to
+    fixName = (player) ->
+      if remap[player.name]
+        console.log "remapping #{player.name} -> #{remap[player.name]} for #{row.bgg_name}"
+        player.name = remap[player.name]
+        remap['//'] = 1
+
+    plays = JSON.parse(row.all_plays)
+    plays.play?.forEach (play) ->
+      if Array.isArray(play.players)
+        play.players.forEach fixName
+      else if play.players?.player
+        fixName play.players.player
+
+    if remap['//']
+      await db('users').where
+        bgg_name:row.bgg_name
+      .update
+        all_plays:JSON.stringify(plays)
+
+module.exports = { fixXml, onePage, allPlays, oneThing, db, cachedPlays, fixNames }
 
 unless module.parent
   [ username, age ] = process.argv.slice(2)
@@ -118,7 +157,8 @@ unless module.parent
     console.error "username required"
     process.exit(1)
   pr.delay(300).then ->
-    plays = await cachedPlays username, if age then +age else null
-    console.log "#{plays.total} plays found"
+    # plays = await cachedPlays username, if age then +age else null
+    # console.log "#{plays.total} plays found"
+    await fixNames()
   .finally ->
     db()?.destroy()
