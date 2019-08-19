@@ -6,7 +6,6 @@ fs = require 'fs'
 mkdirp = require 'mkdirp'
 knex = require 'knex'
 moment = require 'moment'
-log = require('debug')('bgg')
 
 datadir = '/tmp/bgg'
 
@@ -29,6 +28,7 @@ do ->
     t.timestamps true, true
 
 fixXml = (n) ->
+  log = -> 0 #console.log
   if Array.isArray(n)
     log 'array:', n.length
     return n.map fixXml
@@ -52,7 +52,6 @@ fixXml = (n) ->
 
 fetchUrl = (url) ->
   new pr (resolve) ->
-    log "fetchUrl:", url
     resp = await execAsync("curl -qsS '#{url}'")
     try
       json = execSync('xq .', { input:resp })
@@ -68,14 +67,14 @@ fetchUrl = (url) ->
       throw e
 
 onePage = (username, page) ->
-  (await fetchUrl "https://www.boardgamegeek.com/xmlapi2/plays?username=#{username}&page=#{page or 1}").plays
+  await fetchUrl "https://www.boardgamegeek.com/xmlapi2/plays?username=#{username}&page=#{page or 1}"
 
 oneThing = (id) ->
-  (await fetchUrl "https://www.boardgamegeek.com/xmlapi2/thing?id=#{id}").items
+  await fetchUrl "https://www.boardgamegeek.com/xmlapi2/thing?id=#{id}"
 
 allPlays = (username) ->
   first = await onePage(username)
-  if not first.play
+  if not first.plays?.play
     return
       error: first.div['#text']
   totalpages = Math.floor(+first.total / 100) + 1
@@ -83,31 +82,27 @@ allPlays = (username) ->
     prs = await pr.all [2 .. totalpages].map (page) ->
       await onePage(username, page)
     prs.forEach (page, i) ->
-      if not page.play
+      if not page.plays.play
         console.error "no plays on page #{i}"
       else
-        first.play.push ...page.play
-  delete first.page
-  return first
+        first.plays.play.push ...page.plays.play
+  delete first.plays.page
+  return first.plays
 
 cachedPlays = (username, age) ->
   age ?= 60
-  log "cachedPlays:", username, age
 
   rows = await db('users').select().where(bgg_name:username)
   if rows.length is 1
     if moment.utc(rows[0].updated_at).isBefore(moment().subtract(age, 'minutes'))
-      log 'stale row'
       plays = await allPlays(username)
       await db('users').where
         bgg_name:username
       .update
         all_plays:JSON.stringify(plays)
     else
-      log 'fresh row'
       plays = JSON.parse(rows[0].all_plays)
   else
-    log 'no row'
     plays = await allPlays(username)
     await db('users').insert
       all_plays:JSON.stringify(plays)
