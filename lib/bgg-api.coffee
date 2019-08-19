@@ -6,6 +6,7 @@ fs = require 'fs'
 mkdirp = require 'mkdirp'
 knex = require 'knex'
 moment = require 'moment'
+log = require('debug')('bgg')
 
 datadir = '/tmp/bgg'
 
@@ -28,7 +29,6 @@ do ->
     t.timestamps true, true
 
 fixXml = (n) ->
-  log = -> 0 # console.log
   if Array.isArray(n)
     log 'array:', n.length
     return n.map fixXml
@@ -52,7 +52,7 @@ fixXml = (n) ->
 
 fetchUrl = (url) ->
   new pr (resolve) ->
-    console.log "fetchUrl:", url
+    log "fetchUrl:", url
     resp = await execAsync("curl -qsS '#{url}'")
     try
       json = execSync('xq .', { input:resp })
@@ -92,22 +92,22 @@ allPlays = (username) ->
 
 cachedPlays = (username, age) ->
   age ?= 60
-  console.log "cachedPlays:", username, age
+  log "cachedPlays:", username, age
 
   rows = await db('users').select().where(bgg_name:username)
   if rows.length is 1
     if moment.utc(rows[0].updated_at).isBefore(moment().subtract(age, 'minutes'))
-      console.log 'stale row'
+      log 'stale row'
       plays = await allPlays(username)
       await db('users').where
         bgg_name:username
       .update
         all_plays:JSON.stringify(plays)
     else
-      console.log 'fresh row'
+      log 'fresh row'
       plays = JSON.parse(rows[0].all_plays)
   else
-    console.log 'no row'
+    log 'no row'
     plays = await allPlays(username)
     await db('users').insert
       all_plays:JSON.stringify(plays)
