@@ -22,7 +22,7 @@ app.get '/:username', (req, res) ->
     res.type('json')
     res.send fs.readFileSync(filename)
   else
-    data = bgg.allPlays(req.params.username)
+    data = await bgg.allPlays(req.params.username)
     fs.writeFileSync(filename, JSON.stringify(data))
     if data.error
       res.status(500).json(error:data.error)

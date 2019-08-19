@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN apk add --no-cache --update tzdata curl jq python py2-pip \
   && pip install yq \
-  && npm install coffeescript express sanitize-filename cors morgan
+  && npm install coffeescript express sanitize-filename cors morgan mkdirp bluebird
 
 COPY server.coffee bgg-api.coffee ./
 
