@@ -35,10 +35,13 @@ do ->
     if init and typeof init isnt 'function'
       throw new Error "fourth argument must be a function instead of:", init
 
-    if params.has(paramKey(sel))
-      if init
+    if init
+      if params.has(paramKey(sel))
         init(params.get(paramKey(sel)))
       else
+        init()
+    else
+      if params.has(paramKey(sel))
         el().value = params.get(paramKey(sel))
 
     delay = if delay then +delay else 300
