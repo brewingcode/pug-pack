@@ -1,7 +1,6 @@
 express = require 'express'
 http = require 'http'
 bgg = require './bgg-api'
-sanitize = require 'sanitize-filename'
 fs = require 'fs'
 cors = require 'cors'
 morgan = require 'morgan'
