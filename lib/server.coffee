@@ -15,7 +15,7 @@ app.use cors()
 app.use morgan('dev')
 
 app.get '/:username', (req, res) ->
-  res.json await bgg.cachedPlays req.params.username
+  res.json await bgg.cachedPlays req.params.username, if req.query.force then 0 else null
 
 server = http.createServer(app)
 server.listen port, host, ->
