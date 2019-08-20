@@ -4,9 +4,11 @@ WORKDIR /app
 
 RUN apk add --no-cache --update tzdata curl jq python py2-pip \
   && pip install yq \
-  && npm install coffeescript express sanitize-filename cors morgan mkdirp bluebird knex sqlite3
+  && npm install coffeescript express sanitize-filename cors morgan mkdirp bluebird knex sqlite3 moment
 
 COPY server.coffee bgg-api.coffee ./
+
+VOLUME /tmp/bgg
 
 ENV TZ=America/Los_Angeles
 EXPOSE 5000
