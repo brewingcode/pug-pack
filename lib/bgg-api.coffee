@@ -184,8 +184,8 @@ unless module.parent
     console.error "username required"
     process.exit(1)
   pr.delay(300).then ->
-    # plays = await cachedPlays username, if age then +age else null
-    # console.log "#{plays.total} plays found"
-    await fixAllNames()
+    plays = await cachedPlays username, if age then +age else null
+    fs.writeFileSync 'plays.json', JSON.stringify(plays)
+    console.log "#{plays.total} plays found"
   .finally ->
     db()?.destroy()
