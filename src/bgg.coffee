@@ -76,17 +76,22 @@ app = new Vue
         { text: 'Players', value: 'players' }
         { text: 'Location', value: 'location'}
       ]
-    plays: saved.plays or []
+    plays: []
     selected: saved.selected or []
     gameFilter: saved.gameFilter or ''
     playerFilter: saved.playerFilter or ''
-    username: saved.username or ''
+    username: ''
     usernameErrors: []
     isLoading: false
     controller: null
 
   mounted: ->
-    bindInputQueryParam '#u', null, null, (v) => @username = v if v
+    bindInputQueryParam '#u', null, null, (v) =>
+      if v
+        @username = v
+      else
+        saved = load()
+        @username = saved.username
 
   watch:
     plays: -> save()
