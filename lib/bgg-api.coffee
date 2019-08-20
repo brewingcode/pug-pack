@@ -32,6 +32,10 @@ do ->
     t.string('from_api')
     t.string('change_to')
     t.timestamps true, true
+  await makeTable 'remap_titles', (t) ->
+    t.string('bgg_name').notNullable()
+    t.string('game_name')
+    t.timestamps true, true
 
 fixXml = (n) ->
   log = -> 0 #console.log
@@ -94,7 +98,7 @@ allPlays = (username) ->
         first.plays.play.push ...page.plays.play
   delete first.plays.page
 
-  return await fixNames username, first.plays
+  return await fixTitles(username, await fixNames(username, first.plays))
 
 cachedPlays = (username, age) ->
   age ?= 60
@@ -124,8 +128,7 @@ cachedPlays = (username, age) ->
 
 fixNames = (username, plays) ->
   remap_rows = await db('remap_names').select().where(bgg_name:username)
-  console.log "#{username} has #{remap_rows.length} remaps"
-  return plays unless remap_rows.length > 0
+  console.log "#{username} has #{remap_rows.length} remap_names"
 
   remap = {}
   remap_rows.forEach (x) -> remap[x.from_api] = x.change_to
@@ -156,6 +159,22 @@ fixAllNames = ->
     .update
       all_plays:JSON.stringify(plays)
       updated_at: moment().format()
+
+fixTitles = (username, plays) ->
+  remap_rows = await db('remap_titles').select().where(bgg_name:username)
+  console.log "#{username} has #{remap_rows.length} remap_titles"
+
+  remap = remap_rows.map (row) -> row.game_name
+  plays.play?.forEach (play) ->
+    if play.comments and play.item.name.toLowerCase() is 'unpublished prototype'
+      hit = remap.find (r) ->
+        normalize = (s) -> s.toLowerCase().replace(/\W/g, '')
+        normalize(play.comments).includes(normalize(r))
+      if hit
+        console.log "assigning #{hit} as game name for #{username}"
+        play.item.name = hit
+
+  return plays
 
 module.exports = { fixXml, onePage, allPlays, oneThing, db, cachedPlays, fixAllNames }
 
