@@ -105,14 +105,18 @@ cachedPlays = (username, age) ->
   rows = await db('users').select().where(bgg_name:username)
   if rows.length is 1
     if moment.utc(rows[0].updated_at).isBefore(moment().subtract(age, 'minutes'))
+      console.log 'old row:', username, rows[0].updated_at, moment().format()
       plays = await allPlays(username)
       await db('users').where
         bgg_name:username
       .update
         all_plays:JSON.stringify(plays)
+        updated_at: moment().format()
     else
+      console.log 'fresh row:', username, rows[0].updated_at
       plays = JSON.parse(rows[0].all_plays)
   else
+    console.log 'missing row:', username
     plays = await allPlays(username)
     await db('users').insert
       all_plays:JSON.stringify(plays)
@@ -153,7 +157,8 @@ fixAllNames = ->
       await db('users').where
         bgg_name:row.bgg_name
       .update
-        all_plays:JSON.stringify(plays)
+        all_plays:JSON.stringify(updated)
+        updated_at: moment().format()
 
 module.exports = { fixXml, onePage, allPlays, oneThing, db, cachedPlays, fixAllNames }
 
