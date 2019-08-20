@@ -98,6 +98,7 @@ allPlays = (username) ->
 
 cachedPlays = (username, age) ->
   age ?= 60
+  username = username.toLowerCase()
 
   rows = await db('users').select().where(bgg_name:username)
   if rows.length is 1
