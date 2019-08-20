@@ -1,4 +1,5 @@
 express = require 'express'
+http = require 'http'
 bgg = require './bgg-api'
 sanitize = require 'sanitize-filename'
 fs = require 'fs'
@@ -16,5 +17,11 @@ app.use morgan('dev')
 app.get '/:username', (req, res) ->
   res.json await bgg.cachedPlays req.params.username
 
-app.listen port, host, ->
+server = http.createServer(app)
+server.listen port, host, ->
   console.log "listening on #{host}:#{port}"
+
+process.on 'SIGTERM', ->
+  console.log 'closing down server.coffee'
+  await bgg.db().destroy()
+  server.close()
