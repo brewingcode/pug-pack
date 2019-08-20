@@ -8,7 +8,6 @@ load = ->
 save = ->
   data = JSON.stringify
     username: app.username
-    plays: app.plays
     selected: app.selected
     gameFilter: app.gameFilter
     playerFilter: app.playerFilter
@@ -27,6 +26,15 @@ getUser = _.debounce ->
       app.usernameErrors = [ "Error getting user: #{json.error}" ]
     else if json.play
       app.plays = json.play
+      saved = load()
+      if saved.username is app.username
+        app.selected = saved.selected
+        app.gameFilter = saved.gameFilter
+        app.playerFilter = saved.playerFilter
+      else
+        app.selected = []
+        app.gameFilter = ''
+        app.playerFilter = ''
     else
       app.usernameErrors = [ 'No games found for that user' ]
       app.plays = []
@@ -94,7 +102,6 @@ app = new Vue
         @username = saved.username
 
   watch:
-    plays: -> save()
     selected: -> save()
     gameFilter: -> save()
     playerFilter: -> save()
@@ -103,9 +110,6 @@ app = new Vue
       if @username and @username.match(/\S/)
         @controller.abort() if @controller
         @plays = []
-        @selected = []
-        @gameFilter = ''
-        save()
         getUser()
 
   methods:
