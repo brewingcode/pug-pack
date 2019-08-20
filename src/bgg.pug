@@ -47,7 +47,7 @@ html
                     tr(v-for="(v,k) in stats" :key="k")
                       td.font-weight-bold(v-text="k + ':'")
                       td(v-text="v")
-                h3.text-center.mb-2 Full list
+                h3.text-center.mb-2 All games in common between {{selected.length}} player(s)
                 v-data-table(:items="commonGames"
                              item-key="playid"
                              :headers="headers.games"
@@ -70,4 +70,5 @@ html
     :inject(file="vuetify.js")
     :inject(file="lodash-custom.js")
     :inject(file="bind-input-query-param.coffee")
+    :inject(file="moment.js")
     :inject(file="bgg.coffee" bare)

@@ -142,7 +142,7 @@ app = new Vue
 
     commonPlays: ->
       ids = _.intersection ...@selected.map (player) -> player.plays
-      @plays.filter (play) -> play.id in ids
+      @plays.filter (play) -> play.id in ids and play.date isnt '0000-00-00'
 
     commonGames: ->
       @commonPlays.map (play) ->
@@ -188,5 +188,10 @@ app = new Vue
         .reverse()
         .each (w) ->
           stats["#{w.name} wins"] = w.count + ' (' + w.pct + '%)'
+
+      if @commonPlays.length > 1
+        first = moment(@commonPlays[@commonPlays.length - 1].date, 'YYYY-MM-DD')
+        last = moment(@commonPlays[0].date, 'YYYY-MM-DD')
+        stats['Time span'] = moment.duration(first.diff(last)).humanize()
 
       return stats
