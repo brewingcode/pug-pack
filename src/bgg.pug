@@ -31,6 +31,8 @@ html
                            hide-default-footer
                            disable-pagination
                            show-select)
+                template(v-slot:top)
+                  v-text-field(v-model="playerFilter" label="Minimum games")
                 template(v-slot:item.count="{item}")
                   span(v-text="commify(item.count)")
             v-flex(sm7 md8 lg9)
@@ -47,7 +49,6 @@ html
                 v-data-table(:items="commonGames"
                              item-key="playid"
                              :headers="headers.games"
-                             :custom-filter="filterGames"
                              hide-default-footer
                              disable-pagination)
                   template(v-slot:top)
