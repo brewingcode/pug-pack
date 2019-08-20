@@ -11,6 +11,7 @@ save = ->
     plays: app.plays
     selected: app.selected
     gameFilter: app.gameFilter
+    playerFilter: app.playerFilter
     version: dataVersion
   localStorage.setItem('bgg', data)
 
@@ -51,7 +52,15 @@ app = new Vue
     headers:
       players: [
         { text: 'Player Name', value: 'name' }
-        { text: 'Number of Games Played', value: 'count' }
+        {
+          text: 'Number of Games Played'
+          value: 'count'
+          filter: (v) =>
+            if @playerFilter
+              +v >= +@playerFilter
+            else
+              true
+        }
       ]
       games: [
         {
@@ -70,6 +79,7 @@ app = new Vue
     plays: saved.plays or []
     selected: saved.selected or []
     gameFilter: saved.gameFilter or ''
+    playerFilter: saved.playerFilter or ''
     username: saved.username or ''
     usernameErrors: []
     isLoading: false
@@ -82,6 +92,7 @@ app = new Vue
     plays: -> save()
     selected: -> save()
     gameFilter: -> save()
+    playerFilter: -> save()
     username: (v) ->
       @usernameErrors = []
       if @username and @username.match(/\S/)
@@ -93,9 +104,6 @@ app = new Vue
         getUser()
 
   methods:
-    filterGames: (v, search, item) ->
-      item.name.toLowerCase().includes(v.toLowerCase())
-
     commify: (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
 
   computed:
