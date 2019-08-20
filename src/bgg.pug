@@ -9,6 +9,7 @@ html
     :inject(file="vuetify.css")
     style.
       .stats tr:nth-child(even) { background-color: #f2f2f2 }
+      span.win { font-weight: bold }
 
   body
     script#app(type="text/x-template")
@@ -55,7 +56,11 @@ html
                   template(v-slot:top)
                     v-text-field(v-model="gameFilter" label="Filter by game")
                   template(v-slot:item.players="{item}")
-                    span.text-no-wrap(v-html="item.players")
+                    span.text-no-wrap
+                      template(v-for="p,i in item.players")
+                        span(:class="{ win: p.win }" v-text="p.name")
+                        v-icon.mb-1(v-if="p.win" small) mdi-check
+                        br(v-if="i + 1 < item.players.length")
                   template(v-slot:item.name="{item}")
                     a(:href="'https://boardgamegeek.com/boardgame/' + item.gameid") {{item.name}}
                   template(v-slot:item.date="{item}")
