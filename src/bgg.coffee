@@ -147,9 +147,11 @@ app = new Vue
     commonGames: ->
       @commonPlays.map (play) ->
         players = _(play.players)
-          .map (p) -> p.name
-          .sortBy (p) -> p.toLowerCase()
-          .join '<br>'
+          .sortBy (p) -> p.name.toLowerCase()
+          .map (p) ->
+            win: if p.win is '1' then true else false
+            name: p.name
+          .value()
 
         return
           name: play.item.name
