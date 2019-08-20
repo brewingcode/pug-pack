@@ -7,20 +7,21 @@ html
     meta(name="viewport" content="width=device-width, initial-scale=1")
     :inject(file="md-icons.css")
     :inject(file="vuetify.css")
+    style .stats tr:nth-child(even) { background-color: #f2f2f2 };
   body
     script#app(type="text/x-template")
       v-app
-        v-container(fluid)
-          v-row
-            v-col(xs="12")
+        v-container(fluid grid-list-xl)
+          v-layout(row)
+            v-flex(xs12)
               v-text-field(v-model="username"
-                           ref="u"
-                           id="u"
-                           label="boardgamegeek.com username"
-                           :error-messages="usernameErrors"
-                           :loading="isLoading")
-          v-row
-            v-col(md="4" sm="12" xs="12")
+                          ref="u"
+                          id="u"
+                          label="boardgamegeek.com username"
+                          :error-messages="usernameErrors"
+                          :loading="isLoading")
+          v-layout(row)
+            v-flex(sm5 md4 lg3)
               h2.text-center Select the players you want
               span &nbsp;
               v-data-table(:items="players"
@@ -32,12 +33,12 @@ html
                            show-select)
                 template(v-slot:item.count="{item}")
                   span(v-text="commify(item.count)")
-            v-col(md="8" sm="12" xs="12")
+            v-flex(sm7 md8 lg9)
               h2.text-center Details
               h3.text-center(v-if="selected.length < 1") Select one or more players
               template(v-else)
                 h3.text-center Quick stats
-                v-simple-table(style="width:50%; margin:auto;")
+                v-simple-table.stats
                   template(v-slot:default)
                     tr(v-for="(v,k) in stats" :key="k")
                       td.font-weight-bold(v-text="k + ':'")
