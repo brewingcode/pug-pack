@@ -83,7 +83,7 @@ allPlays = (username) ->
   if not first.plays?.play
     return
       error: first.div['#text']
-  totalpages = Math.floor(+first.total / 100) + 1
+  totalpages = Math.floor(+first.plays.total / 100) + 1
   if totalpages > 1
     prs = await pr.all [2 .. totalpages].map (page) ->
       await onePage(username, page)
