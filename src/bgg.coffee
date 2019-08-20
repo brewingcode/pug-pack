@@ -1,5 +1,5 @@
 
-dataVersion = 2
+dataVersion = 3
 load = ->
   if data = localStorage.getItem('bgg')
     data = JSON.parse(data)
@@ -24,8 +24,8 @@ getUser = _.debounce ->
   .then (json) ->
     if json.error
       app.usernameErrors = [ "Error getting user: #{json.error}" ]
-    else if json.plays?.play
-      app.plays = json.plays?.play
+    else if json.play
+      app.plays = json.play
     else
       app.usernameErrors = [ 'No games found for that user' ]
       app.plays = []
