@@ -93,7 +93,11 @@ allPlays = (username) ->
       else
         first.plays.play.push ...page.plays.play
   delete first.plays.page
-  return first.plays
+
+  if updated = fixNames username, first.plays
+    return updated
+  else
+    return first.plays
 
 cachedPlays = (username, age) ->
   age ?= 60
@@ -116,7 +120,28 @@ cachedPlays = (username, age) ->
 
   return plays
 
-fixNames = (username) ->
+fixNames = (username, plays) ->
+  remap_rows = await db('remap_names').select().where(bgg_name:username)
+  console.log "#{username} has #{remap_rows.length} remaps"
+  return unless remap_rows.length > 0
+
+  remap = {}
+  remap_rows.forEach (x) -> remap[x.from_api] = x.change_to
+  fixName = (player) ->
+    if remap[player.name]
+      console.log "remapping #{player.name} -> #{remap[player.name]} for #{username}"
+      player.name = remap[player.name]
+      remap['//'] = 1
+
+  plays.play?.forEach (play) ->
+    if Array.isArray(play.players)
+      play.players.forEach fixName
+    else if play.players?.player
+      fixName play.players.player
+
+  return if remap['//'] then plays else null
+
+fixAllNames = ->
   rows = if username
     await db('users').select().where(bgg_name:username)
   else
@@ -124,32 +149,13 @@ fixNames = (username) ->
 
   console.log "remapping #{rows.length} users"
   await pr.all rows.map (row) ->
-    remap_rows = await db('remap_names').select().where(bgg_name:row.bgg_name)
-    console.log "#{row.bgg_name} has #{remap_rows.length} remaps"
-    return unless remap_rows.length > 0
-
-    remap = {}
-    remap_rows.forEach (x) -> remap[x.from_api] = x.change_to
-    fixName = (player) ->
-      if remap[player.name]
-        console.log "remapping #{player.name} -> #{remap[player.name]} for #{row.bgg_name}"
-        player.name = remap[player.name]
-        remap['//'] = 1
-
-    plays = JSON.parse(row.all_plays)
-    plays.play?.forEach (play) ->
-      if Array.isArray(play.players)
-        play.players.forEach fixName
-      else if play.players?.player
-        fixName play.players.player
-
-    if remap['//']
+    if updated = fixNames row.bgg_name, JSON.parse(row.all_plays)
       await db('users').where
         bgg_name:row.bgg_name
       .update
         all_plays:JSON.stringify(plays)
 
-module.exports = { fixXml, onePage, allPlays, oneThing, db, cachedPlays, fixNames }
+module.exports = { fixXml, onePage, allPlays, oneThing, db, cachedPlays, fixAllNames }
 
 unless module.parent
   [ username, age ] = process.argv.slice(2)
@@ -159,6 +165,6 @@ unless module.parent
   pr.delay(300).then ->
     # plays = await cachedPlays username, if age then +age else null
     # console.log "#{plays.total} plays found"
-    await fixNames()
+    await fixAllNames()
   .finally ->
     db()?.destroy()
