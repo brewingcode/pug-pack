@@ -65,6 +65,12 @@ html
                     a(:href="'https://boardgamegeek.com/boardgame/' + item.gameid") {{item.name}}
                   template(v-slot:item.date="{item}")
                     a.text-no-wrap(:href="'https://boardgamegeek.com/play/details/' + item.playid") {{item.date}}
+          v-layout(row)
+            v-flex.text-center(style="color:black; opacity:0.7")
+              - var url = 'https://github.com/brewingcode/pug-pack/blob/' + src.GIT_HEAD + '/src/bgg.pug';
+              a(style="text-decoration:none" href=url)
+                v-icon mdi-github-circle
+              a(href=url) #{src.GIT_HEAD}
 
     :inject(file="vue-prod.js")
     :inject(file="vuetify.js")
