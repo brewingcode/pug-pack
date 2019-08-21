@@ -1,0 +1,80 @@
+doctype html
+html
+  head
+    title boardgamegeek
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    :inject(file="md-icons.css")
+    :inject(file="vuetify.css")
+    style.
+      .stats tr:nth-child(even) { background-color: #f2f2f2 }
+      span.win { font-weight: bold }
+
+  body
+    script#app(type="text/x-template")
+      v-app
+        v-container(fluid grid-list-xl)
+          v-layout(row)
+            v-flex(xs12)
+              v-text-field(v-model="username"
+                          ref="u"
+                          id="u"
+                          label="boardgamegeek.com username"
+                          :error-messages="usernameErrors"
+                          :loading="isLoading")
+          v-layout(row)
+            v-flex(sm5 md4 lg3)
+              h2.text-center.mb-2 Select the players you want
+              v-data-table(:items="players"
+                           item-key="name"
+                           v-model="selected"
+                           :headers="headers.players"
+                           hide-default-footer
+                           disable-pagination
+                           show-select)
+                template(v-slot:top)
+                  v-text-field(v-model="playerFilter" label="Minimum games")
+                template(v-slot:item.count="{item}")
+                  span(v-text="commify(item.count)")
+            v-flex(sm7 md8 lg9)
+              h2.text-center.mb-2 Details
+              h3.text-center.mb-2(v-if="selected.length < 1") Select one or more players
+              template(v-else)
+                h3.text-center.mb-2 Quick stats
+                v-simple-table.stats.mb-2
+                  template(v-slot:default)
+                    tr(v-for="(v,k) in stats" :key="k")
+                      td.font-weight-bold(v-text="k + ':'")
+                      td(v-text="v")
+                h3.text-center.mb-2 All games in common between {{selected.length}} player(s)
+                v-data-table(:items="commonGames"
+                             item-key="playid"
+                             :headers="headers.games"
+                             hide-default-footer
+                             disable-pagination)
+                  template(v-slot:top)
+                    v-text-field(v-model="gameFilter" label="Filter by game")
+                  template(v-slot:item.players="{item}")
+                    span.text-no-wrap
+                      template(v-for="p,i in item.players")
+                        span(:class="{ win: p.win }" v-text="p.name")
+                        v-icon.mb-1(v-if="p.win" small) mdi-check
+                        br(v-if="i + 1 < item.players.length")
+                  template(v-slot:item.name="{item}")
+                    a(:href="'https://boardgamegeek.com/boardgame/' + item.gameid") {{item.name}}
+                  template(v-slot:item.date="{item}")
+                    a.text-no-wrap(:href="'https://boardgamegeek.com/play/details/' + item.playid") {{item.date}}
+          v-layout(row)
+            v-flex.text-center(style="color:black; opacity:0.7")
+              - var url = 'https://github.com/brewingcode/pug-pack/blob/' + src.GIT_HEAD + '/src/bgg.pug';
+              a(style="text-decoration:none" href=url)
+                v-icon mdi-github-circle
+              a(href=url) #{src.GIT_HEAD}
+
+    :inject(file="vue-prod.js")
+    :inject(file="vuetify.js")
+    :inject(file="lodash-custom.js")
+    :inject(file="bind-input-query-param.coffee")
+    :inject(file="moment.js")
+    :inject(file="bgg.coffee" bare)

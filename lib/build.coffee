@@ -157,6 +157,8 @@ module.exports = self =
         pr.all(prs).then ([forCSS, forDOM]) ->
           forCSS: forCSS.data
           forDOM: forDOM.data
+      .catch (e) ->
+        console.error e.stack
 
     html: (s) ->
       if self.prod
@@ -175,6 +177,11 @@ module.exports = self =
   # 1, for example
   crawl: (rootDir, skipPug) ->
     self.vars.basedir = path.resolve rootDir
+
+    execAsync("cd '#{self.vars.basedir}' && git rev-parse --short HEAD").then (stdout) =>
+      self.vars.src['GIT_HEAD'] = stdout.toString()
+    .catch ->
+      self.vars.src['GIT_HEAD'] = null
 
     execAsync("find '#{self.vars.basedir}' -type f -print0").then (stdout) =>
       pug_files = []
@@ -207,6 +214,6 @@ module.exports = self =
     .catch console.error
 
   self: (testPug) ->
-    self.crawl("#{__dirname}/../src").then =>
+    self.crawl("#{__dirname}/../src", true).then =>
       if testPug
-        self.crawl("#{__dirname}/../test", true)
+        self.crawl("#{__dirname}/../test", false)

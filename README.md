@@ -4,19 +4,8 @@
 
 ```sh
 yarn add pug-pack
-mkdir -p src
-cat <<EOF > src/index.pug
-extends ../node_modules/pug-pack/src/_base
-
-append head
-  :inject(file="bootstrap.css")
-
-append body
-  .container
-    p Hello from pug-pack and Bootstrap
-EOF
-npx pug-pack
-open dist/index.html
+npx pug-pack --init
+yarn dev # or `pug-pack -w`, if you don't have a package.json file
 ```
 
 `pug-pack` takes all the `.pug` templates in your `src` directory, and renders
@@ -28,11 +17,13 @@ allows you to easily inline other assets (scripts, CSS, images) into the
 [.yml](http://www.yaml.org/start.html)) are supported, but you can fall back
 on files from the last 20 years if you have to.
 
-You can compile a few test files with:
+You can see some examples by compiling the `test` directory of this repo:
 
 ```sh
-pug-pack "$(npm -g root)/pug-pack/test"
+cd pug-pack
+npx pug-pack -w test
 open dist/index.html
+open dist/hyperapp.html
 ```
 
 # pug
@@ -233,7 +224,8 @@ As noted above, avoid this issue by simply using
 `:inject(file="bootstrap.ss")`, without worrying about `include`. The filter
 is smart enough to figure out where to look for files.
 
-For `extend`, you will have to use the full relative path to `pug-pack/src`:
+For `extend`, you will have to use the full relative path from `pug-pack/src`
+to your target file:
 
 ```pug
 extend ../node_modules/pug-pack/src/_base
@@ -293,3 +285,8 @@ Chart.js, see both the [pug](./src/vue-chart.pug) and the
 
 This is a command-line tool to feed newline-based timestamps into
 vue-chart.pug on your local machine.
+
+## bgg.pug
+
+Another Vuetify-driven static page to display data from boardgamegeek.com
+([.pug](./src/bgg.pug) and [.js](./src/bgg.coffee)).
