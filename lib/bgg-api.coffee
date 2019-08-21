@@ -36,6 +36,10 @@ do ->
     t.string('bgg_name').notNullable()
     t.string('game_name')
     t.timestamps true, true
+  await makeTable 'bgg_names', (t) ->
+    t.string('bgg_name').notNullable()
+    t.string('display_name').notNullable()
+    t.timestamps true, true
 
 fixXml = (n) ->
   log = -> 0 #console.log
@@ -98,7 +102,11 @@ allPlays = (username) ->
         first.plays.play.push ...page.plays.play
   delete first.plays.page
 
-  return await fixTitles(username, await fixNames(username, first.plays))
+  plays = await fixNames(username, first.plays)
+  plays = await fixTitles(username, plays)
+  plays = await fixZeroPlayers(username, plays)
+
+  return plays
 
 cachedPlays = (username, age) ->
   age ?= 60
@@ -173,6 +181,21 @@ fixTitles = (username, plays) ->
       if hit
         console.log "assigning #{hit} as game name for #{username}"
         play.item.name = hit
+
+  return plays
+
+fixZeroPlayers = (username, plays) ->
+  rows = await db('bgg_names').select('display_name').where(bgg_name:username)
+  plays.play?.forEach (play) ->
+    if Array.isArray(play.players)
+      # player info found
+    else if play.players?.player
+      # player info found
+    else
+      if rows.length > 0
+        play.players = player: rows[0].display_name
+      else
+        play.players = player: '(no players)'
 
   return plays
 
