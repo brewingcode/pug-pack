@@ -66,7 +66,7 @@ html
                   template(v-slot:item.date="{item}")
                     a.text-no-wrap(:href="'https://boardgamegeek.com/play/details/' + item.playid") {{item.date}}
 
-    :inject(file="vue-dev.js")
+    :inject(file="vue-prod.js")
     :inject(file="vuetify.js")
     :inject(file="lodash-custom.js")
     :inject(file="bind-input-query-param.coffee")
