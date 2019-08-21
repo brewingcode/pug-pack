@@ -1,5 +1,5 @@
 
-dataVersion = 3
+dataVersion = 4
 load = ->
   if data = localStorage.getItem('bgg')
     data = JSON.parse(data)
@@ -125,9 +125,9 @@ app = new Vue
         if Array.isArray(play.players)
           play.players.forEach addName
         else if play.players?.player
-          addName play.players.player
+          addName name: play.players.player
         else
-          addName name:'(no players)'
+          console.error 'could not infer player:', play
 
       return _(names)
         .keys()
@@ -142,7 +142,13 @@ app = new Vue
 
     commonPlays: ->
       ids = _.intersection ...@selected.map (player) -> player.plays
-      @plays.filter (play) -> play.id in ids and play.date isnt '0000-00-00'
+      @plays
+        .filter (play) ->
+          play.id in ids and play.date isnt '0000-00-00'
+        .map (play) ->
+          if not Array.isArray(play.players)
+            play.players = [name:play.players.player]
+          return play
 
     commonGames: ->
       @commonPlays.map (play) ->
@@ -172,7 +178,7 @@ app = new Vue
       winners = {}
       selected = @selected.map (x) -> x.name
       games.forEach (play) ->
-        if Array.isArray(play.players)
+        if Array.isArray(play.players) and play.players.length > 1
           play.players.forEach (player) ->
             if player.name in selected
               winners[player.name] ?= 0
