@@ -192,7 +192,7 @@ fixZeroPlayers = (username, plays) ->
     if Array.isArray(play.players)
       # player info found
     else if play.players?.player
-      # player info found
+      play.players = [play.players.player]
     else
       if rows.length > 0
         play.players = player: rows[0].display_name
