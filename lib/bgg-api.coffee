@@ -12,6 +12,8 @@ datadir = '/tmp/bgg'
 dbh = null
 db = (args...) -> if args.length then dbh(args...) else dbh
 do ->
+  mkdirp.sync(datadir)
+
   dbh = await knex
     client: 'sqlite3'
     connection:
