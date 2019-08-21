@@ -178,6 +178,11 @@ module.exports = self =
   crawl: (rootDir, skipPug) ->
     self.vars.basedir = path.resolve rootDir
 
+    execAsync("cd '#{self.vars.basedir}' && git rev-parse --short HEAD").then (stdout) =>
+      self.vars.src['GIT_HEAD'] = stdout.toString()
+    .catch ->
+      self.vars.src['GIT_HEAD'] = null
+
     execAsync("find '#{self.vars.basedir}' -type f -print0").then (stdout) =>
       pug_files = []
       other_files = []
