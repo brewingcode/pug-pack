@@ -1,10 +1,44 @@
 #!/usr/bin/env coffee
 
 fs = require 'fs'
-argv = require('minimist') process.argv.slice(2)
+argv = require('minimist') process.argv.slice(2),
+  boolean: ['h', 'help']
 moment = require 'moment'
 tmp = require 'tmp'
 { execSync } = require 'child_process'
+
+if argv.h or argv.help
+  console.log """
+tsc - (t)ime (s)eries (c)hart
+
+usage: tsc [file ...] [-f fmt>]
+
+Parse timestamps from lines of input and graph it using Vue and Chart.js. The
+chart includes:
+
+- aggregation by adjustable duration
+- limiting to most recent timestamps
+
+Each timestamp has a weight of 1, so that default aggregation amounts to simply
+counting timestamps. Weight can be changed by including a number with each
+timestamp, either before or after the timestamp and separated by comma or tab,
+for example:
+
+    2019-08-29,12
+    24,2019-08-30
+    26,2019-09-01
+
+Timestamps are parsed strictly.
+
+-f/--format <moment format string>
+
+    Without a format, falls back on moment's default parsing, otherwise
+    parsing will use your format:
+
+    https://momentjs.com/docs/#/parsing/string/
+    https://momentjs.com/docs/#/parsing/string-format/
+  """
+  process.exit()
 
 content = ''
 if not process.stdin.isTTY
