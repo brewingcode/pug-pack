@@ -53,21 +53,25 @@ format = argv.f or argv.format or undefined
 isNumber = (s) -> s.toString().replace(/,/g, '').match(/^([\-\+])?[\d\.]+$/)
 isMoment = (s) -> moment(s, format, true).isValid()
 
-content.split('\n').forEach (line) ->
+content.split('\n').forEach (line, i) ->
   [t, y] = line.split(/\s*[\t,]\s*/)
   return unless t or y
-  if isMoment(t)
-    y = if y and isNumber(y) then y else 1
-    points.push
-      t: moment(t, format, true)
-      y: parseFloat(y)
-  else if isMoment(y)
-    t = if t and isNumber(t) then t else 1
+  if isNumber(t)
+    console.log "number,timestamp"
+    unless isMoment(y)
+      console.warn "missing timestamp on line #{i+1}: #{line}"
+      return
     points.push
       t: moment(y, format, true)
       y: parseFloat(t)
+  else if isMoment(t)
+    y = if y and isNumber(y) then y else 1
+    console.log "timestamp,#{y}"
+    points.push
+      t: moment(t, format, true)
+      y: parseFloat(y)
   else
-    console.warn "skipping: #{line}"
+    console.warn "skipping line #{i+1}: #{line}"
 
 if points.length is 0
   console.error "no data points found"
