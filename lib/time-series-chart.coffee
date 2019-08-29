@@ -50,7 +50,7 @@ argv._.forEach (filename) ->
 
 points = []
 format = argv.f or argv.format or undefined
-isNumber = (s) -> s.toString().replace(/,/g, '').match(/^[\d\-\+\.]+$/)
+isNumber = (s) -> s.toString().replace(/,/g, '').match(/^([\-\+])?[\d\.]+$/)
 isMoment = (s) -> moment(s, format, true).isValid()
 
 content.split('\n').forEach (line) ->
