@@ -45,6 +45,7 @@ if not process.stdin.isTTY
   content += fs.readFileSync('/dev/stdin').toString()
 
 argv._.forEach (filename) ->
+  filename = '/dev/stdin' if filename is '-'
   content += fs.readFileSync(filename).toString()
 
 points = []
