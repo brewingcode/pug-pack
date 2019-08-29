@@ -26,6 +26,15 @@ open dist/index.html
 open dist/hyperapp.html
 ```
 
+There are a couple other examples, see `helpers and other tools`, below. These
+can be built by running pug-pack with its own `src`:
+
+```
+cd pug-pack
+npx pug-pack -w
+open dist/vue-chart.html
+```
+
 # pug
 
 The main files in `src` are your `.pug` files: these will each end up in
@@ -153,6 +162,14 @@ Note the `css` attribute passed to the `:inject` filter: this is required to
 tell the filter to produce CSS instead of SVG. See
 [test/index.pug](test/index.pug) to see both uses of `:inject()` with an
 `.svg` file.
+
+### extras
+
+The `src` object also gets two additional properties:
+
+* `GIT_HEAD`: the short git sha of the `src` HEAD
+
+* `GIT_TAGS`: any tags that refer to `GIT_HEAD`
 
 # CLI
 
@@ -285,6 +302,37 @@ Chart.js, see both the [pug](./src/vue-chart.pug) and the
 
 This is a command-line tool to feed newline-based timestamps into
 vue-chart.pug on your local machine.
+
+```
+tsc - (t)ime (s)eries (c)hart
+
+usage: tsc [file ...] [-f fmt>]
+
+Parse timestamps from lines of input and graph it using Vue and Chart.js. The
+chart includes:
+
+- aggregation by adjustable duration
+- limiting to most recent timestamps
+
+Each timestamp has a weight of 1, so that default aggregation amounts to simply
+counting timestamps. Weight can be changed by including a number with each
+timestamp, either before or after the timestamp and separated by comma or tab,
+for example:
+
+    2019-08-29,12
+    24,2019-08-30
+    26,2019-09-01
+
+Timestamps are parsed strictly.
+
+-f/--format <moment format string>
+
+    Without a format, falls back on moment's default parsing, otherwise
+    parsing will use your format:
+
+    https://momentjs.com/docs/#/parsing/string/
+    https://momentjs.com/docs/#/parsing/string-format/
+```
 
 ## bgg.pug
 
