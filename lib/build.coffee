@@ -179,9 +179,15 @@ module.exports = self =
     self.vars.basedir = path.resolve rootDir
 
     execAsync("cd '#{self.vars.basedir}' && git rev-parse --short HEAD").then (stdout) =>
-      self.vars.src['GIT_HEAD'] = stdout.toString()
+      self.vars.src.GIT_HEAD = stdout.toString()
     .catch ->
-      self.vars.src['GIT_HEAD'] = null
+      self.vars.src.GIT_HEAD = null
+
+    if head = self.vars.src.GIT_HEAD
+      execAsync("cd '#{self.vars.basedir}' && git tag --points-at #{head}").then (stdout) =>
+        self.vars.src.GIT_TAGS = stdout.toString().split('\n').filter (s) -> s.match(/\S/)
+      .catch ->
+        self.vars.src.GIT_TAGS = []
 
     execAsync("find '#{self.vars.basedir}' -type f -print0").then (stdout) =>
       pug_files = []
