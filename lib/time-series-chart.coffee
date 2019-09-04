@@ -43,7 +43,6 @@ do ->
     process.exit()
 
   content = ''
-  console.log 'isTTY:', process.stdin.isTTY, typeof process.stdin.isTTY
   if not process.stdin.isTTY
     content += await getStdin()
 
@@ -62,7 +61,6 @@ do ->
     [t, y] = line.split(/\s*[\t,]\s*/)
     return unless t or y
     if isNumber(t)
-      console.log "number,timestamp"
       unless isMoment(y)
         console.warn "missing timestamp on line #{i+1}: #{line}"
         return
@@ -71,7 +69,6 @@ do ->
         y: parseFloat(t)
     else if isMoment(t)
       y = if y and isNumber(y) then y else 1
-      console.log "timestamp,#{y}"
       points.push
         t: moment(t, format, true)
         y: parseFloat(y)
