@@ -33,6 +33,11 @@ html
               span &nbsp;
               span.text-no-wrap(v-html="v")
           v-row(v-if="stats")
+            v-col(xs2 v-for="(v,k) of moreStats" :key="k")
+              b.text-no-wrap(v-html="k + ':'")
+              span &nbsp;
+              span.text-no-wrap(v-html="v")
+          v-row(v-if="stats")
             v-col
               v-tooltip(v-model="tooltip" bottom transition="scale-transition")
                 template(v-slot:activator="{}")

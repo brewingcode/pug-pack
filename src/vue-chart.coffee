@@ -74,12 +74,22 @@ drawChart = _.debounce ->
   widthCheck()
 
   if app.points.length > 0
+    sum = 0
+    yValues = app.points.map (p) -> p.y
+    sum += y for y in yValues
+
     app.stats =
       'Number of Dates': app.points.length
       'First Date': min(app.points).t.format('MMM D, YYYY h:mm:ssa')
       'Last Date': max(app.points).t.format('MMM D, YYYY h:mm:ssa')
+
+    app.moreStats =
+      'Average': (sum / app.points.length).toFixed(2)
+      'Min': Math.min(yValues...)
+      'Max': Math.max(yValues...)
   else
     app.stats = null
+    app.moreStats = null
 , 300
 
 randomPoints = [1..500].map (i) ->
@@ -125,6 +135,7 @@ app = new Vue
     regex: /^\s*(\d+)\s*([a-z]+)\s*$/i
     points: [1] # this will get correctly set on first drawChart()
     stats: null
+    moreStats: null
     tooltip: false
     copyResult: ''
     pasteError:
