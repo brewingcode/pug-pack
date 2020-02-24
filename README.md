@@ -1,6 +1,7 @@
 # pug-pack
 
-> Static site generator for developers who like clean formatting
+> Static site generator for developers who like clean formatting, plus a handful
+of CLI tools using Pug and/or CoffeeScript.
 
 ```sh
 yarn add pug-pack
@@ -23,16 +24,14 @@ You can see some examples by compiling the `test` directory of this repo:
 cd pug-pack
 npx pug-pack -w test
 open dist/index.html
-open dist/hyperapp.html
 ```
 
-There are a couple other examples, see `helpers and other tools`, below. These
-can be built by running pug-pack with its own `src`:
+There are a couple other examples:
 
 ```
-cd pug-pack
-npx pug-pack -w
+open dist/hyper.html
 open dist/vue-chart.html
+open dist/bgg.html
 ```
 
 # pug
@@ -214,39 +213,20 @@ See the [CLI](lib/cli.coffee) as an example.
 
 # `include` and `extend`
 
-**tl;dr** Use `:inject(file=...)` instead of `include`, and be careful when
-using `extend` with .pug files outside your `src` directory.
-
-Because these two keywords read files before the `:inject()` filter can look
-them up, you need to be very explicit when using these keywords to get assets
-from `pug-pack` itself.
-
-For example, to `include` Bootstrap from `pug-pack`, you might try:
+If you would rather use these pug built-ins, see `pugs` below: it exposes the
+`pug-pack/src` directory via pug's own `--basedir` option, so that you can
+write:
 
 ```pug
-include:inject bootstrap.css
+extend /_base  <!-- NOTE: the leading slash tells pug to use "absolute" paths,
+               starting at --basedir -->
+
+append head
+  title Your Cool Page
 ```
 
-However, because Pug defaults to finding your include files relative to the
-`.pug` file itself, Pug will not find `bootstrap.css`, unless you happen to
-have your own copy in your `src` directory. In order to `include` Bootstrap
-from `pug-pack` you would need to use:
-
-```pug
-    style
-      include:inject ../node_modules/pug-pack/src/bootstrap.css
-```
-
-As noted above, avoid this issue by simply using
-`:inject(file="bootstrap.ss")`, without worrying about `include`. The filter
-is smart enough to figure out where to look for files.
-
-For `extend`, you will have to use the full relative path from `pug-pack/src`
-to your target file:
-
-```pug
-extend ../node_modules/pug-pack/src/_base
-```
+If you don't want to use `pugs`, just specify the full path to `pug-pack/src`
+when you use `include` and `extend`.
 
 # Additional JSTransformers in Pug
 
@@ -268,7 +248,7 @@ Note that:
 
 - this is simply an alternative to `:inject(ext="cofffee")`
 
-- `pug` itself comes with the `coffee-script` filter, which is CoffeeScript v1
+- `pug` itself might include the `coffee-script` filter, which is CoffeeScript v1
 
 - this jstransformer is `coffeescript` (without the hyphen), and is CoffeeScript v2
 
@@ -276,9 +256,13 @@ Note that:
   so for inlining more than a few lines of CoffeeScript, this jstransformer
   is preferable
 
+### markdown-it
+
+Markdown and Pug are a great combo, use this filter as `:markdown-it`.
+
 # helpers and other tools
 
-## bind-input-query-param
+## bind-input-query-param.coffee
 
 [This](./src/bind-input-query-params.coffee) is a function to bind \<input>
 elements to url query params, with a few extra conveniences around that. After
@@ -338,3 +322,40 @@ Timestamps are parsed strictly.
 
 Another Vuetify-driven static page to display data from boardgamegeek.com
 ([.pug](./src/bgg.pug) and [.js](./src/bgg.coffee)).
+
+## cs
+
+A CLI that wraps the `coffee` script with some useful behavior for shell
+one-liners, as well as exploring CoffeeScript in its REPL.
+
+```
+Run CoffeeScript with lots of pre-defined objects/functions:
+
+  s: sugar.js
+  m: moment.js
+  l: lodash.js
+  fs: fs
+  log: console.log()
+  js: JSON.stringify()
+  jp: JSON.parse()
+  fsr: fs.readFileSync()
+  fsw: fs.writeFileSync()
+
+If given args, assumes each arg is a line of the function to run on each
+line of stdin. Without args, just opens the REPL.
+```
+
+## pugs
+
+A CLI to run `pug` in the context of your local pug-pack installation:
+
+```
+$ pugs -h
+A wrapper around running pug with --basedir set to pug-pack's `src` directory.
+
+usage:
+  pugs [-l|--list|ls [ARGS]]   # runs `ls` with ARGS in `src`
+  pugs [-f|--find|find [ARGS]] # runs `find` with ARGS in `src`
+  pugs ARGS                    # runs `pug` with --basedir set to `src` and
+                               # ARGS for pug
+```
