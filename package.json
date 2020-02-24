@@ -9,7 +9,8 @@
   "bin": {
     "pug-pack": "bin/cli.coffee",
     "tsc": "bin/time-series-chart.coffee",
-    "cs": "bin/coffee-shortcut.sh"
+    "cs": "bin/coffee-shortcut.sh",
+    "pugs": "bin/pug-shortcut.sh"
   },
   "dependencies": {
     "bluebird": "^3.5.5",
@@ -20,9 +21,11 @@
     "html-minifier": "^4.0.0",
     "js-yaml": "^3.13.1",
     "jstransformer-coffeescript": "zdenko/jstransformer-coffeescript",
+    "jstransformer-markdown-it": "^2.1.0",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "pug": "^2.0.4",
+    "pug-cli": "^1.0.0-alpha6",
     "stylus": "^0.54.5",
     "sugar": "^2.0.6",
     "svgo": "^1.2.2",
