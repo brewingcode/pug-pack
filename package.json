@@ -7,8 +7,9 @@
     "build": "coffee lib/cli.coffee -p"
   },
   "bin": {
-    "pug-pack": "lib/cli.coffee",
-    "tsc": "lib/time-series-chart.coffee"
+    "pug-pack": "bin/cli.coffee",
+    "tsc": "bin/time-series-chart.coffee",
+    "cs": "bin/coffee-shortcut.sh"
   },
   "dependencies": {
     "bluebird": "^3.5.5",
@@ -23,6 +24,7 @@
     "mkdirp": "^0.5.1",
     "pug": "^2.0.4",
     "stylus": "^0.54.5",
+    "sugar": "^2.0.6",
     "svgo": "^1.2.2",
     "tmp": "^0.1.0",
     "uglify-es": "^3.3.9"

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Run CoffeeScript with lots of pre-defined objects/functions:
+#
+#   s: sugar.js
+#   m: moment.js
+#   l: lodash.js
+#   fs: fs
+#   log: console.log()
+#   js: JSON.stringify()
+#   jp: JSON.parse()
+#   fsr: fs.readFileSync()
+#   fsw: fs.writeFileSync()
+#
+# If given args, assumes each arg is a line of the function to run on each
+# line of stdin. Without args, just opens the REPL.
+
+d="$(readlink "$0")"
+if [ -z "$d" ]; then
+  d="./$(dirname "$0")"
+else
+  d="$(dirname "$0")/$(dirname "$d")"
+fi
+d="$d/../src"
+
+read -r -d '' reqs << EOF
+-r s=sugar
+-r m=$d/moment.js
+-r l=$d/lodash-custom.js
+-r fs
+EOF
+
+read -r -d '' shorts << EOF
+log = console.log
+js = JSON.stringify
+jp = JSON.parse
+fsr = fs.readFileSync
+fsw = fs.writeFileSync
+EOF
+
+if [[ "$#" == "0" ]]; then
+  echo "copy-paste for shortcuts:"
+  echo "$shorts" | paste -sd ';' -
+  coffee $reqs
+else
+  t="$(mktemp "/tmp/cs-$$-XXX")"
+  cat <<EOF > "$t"
+$shorts  
+g = {}       # for any globals you want to keep between lines
+end = null   # run this after all lines
+
+rl = require('readline').createInterface
+  input: process.stdin
+  terminal: false
+rl.on 'line', (line) ->
+EOF
+
+  for i in "$@"; do printf "  %s\n" "$i" >> "$t"; done
+
+  cat <<EOF >> "$t"
+rl.on 'close', ->
+  end() if end  
+EOF
+
+  coffee $reqs "$t"
+fi

@@ -1,6 +1,6 @@
 #!/usr/bin/env coffee
 
-build = require './build'
+build = require '../lib/build'
 browserSync = require 'browser-sync'
 fs = require 'fs'
 path = require 'path'
