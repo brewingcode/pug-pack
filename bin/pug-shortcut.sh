@@ -14,13 +14,18 @@ usage:
 EOF
 }
 
-pproot="$(node -e 'console.log(require.resolve("pug-pack"))')"
-pproot="$(dirname "$pproot")/.."
+d="$(readlink "$0")"
+if [ -z "$d" ]; then
+  d="./$(dirname "$0")"
+else
+  d="$(dirname "$0")/$(dirname "$d")"
+fi
+d="$d/.."
 
 case "$1" in
-  -l|--list|ls)    shift; ls "$@" "$pproot/src" ;;
-  -f|--find|find)  shift; find "$pproot/src" "$@" ;;
+  -l|--list|ls)    shift; ls "$@" "$d/src" ;;
+  -f|--find|find)  shift; find "$d/src" "$@" ;;
   -h|--help|help)  usage; exit 0 ;;
   "")              usage; exit 1 ;;
-  *) NODE_PATH="$NODE_PATH:$pproot/node_modules" "$pproot/node_modules/.bin/pug" -b "$pproot/src" "$@" ;;
+  *) NODE_PATH="$NODE_PATH:$d/node_modules" "$d/node_modules/.bin/pug" -b "$d/src" "$@" ;;
 esac
