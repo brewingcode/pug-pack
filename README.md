@@ -33,7 +33,7 @@ open dist/vue-chart.html
 open dist/bgg.html
 ```
 
-# pug
+# Pug files
 
 The main files in `src` are your `.pug` files: these will each end up in
 the `dist` directory at the exact path they are at, relative to `src`:
@@ -88,7 +88,7 @@ html
       $('.current-time').text moment()
 ```
 
-# non-pug files
+# Non-pug files
 
 The following file types are supported: `.coffee`, `.styl`, `.yml`, `.js`,
 `.css`, `.svg`, `.html`, and `.json`. Most of these are simple transforms of
@@ -169,7 +169,7 @@ The `src` object also gets two additional properties:
 
 * `GIT_TAGS`: any tags that refer to `GIT_HEAD`
 
-# CLI
+# Options for `pug-pack`
 
 `pug-pack` will compile the assets in its own `src` directory first, and then
 compile your own `src` files. Any file naming collisions will override the
@@ -196,7 +196,7 @@ on every change
 
 See `pug-pack --help` for more, or see the CLI [here](lib/cli.coffee).
 
-# API
+# Node API for `pug-pack`
 
 You can `require('pug-pack')` yourself, if you really want to. The two main
 methods are:
@@ -210,7 +210,7 @@ one or more `.pug` files
 
 See the [CLI](lib/cli.coffee) as an example.
 
-# `include` and `extend`
+# `include` and `extend` keywords in Pug
 
 If you would rather use these pug built-ins, see `pugs` below: it exposes the
 `pug-pack/src` directory via pug's own `--basedir` option, so that you can
@@ -227,7 +227,7 @@ append head
 If you don't want to use `pugs`, just specify the full path to `pug-pack/src`
 when you use `include` and `extend`.
 
-# Additional JSTransformers in Pug
+# Additional JSTransformers included in `pug-pack`
 
 ### coffeescript
 
@@ -257,11 +257,61 @@ Note that:
 
 ### markdown-it
 
-Markdown and Pug are a great combo, use this filter as `:markdown-it`.
+Markdown and Pug are a great combo, use this filter like so:
 
-# helpers and other tools
+```pug
+:markdown-it
+    # Your Markdown Content
 
-## bind-input-query-param.coffee
+    | Column A         | Column B             |
+    | ---------------- | -------------------- |
+    | A little of this |                      |
+    |                  | and a little of that |
+```
+
+# Reference for files in `src`
+
+
+## Third-party libraries
+
+| File(s)                          | Notes                                                                 |
+| -------------------------------- | --------------------------------------------------------------------- |
+| bootstrap.css                    | Bootstrap CSS                                                         |
+| chart.js + chart.css             | Chart.js for making charts                                            |
+| filesize.js                      | Convert numbers to SI-prefixed byte strings                           |
+| hyperapp.js                      | HyperApp UI Framework                                                 |
+| jquery-stripped.js               | Custom JQuery build                                                   |
+| jquery.js                        | Standard JQuery library                                               |
+| jquery.tablesorter.min.js        | Plugin to turn any table sortable                                     |
+| tablesorter-theme-bootstrap4.css | Nice CSS for the tablsorter plugin                                    |
+| lodash-custom.js                 | Custom Lodash build                                                   |
+| lodash.js                        | Standard Lodash build                                                 |
+| md-icons.css                     | Local copy of Material Design css                                     |
+| moment.js                        | Moment.js                                                             |
+| moment-timezone.js               | Timezone data for Moment                                              |
+| showdown.js                      | Showdown.js to render Markdown to HTML on the client                  |
+| sorttable.js                     | An ancient way to make table sortable; use JQuery.tablesorter instead |
+| vue-dev.js                       | Vue.js dev build                                                      |
+| vue-prod.js                      | Vue.js prod build                                                     |
+| vuetify.js                       | Vuetify UI Framework                                                  |
+| vuetify.css                      | CSS for Vuetify                                                       |
+
+## Example Pug files
+
+| Template      | Notes                                                                          |
+| ------------- | ------------------------------------------------------------------------------ |
+| vue-chart.pug | Demo for using Vuetify inside pug-pack that graphs/aggregates time-series data | 
+| bgg.pug       | Small Docker-based site to view BoardGameGeek data                             |
+
+## Client-side helpers
+
+| File                           | Notes                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------- |
+| bind-input-query-param.coffee  | Easily wrangle query params in the url (see below)                        |
+| mdtable.js                     | Convert JS array-of-arrays to a string of nicely-formatted Markdown table |
+| commify.js                     | Inject commas as thousands separators to a number                         |
+
+### bind-input-query-param.coffee
 
 [This](./src/bind-input-query-params.coffee) is a function to bind \<input>
 elements to url query params, with a few extra conveniences around that. After
@@ -275,11 +325,7 @@ input#query
     console.log 'the url query string was updated, look at it!'
 ```
 
-## vue-chart.pug
-
-An interactive chart for slicing up time-series data. Uses Vuetify and
-Chart.js, see both the [pug](./src/vue-chart.pug) and the
-[js](./src/vue-chart.coffee).
+# Misc CLI Tools
 
 ## tsc
 
@@ -317,11 +363,6 @@ Timestamps are parsed strictly.
     https://momentjs.com/docs/#/parsing/string-format/
 ```
 
-## bgg.pug
-
-Another Vuetify-driven static page to display data from boardgamegeek.com
-([.pug](./src/bgg.pug) and [.js](./src/bgg.coffee)).
-
 ## cs
 
 A CLI that wraps the `coffee` script with some useful behavior for shell
@@ -346,7 +387,9 @@ line of stdin. Without args, just opens the REPL.
 
 ## pugs
 
-A CLI to run `pug` in the context of your local pug-pack installation:
+A CLI to run `pug` in the context of your local pug-pack installation. `src`
+in this context is the `pug-pack/src` directory itself, not your own `src`
+directory.
 
 ```
 $ pugs -h
