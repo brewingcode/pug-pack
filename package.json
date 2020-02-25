@@ -10,7 +10,9 @@
     "pug-pack": "bin/cli.coffee",
     "tsc": "bin/time-series-chart.coffee",
     "cs": "bin/coffee-shortcut.sh",
-    "pugs": "bin/pug-shortcut.sh"
+    "pugs": "bin/pug-shortcut.sh",
+    "mdtable": "bin/markdown-table.js",
+    "commify": "bin/commify.js"
   },
   "dependencies": {
     "bluebird": "^3.5.5",

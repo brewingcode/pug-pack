@@ -401,3 +401,36 @@ usage:
   pugs ARGS                    # runs `pug` with --basedir set to `src` and
                                # ARGS for pug
 ```
+
+## commify
+
+```
+usage: commify [-j] [NUMBER ...]
+
+Inserts commas as thousands separators in one or more NUMBER, and outputs each
+on its own line. -j outputs as JSON for Alfred Workflow integration.
+```
+
+## mdtable
+
+```
+usage: mdtable [options and filename(s)]
+
+Reads lines from filename(s) and/or stdin and outputs them in a nicely
+formatted Markdown table.
+
+-r REGEX     regex used to split each row into cells (" " by default)
+-a ALIGN     string of "l", "r", and "c" to specify alignments for each cell
+-n NAMES     CSV of header names (if first line of input is not headers)
+-t N         number of characters to truncate each cell to
+-i INDEXES   CSV of 1-based indexes to specify cells to include
+-e INDEXES   CSV of 1-based indexes to specify cells to exclude
+-s           flag for strict: only include lines that parse to the same number
+             of cells as the first line of input
+-w           flag for whitespace: infer cells based on how whitespace is laid
+             out on first line of input (see docker's CLI output)
+
+Long args are also supported: --regex, --align, --names, --truncate,
+--include/--indexes, --exclude, --strict, and --whitespace. A filename of "-"
+will read from stdin.
+```

@@ -11,9 +11,9 @@ getStdin = require 'get-stdin'
 do ->
   if argv.h or argv.help
     console.log """
-  tsc - (t)ime (s)eries (c)hart
+  usage: tsc [file ...] [-f FORMAT]
 
-  usage: tsc [file ...] [-f fmt>]
+  tsc - (t)ime (s)eries (c)hart
 
   Parse timestamps from lines of input and graph it using Vue and Chart.js. The
   chart includes:
