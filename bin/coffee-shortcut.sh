@@ -21,12 +21,14 @@ if [ -z "$d" ]; then
 else
   d="$(dirname "$0")/$(dirname "$d")"
 fi
-d="$d/../src"
+d="$d/.."
+
+export NODE_PATH="$NODE_PATH:$d/node_modules"
 
 read -r -d '' reqs << EOF
 -r s=sugar
--r m=$d/moment.js
--r l=$d/lodash-custom.js
+-r m=$d/src/moment.js
+-r l=$d/src/lodash-custom.js
 -r fs
 EOF
 
@@ -41,7 +43,7 @@ EOF
 if [[ "$#" == "0" ]]; then
   echo "copy-paste for shortcuts:"
   echo "$shorts" | paste -sd ';' -
-  coffee $reqs
+  "$d/node_modules/.bin/coffee" $reqs
 else
   t="$(mktemp "/tmp/cs-$$-XXX")"
   cat <<EOF > "$t"
@@ -62,5 +64,5 @@ rl.on 'close', ->
   end() if end  
 EOF
 
-  coffee $reqs "$t"
+  "$d/node_modules/.bin/coffee" $reqs "$t"
 fi
