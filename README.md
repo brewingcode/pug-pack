@@ -4,9 +4,8 @@
 of CLI tools using Pug and/or CoffeeScript.
 
 ```sh
-yarn add pug-pack
-npx pug-pack --init
-yarn dev # or `pug-pack -w`, if you don't have a package.json file
+npm install -g pug-pack
+pug-pack --init
 ```
 
 `pug-pack` takes all the `.pug` templates in your `src` directory, and renders
