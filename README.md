@@ -194,7 +194,7 @@ on every change
 
   - write a bare-bones `src/index.pug` file, as per the quickstart above
 
-See `pug-pack --help` for more, or see the CLI [here](lib/cli.coffee).
+See `pug-pack --help` for more, or see the CLI [here](bin/cli.coffee).
 
 # Node API for `pug-pack`
 
@@ -208,7 +208,7 @@ to denote they are skipped for compilation to .html)
 * `.crawl(rootDir)` will process the assets in `rootDir`, which should include
 one or more `.pug` files
 
-See the [CLI](lib/cli.coffee) as an example.
+See the [CLI](bin/cli.coffee) as an example.
 
 # `include` and `extend` keywords in Pug
 

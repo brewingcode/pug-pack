@@ -3,8 +3,8 @@
   "version": "1.9.2",
   "description": "Pseudo-webpack for developers who like clean formatting",
   "scripts": {
-    "dev": "coffee lib/cli.coffee -w",
-    "build": "coffee lib/cli.coffee -p"
+    "dev": "coffee bin/cli.coffee -w",
+    "build": "coffee bin/cli.coffee -p"
   },
   "bin": {
     "pug-pack": "bin/cli.coffee",
