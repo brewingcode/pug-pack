@@ -25,7 +25,7 @@ d="$d/.."
 case "$1" in
   -l|--list|ls)    shift; ls "$@" "$d/src" ;;
   -f|--find|find)  shift; find "$d/src" "$@" ;;
-  -h|--help|help)  usage; exit 0 ;;
+  -h|--help|help)  usage; "$d/node_modules/.bin/pug" --help; exit 0 ;;
   "")              usage; exit 1 ;;
   *) NODE_PATH="$NODE_PATH:$d/node_modules" "$d/node_modules/.bin/pug" -b "$d/src" "$@" ;;
 esac
