@@ -278,6 +278,7 @@ Markdown and Pug are a great combo, use this filter like so:
 | File(s)                          | Notes                                                                 |
 | -------------------------------- | --------------------------------------------------------------------- |
 | bootstrap.css                    | Bootstrap CSS                                                         |
+| bootstrap-dark.css               | Bootstrap CSS for dark mode                                           |
 | chart.js + chart.css             | Chart.js for making charts                                            |
 | filesize.js                      | Convert numbers to SI-prefixed byte strings                           |
 | hyperapp.js                      | HyperApp UI Framework                                                 |
