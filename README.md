@@ -300,10 +300,11 @@ Markdown and Pug are a great combo, use this filter like so:
 
 ## Example Pug files
 
-| Template      | Notes                                                                          |
-| ------------- | ------------------------------------------------------------------------------ |
-| vue-chart.pug | Demo for using Vuetify inside pug-pack that graphs/aggregates time-series data | 
-| bgg.pug       | Small Docker-based site to view BoardGameGeek data                             |
+| Template        | Notes                                                                          |
+| --------------- | ------------------------------------------------------------------------------ |
+| vue-chart.pug   | Demo for using Vuetify inside pug-pack that graphs/aggregates time-series data | 
+| bgg.pug         | Small Docker-based site to view BoardGameGeek data                             |
+| github-user.pug | Demo for Vuetify that shows repos of a GitHub user
 
 ## Client-side helpers
 

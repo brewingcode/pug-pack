@@ -1,0 +1,42 @@
+doctype html
+html
+  head
+    title Github User Lookup
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    :inject(file="md-icons.css")
+    :inject(file="vuetify.css")
+  body
+    script#app(type="text/x-template")
+      v-app
+        v-container(fluid)
+          v-row
+            v-col
+              v-text-field(label="Username", placeholder="GitHub user alias" v-model="user")
+          v-row
+            v-col
+              v-alert(v-if="status.text" :type="status.type") {{ status.text }}
+          v-row
+            v-col
+              v-data-table(:headers="headers"
+                           :items="repos"
+                           :sort-by="['updated_at']"
+                           :sort-desc="[true]"
+                           :loading="loading"
+                           :items-per-page="100"
+                           hide-default-footer)
+                template(v-slot:item.name="{ item }")
+                  a(:href="item.html_url" target="_blank") {{ item.name }}
+                template(v-slot:item.updated_at="{ item }")
+                  span(:title="item.updated_at") {{ item.updated_at | humanize }}
+                template(v-slot:item.fork="{ item }")
+                  v-icon(color="black") {{ item.fork ? "mdi-close" : "mdi-check"}}
+
+    :inject(file="axios.js")
+    :inject(file="vue-prod.js")
+    :inject(file="vuetify.js")
+    :inject(file="lodash-custom.js")
+    :inject(file="bind-input-query-param.coffee")
+    :inject(file="moment.js")
+    :inject(file="github-user.coffee" bare)
