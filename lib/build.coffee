@@ -54,7 +54,7 @@ module.exports = self =
               .#{className} {
                 background-image: url('data:image/svg+xml;utf8,#{out.forCSS}');
               }
-            """
+            """.replace /#/g, '%23'
             ext = 'css'
           else
             out = out.forDOM
