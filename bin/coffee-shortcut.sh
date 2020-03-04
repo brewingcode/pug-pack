@@ -47,7 +47,7 @@ if [[ "$#" == "0" ]]; then
 else
   t="$(mktemp "/tmp/cs-$$-XXX")"
   cat <<EOF > "$t"
-$shorts  
+$shorts
 g = {}       # for any globals you want to keep between lines
 end = null   # run this after all lines
 
@@ -57,11 +57,21 @@ rl = require('readline').createInterface
 rl.on 'line', (line) ->
 EOF
 
-  for i in "$@"; do printf "  %s\n" "$i" >> "$t"; done
+  for i in "$@"; do
+    if [[ "$i" =~ ^-(h|-help)$ ]]; then
+      echo usage: cs [LINE_OF_CODE ...]
+      echo requires:
+      echo "$reqs" | perl -pe 's/^/  /gm'
+      echo shortcuts:
+      echo "$shorts" | perl -pe 's/^/  /gm'
+      exit
+    fi
+    printf "  %s\n" "$i" >> "$t"
+  done
 
   cat <<EOF >> "$t"
 rl.on 'close', ->
-  end() if end  
+  end() if end
 EOF
 
   "$d/node_modules/.bin/coffee" $reqs "$t"
