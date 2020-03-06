@@ -19,7 +19,7 @@ html
                      :sort-by="['updated_at']"
                      :sort-desc="[true]"
                      :loading="timer ? true : false"
-                     :items-per-page="100"
+                     :items-per-page="-1"
                      hide-default-footer)
           template(v-slot:item.name="{ item }")
             a(:href="item.html_url" target="_blank") {{ item.name }}

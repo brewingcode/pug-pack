@@ -21,22 +21,27 @@ app = new Vue
 
   watch:
     user: ->
-      return unless @user
       clearTimeout @timer
+      @timer = null
+      return unless @user
       @timer = setTimeout =>
         @status = null
         @repos = []
-        axios.get("https://api.github.com/users/#{@user}/repos?per_page=100")
-          .then (res) =>
-            @repos = res.data
+        url = "https://api.github.com/users/#{@user}/repos?per_page=100"
+        while url
+          try
+            res = await axios.get(url)
+            @repos.push ...(res.data)
             @status =
               type: 'success'
-              text: "Showing #{res.data.length} repos"
-          .catch (err) =>
+              text: "Showing #{@repos.length} repos"
+            url = res.headers?.link?.match(/<([^>]+)>; rel=.next./)?[1]
+          catch err
             @status =
               type: 'error'
-              text: err
-          .finally =>
+              text: err + ' ' + url
+            url = null
+          finally
             @timer = null
       , 500
 
