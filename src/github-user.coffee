@@ -7,9 +7,7 @@ app = new Vue
     repos: []
     user: ''
     timer: null
-    status:
-      error: false
-      text: ''
+    status: null
     headers: [
       { text:'Repo', value:'name' }
       { text:'Last Updated', value:'updated_at' }
@@ -21,16 +19,12 @@ app = new Vue
   mounted: ->
     bindInputQueryParam 'input', null, null, (v) => @user = v
 
-  computed:
-    loading: ->
-      @timer?
-
   watch:
     user: ->
       return unless @user
       clearTimeout @timer
       @timer = setTimeout =>
-        @status = {}
+        @status = null
         @repos = []
         axios.get("https://api.github.com/users/#{@user}/repos?per_page=100")
           .then (res) =>
@@ -39,7 +33,6 @@ app = new Vue
               type: 'success'
               text: "Showing #{res.data.length} repos"
           .catch (err) =>
-            @error = err
             @status =
               type: 'error'
               text: err
