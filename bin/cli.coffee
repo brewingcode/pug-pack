@@ -54,6 +54,8 @@ if argv.w or argv.watch
       host: process.env.HOST or '127.0.0.1'
       port: process.env.PORT or 3000
       ghostMode: false
+      logConnections: true
+      logFileChanges: true
 
 else if argv.l or argv.list
   build.self().then ->
