@@ -208,9 +208,8 @@ module.exports = self =
       pr.each other_files, (f) =>
         log 'reading:', f
         { srcname } = self.parsename f
-        unless self.vars.src[srcname]
-          self.transform(f).then (out) =>
-            self.vars.src[srcname] = out
+        self.transform(f).then (out) =>
+          self.vars.src[srcname] = out
       .then =>
         unless skipPug
           pr.each pug_files, (f) =>
