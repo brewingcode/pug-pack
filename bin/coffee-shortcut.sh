@@ -48,8 +48,10 @@ else
   t="$(mktemp "/tmp/cs-$$-XXX")"
   cat <<EOF > "$t"
 $shorts
-g = {}       # for any globals you want to keep between lines
-end = null   # run this after all lines
+g =          # for any globals you want to keep between lines
+  h: {}      # a (h)ash
+  a: []      # an (a)rray
+  end: null  # if defined, call this function after end of input
 
 rl = require('readline').createInterface
   input: process.stdin
@@ -71,7 +73,7 @@ EOF
 
   cat <<EOF >> "$t"
 rl.on 'close', ->
-  end() if end
+  g.end() if g.end
 EOF
 
   "$d/node_modules/.bin/coffee" $reqs "$t"
