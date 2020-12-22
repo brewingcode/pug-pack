@@ -8,6 +8,8 @@ tmp = require 'tmp'
 { execSync } = require 'child_process'
 getStdin = require 'get-stdin'
 
+moment.suppressDeprecationWarnings = true
+
 do ->
   if argv.h or argv.help
     console.log """
