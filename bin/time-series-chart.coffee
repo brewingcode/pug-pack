@@ -89,5 +89,5 @@ do ->
   dir = tmp.dirSync()
   chartHtml = fs.readFileSync(chartFile).toString().replace /(globalPoints\s*=\s*)\[\]/, '$1' + JSON.stringify(points)
   fs.writeFileSync "#{dir.name}/vue-chart.html", chartHtml
-  console.log "graphing #{points.length} points via #{dir.name}"
+  console.log "graphing #{points.length} points via #{dir.name}/vue-chart.html"
   execSync "open '#{dir.name}/vue-chart.html'"
