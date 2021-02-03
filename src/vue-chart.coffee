@@ -113,10 +113,16 @@ config =
       display: false
     tooltips:
       callbacks:
+        title: (tips, data) ->
+          tip = tips[0]
+          config.data.datasets[tip.datasetIndex].data[tip.index].t.format()
         label: (tip, data) -> commify(tip.value)
     scales:
       xAxes: [{
         type: 'time'
+        time:
+          displayFormats:
+            hour: 'HH:mm:ss'
       }]
       yAxes: [{
         ticks:
