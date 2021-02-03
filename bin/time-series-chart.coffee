@@ -62,6 +62,8 @@ do ->
   content.split('\n').forEach (line, i) ->
     [t, y] = line.split(/\s*[\t,]\s*/)
     return unless t or y
+    t = if t then t.trim()
+    y = if y then y.trim()
     if isNumber(t)
       unless isMoment(y)
         console.warn "missing timestamp on line #{i+1}: #{line}"
