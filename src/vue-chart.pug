@@ -41,7 +41,7 @@ html
             v-col
               v-tooltip(v-model="tooltip" bottom transition="scale-transition")
                 template(v-slot:activator="{}")
-                  v-btn(small @click="pbcopy") Copy {{dataSize}} to clipboard
+                  v-btn(small @click="pbcopy") Copy data points ({{dataSize}}) to clipboard as json
                 span(v-text="copyResult")
           v-row
             v-col

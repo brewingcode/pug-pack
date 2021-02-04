@@ -79,14 +79,14 @@ drawChart = _.debounce ->
     sum += y for y in yValues
 
     app.stats =
-      'Number of Dates': app.points.length
-      'First Date': min(app.points).t.format('MMM D, YYYY h:mm:ssa')
-      'Last Date': max(app.points).t.format('MMM D, YYYY h:mm:ssa')
+      'Number of Points': app.points.length
+      'First Date': min(app.points).t.format('ddd MMM D, YYYY h:mm:ssa')
+      'Last Date': max(app.points).t.format('ddd MMM D, YYYY h:mm:ssa')
 
     app.moreStats =
       'Average': (sum / app.points.length).toFixed(2)
-      'Min': Math.min(yValues...)
-      'Max': Math.max(yValues...)
+      'Min': commify Math.min(yValues...)
+      'Max': commify Math.max(yValues...)
   else
     app.stats = null
     app.moreStats = null
@@ -165,7 +165,7 @@ app = new Vue
     momentable: (v) ->
       return true if (not v) or v.match(/^\s*$/)
       m = v.match(app.regex)
-      return "Unable to parse into '&lt;number> &lt;text>'" unless m
+      return "Unable to parse into '<number> <text>'" unless m
       a = moment()
       b = a.clone().add(m[1], m[2])
       return "Moment does not understand '#{m[1]}, #{m[2]}' for .add()" if +a is +b
