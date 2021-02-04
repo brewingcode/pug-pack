@@ -8,6 +8,16 @@ npm install -g pug-pack
 pug-pack --init
 ```
 
+or for running locally:
+
+```sh
+git clone github.com/brewingcode/pug-pack
+cd pug-pack
+npm install
+npm run build
+npm link
+```
+
 `pug-pack` takes all the `.pug` templates in your `src` directory, and renders
 each one as an `.html` file in a `dist` directory. A custom `:inject()` filter
 allows you to easily inline other assets (scripts, CSS, images) into the
