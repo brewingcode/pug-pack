@@ -338,9 +338,11 @@ input#query
     console.log 'the url query string was updated, look at it!'
 ```
 
-#### mdtable
+#### mdtable.js
 
-There is also a CLI interface:
+This takes an array-of-arrays, and renders it as a markdown table (in a
+string) using https://github.com/wooorm/markdown-table. There is also a CLI
+interface:
 
 ```
 usage: mdtable [options and filename(s)]
@@ -358,15 +360,18 @@ formatted Markdown table.
              of cells as the first line of input
 -w           flag for whitespace: infer cells based on how whitespace is laid
              out on first line of input (see docker's CLI output)
+-j           input is json-formatted
+-c           input is csv-formatted
 
 Long args are also supported: --regex, --align, --names, --truncate,
---include/--indexes, --exclude, --strict, and --whitespace. A filename of "-"
-will read from stdin.
+--include/--indexes, --exclude, --strict, --whitespace, --json, and --csv. A
+filename of "-" will read from stdin.
 ```
 
-#### commify
+#### commify.js
 
-There is also a CLI interface:
+Adds commas to a number to make it easier to read. There is also a CLI
+interface:
 
 ```
 usage: commify [-j] [NUMBER ...]

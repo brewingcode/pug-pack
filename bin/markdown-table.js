@@ -2,9 +2,10 @@
 
 const mdtable = require('../src/mdtable')
 const fs = require('fs')
+const csvparse = require('csv-parse/lib/sync')
 
 const argv = require('minimist')(process.argv.slice(2), {
-  boolean: ['h', 'help', 's', 'strict', 'w', 'whitespace'] 
+  boolean: ['h', 'help', 's', 'strict', 'w', 'whitespace']
 })
 
 const usage = `usage: mdtable [options and filename(s)]
@@ -22,10 +23,12 @@ formatted Markdown table.
              of cells as the first line of input
 -w           flag for whitespace: infer cells based on how whitespace is laid
              out on first line of input (see docker's CLI output)
+-j           input is json-formatted
+-c           input is csv-formatted
 
 Long args are also supported: --regex, --align, --names, --truncate,
---include/--indexes, --exclude, --strict, and --whitespace. A filename of "-"
-will read from stdin.`
+--include/--indexes, --exclude, --strict, --whitespace, --json, and --csv. A
+filename of "-" will read from stdin.`
 
 if (argv.help || argv.h) {
   console.log(usage)
@@ -36,6 +39,8 @@ let regex = argv.regex || argv.r
 const align = argv.align || argv.a
 const names = argv.names || argv.n
 const truncate = argv.truncate || argv.t
+const json_in = argv.json || argv.j
+const csv_in = argv.csv || argv.c
 let indexes = argv.indexes || argv.include || argv.i
 let exclude = argv.exclude || argv.e
 let strict = argv.strict || argv.s
@@ -60,49 +65,69 @@ if (exclude) {
   exclude = exclude.toString().split(',').map(parseFloat)
 }
 
-const lines = []
+const allLines = []
 let lineNumber = 0
 
 function finish() {
   if (names) {
-    lines.unshift(names.toString().split(','))
+    allLines.unshift(names.toString().split(','))
   }
-  console.log(mdtable(lines, {align}));
+  console.log(mdtable(allLines, {align}));
 }
 
 function add(str) {
-  str.toString().split('\n').forEach(function(line) {
+  let lines = []
+  if (json_in) {
+    lines = JSON.parse(str)
+    // use first record as example for all other records
+    const first = lines[0]
+    if (!Array.isArray(first)) {
+      lines = lines.map(function(obj) {
+        return Object.values(obj)
+      })
+    }
+  }
+  else if (csv_in) {
+    lines = csvparse(str)
+  }
+  else {
+    str.toString().split('\n').forEach(function(line) {
+      if (!line.match(/\S/)) {
+        return
+      }
+
+      if (whitespace === true) {
+        // init
+        whitespace = []
+        let space = 2
+        for (let i = 0; i < line.length; i++) {
+          if (line[i].match(/\s/)) {
+            space++
+          }
+          else if (space >= 2) {
+            space = 0
+            whitespace.push(i)
+          }
+        }
+      }
+
+      let cells = []
+      if (typeof whitespace === 'object') {
+        for (let i = 0; i < whitespace.length; i++) {
+          const end = i === whitespace.length - 1 ? undefined : whitespace[i+1]
+          cells.push(line.slice(whitespace[i], end))
+        }
+      }
+      else {
+        cells = line.split(regex)
+      }
+
+      lines.push(cells)
+    })
+  }
+
+  lines = lines.map(function(cells) {
     lineNumber++
-
-    if (!line.match(/\S/)) {
-      return
-    }
-
-    if (whitespace === true) {
-      // init
-      whitespace = []
-      let space = 2
-      for (let i = 0; i < line.length; i++) {
-        if (line[i].match(/\s/)) {
-          space++
-        }
-        else if (space >= 2) {
-          space = 0
-          whitespace.push(i)
-        }
-      }
-    }
-
-    let cells = []
-    if (typeof whitespace === 'object') {
-      for (let i = 0; i < whitespace.length; i++) {
-        const end = i === whitespace.length - 1 ? undefined : whitespace[i+1]
-        cells.push(line.slice(whitespace[i], end))
-      }
-    }
-    else {
-      cells = line.split(regex)
-    }
 
     if (strict === true) {
       // init
@@ -111,7 +136,7 @@ function add(str) {
     if (typeof strict === 'number') {
       if (cells.length !== strict) {
         console.warn(`skipping line ${lineNumber}: expected ${strict} cells, but saw ${cells.length}`)
-        return
+        return null
       }
     }
 
@@ -143,8 +168,14 @@ function add(str) {
       }
     }
 
-    lines.push(reordered.length ? reordered : cells)
+    if (reordered.length) {
+      cells = reordered
+    }
+
+    return cells
   })
+
+  allLines.push(...lines.filter(Boolean))
 }
 
 argv._.forEach(function(arg) {
