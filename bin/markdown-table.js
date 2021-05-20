@@ -5,7 +5,8 @@ const fs = require('fs')
 const csvparse = require('csv-parse/lib/sync')
 
 const argv = require('minimist')(process.argv.slice(2), {
-  boolean: ['h', 'help', 's', 'strict', 'w', 'whitespace']
+  boolean: ['h', 'help', 's', 'strict', 'w', 'whitespace', 'p', 'plaintext',
+    'j', 'json', 'c', 'csv'],
 })
 
 const usage = `usage: mdtable [options and filename(s)]
@@ -23,12 +24,17 @@ formatted Markdown table.
              of cells as the first line of input
 -w           flag for whitespace: infer cells based on how whitespace is laid
              out on first line of input (see docker's CLI output)
+-p           plain text output: un-markdownify the final result
 -j           input is json-formatted
 -c           input is csv-formatted
 
 Long args are also supported: --regex, --align, --names, --truncate,
---include/--indexes, --exclude, --strict, --whitespace, --json, and --csv. A
-filename of "-" will read from stdin.`
+--include/--indexes, --exclude, --strict, --whitespace, --plaintext, --json,
+and --csv. A filename of "-" will read from stdin.
+
+-a and -n are used AFTER -i and -e. i.e., if you -i three columns, you should
+ALSO pass three values for -a and/or -n.`
+
 
 if (argv.help || argv.h) {
   console.log(usage)
@@ -45,6 +51,7 @@ let indexes = argv.indexes || argv.include || argv.i
 let exclude = argv.exclude || argv.e
 let strict = argv.strict || argv.s
 let whitespace = argv.whitespace || argv.w
+const plaintext = argv.plaintext || argv.p
 
 if (indexes && exclude) {
   console.error('-i and -e cannot be used at the same time')
@@ -72,7 +79,26 @@ function finish() {
   if (names) {
     allLines.unshift(names.toString().split(','))
   }
-  console.log(mdtable(allLines, {align}));
+  let table = mdtable(allLines, {align})
+  if (plaintext) {
+    const lines = table.split(/\n/)
+    const layout = lines.splice(1,1) // remove second line
+    const indexes = []
+    const re = / \| /g
+    let m
+    while (m = re.exec(layout)) {
+      indexes.push(m.index)
+    }
+    table = lines.map(function(line) {
+      indexes.forEach(function(i) {
+        line = line.substring(0, i) + '\0\0\0' + line.substring(i+3)
+      })
+      return line.replace(/\0\0\0/g, ' ')
+        .replace(/^\| /, '')
+        .replace(/ \|$/, '')
+    }).join('\n')
+  }
+  console.log(table)
 }
 
 function add(str) {
