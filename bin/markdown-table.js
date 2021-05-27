@@ -43,7 +43,7 @@ if (argv.help || argv.h) {
 
 let regex = argv.regex || argv.r
 const align = argv.align || argv.a
-const names = argv.names || argv.n
+let names = argv.names || argv.n
 const truncate = argv.truncate || argv.t
 const json_in = argv.json || argv.j
 const csv_in = argv.csv || argv.c
@@ -52,6 +52,10 @@ let exclude = argv.exclude || argv.e
 let strict = argv.strict || argv.s
 let whitespace = argv.whitespace || argv.w
 const plaintext = argv.plaintext || argv.p
+
+if (names) {
+    names = names.toString().split(',')
+}
 
 if (indexes && exclude) {
   console.error('-i and -e cannot be used at the same time')
@@ -107,10 +111,22 @@ function add(str) {
     lines = JSON.parse(str)
     // use first record as example for all other records
     const first = lines[0]
-    if (!Array.isArray(first)) {
-      lines = lines.map(function(obj) {
-        return Object.values(obj)
-      })
+    if (Array.isArray(first)) {
+      // each record is an array, nothing needs to be done
+    }
+    else {
+      if (typeof(first) === 'object') {
+        names = Object.keys(first)
+        lines = lines.map(function(obj) {
+          return Object.values(obj)
+        })
+      }
+      else {
+        // some kind of scalar, so uh.... make it an array of one I suppose
+        lines = lines.map(function(x) {
+          return [x]
+        })
+      }
     }
   }
   else if (csv_in) {
