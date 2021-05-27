@@ -25,7 +25,7 @@ allows you to easily inline other assets (scripts, CSS, images) into the
 ([.pug](https://pugjs.org/api/getting-started.html),
 [.coffee](http://coffeescript.org/), [.styl](http://stylus-lang.com/), and
 [.yml](http://www.yaml.org/start.html)) are supported, but you can fall back
-on files from the last 20 years if you have to.
+on files from the last 30 years if you have to.
 
 You can see some examples by compiling the `test` directory of this repo:
 
@@ -255,7 +255,7 @@ script.
 
 Note that:
 
-- this is simply an alternative to `:inject(ext="cofffee")`
+- this is simply an alternative to `:inject(ext="coffee")`
 
 - `pug` itself might include the `coffee-script` (with the hyphen) filter,
   which is CoffeeScript v1
@@ -282,39 +282,41 @@ Markdown and Pug are a great combo, use this filter like so:
 
 # Reference for files in `src`
 
-
 ## Third-party libraries
 
 | File(s)                          | Notes                                                                 |
 | -------------------------------- | --------------------------------------------------------------------- |
+| axios.js                         | Axios                                                                 |
 | bootstrap.css                    | Bootstrap CSS                                                         |
 | bootstrap-dark.css               | Bootstrap CSS for dark mode                                           |
-| chart.js + chart.css             | Chart.js for making charts                                            |
+| chart.{css,js}                   | Chart.js for making charts                                            |
 | filesize.js                      | Convert numbers to SI-prefixed byte strings                           |
 | hyperapp.js                      | HyperApp UI Framework                                                 |
 | jquery-stripped.js               | Custom JQuery build                                                   |
 | jquery.js                        | Standard JQuery library                                               |
 | jquery.tablesorter.min.js        | Plugin to turn any table sortable                                     |
-| tablesorter-theme-bootstrap4.css | Nice CSS for the tablsorter plugin                                    |
 | lodash-custom.js                 | Custom Lodash build                                                   |
 | lodash.js                        | Standard Lodash build                                                 |
 | md-icons.css                     | Local copy of Material Design css                                     |
-| moment.js                        | Moment.js                                                             |
 | moment-timezone.js               | Timezone data for Moment                                              |
+| moment.js                        | Moment.js                                                             |
 | showdown.js                      | Showdown.js to render Markdown to HTML on the client                  |
 | sorttable.js                     | An ancient way to make table sortable; use JQuery.tablesorter instead |
+| sugar.min.js                     | The Sugar.js framework
+| tablesorter-theme-bootstrap4.css | Nice CSS for the tablsorter plugin                                    |
 | vue-dev.js                       | Vue.js dev build                                                      |
 | vue-prod.js                      | Vue.js prod build                                                     |
-| vuetify.js                       | Vuetify UI Framework                                                  |
-| vuetify.css                      | CSS for Vuetify                                                       |
+| vuetify.{css,js}                 | Vuetify UI Framework                                                  |
 
 ## Example Pug files
 
+These all use Vuetify to demonstrate how small a useful page can be:
+
 | Template        | Notes                                                                          |
-| --------------- | ------------------------------------------------------------------------------ |
-| vue-chart.pug   | Demo for using Vuetify inside pug-pack that graphs/aggregates time-series data | 
-| bgg.pug         | Small Docker-based site to view BoardGameGeek data                             |
-| github-user.pug | Demo for Vuetify that shows repos of a GitHub user
+| --------------- | ------------------------------------------------ |
+| bgg.pug         | View BoardGameGeek data for a given username     |
+| github-user.pug | Display all repos of a GitHub user               |
+| vue-chart.pug   | Plot time series data (see `tsc` CLI tool below) | 
 
 ## Client-side helpers
 
@@ -322,7 +324,7 @@ Markdown and Pug are a great combo, use this filter like so:
 | ------------------------------ | ------------------------------------------------------------------------- |
 | bind-input-query-param.coffee  | Easily wrangle query params in the url (see below)                        |
 | mdtable.js                     | Convert JS array-of-arrays to a string of nicely-formatted Markdown table |
-| commify.js                     | Inject commas as thousands separators to a number                         |
+| commify.js                     | Inject commas as thousands separators into a number                       |
 
 #### bind-input-query-param.coffee
 
@@ -341,8 +343,25 @@ input#query
 #### mdtable.js
 
 This takes an array-of-arrays, and renders it as a markdown table (in a
-string) using https://github.com/wooorm/markdown-table. There is also a CLI
-interface:
+string) using https://github.com/wooorm/markdown-table.
+
+```js
+mdtable(['foo', 'bar'], ['first',2], ['second',4], { align: 'lr' })
+```
+
+#### commify.js
+
+Adds commas to a number to make it easier to read.
+
+```js
+commify(3423545656356923.1231255)
+```
+
+# Misc CLI Tools
+
+## mdtable
+
+A CLI wrapper around the client-side `mdtable.js` library.
 
 ```
 usage: mdtable [options and filename(s)]
@@ -368,10 +387,9 @@ Long args are also supported: --regex, --align, --names, --truncate,
 filename of "-" will read from stdin.
 ```
 
-#### commify.js
+## commify
 
-Adds commas to a number to make it easier to read. There is also a CLI
-interface:
+A CLI wrapper around `commify.js`.
 
 ```
 usage: commify [-j] [NUMBER ...]
@@ -379,8 +397,6 @@ usage: commify [-j] [NUMBER ...]
 Inserts commas as thousands separators in one or more NUMBER, and outputs each
 on its own line. -j outputs as JSON for Alfred Workflow integration.
 ```
-
-# Misc CLI Tools
 
 ## tsc
 
@@ -420,7 +436,7 @@ Timestamps are parsed strictly.
 
 ## cs
 
-A CLI that wraps the `coffee` script with some useful behavior for shell
+A CLI that wraps the `coffee` binary with some useful behavior for shell
 one-liners, as well as exploring CoffeeScript in its REPL.
 
 ```
@@ -444,7 +460,8 @@ line of stdin. Without args, just opens the REPL.
 
 A CLI to run `pug` in the context of your local pug-pack installation. `src`
 in this context is the `pug-pack/src` directory itself, not your own `src`
-directory.
+directory. Use this if you're intentionally trying to use files in this repo,
+something like the `tsc` script.
 
 ```
 $ pugs -h
