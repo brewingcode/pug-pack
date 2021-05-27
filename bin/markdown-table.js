@@ -105,6 +105,36 @@ function finish() {
   console.log(table)
 }
 
+function reordered(cells) {
+  const reordered = []
+  if (indexes) {
+    for (let i of indexes) {
+      i = i < 0 ? cells.length + i : i - 1
+      reordered.push(cells[i])
+    }
+  }
+  if (exclude) {
+    for (let i = 0; i < cells.length; i++) {
+      let keep = true
+      for (let e of exclude) {
+        e = e < 0 ? cells.length + e : e - 1
+        if (i === e) {
+          keep = false
+        }
+      }
+      if (keep) {
+        reordered.push(cells[i])
+      }
+    }
+  }
+
+  if (reordered.length) {
+    cells = reordered
+  }
+
+  return cells
+}
+
 function add(str) {
   let lines = []
   if (json_in) {
@@ -116,7 +146,9 @@ function add(str) {
     }
     else {
       if (typeof(first) === 'object') {
-        names = Object.keys(first)
+        if (!names) {
+          names = reordered(Object.keys(first))
+        }
         lines = lines.map(function(obj) {
           return Object.values(obj)
         })
@@ -188,33 +220,7 @@ function add(str) {
       })
     }
 
-    const reordered = []
-    if (indexes) {
-      for (let i of indexes) {
-        i = i < 0 ? cells.length + i : i - 1
-        reordered.push(cells[i])
-      }
-    }
-    if (exclude) {
-      for (let i = 0; i < cells.length; i++) {
-        let keep = true
-        for (let e of exclude) {
-          e = e < 0 ? cells.length + e : e - 1
-          if (i === e) {
-            keep = false
-          }
-        }
-        if (keep) {
-          reordered.push(cells[i])
-        }
-      }
-    }
-
-    if (reordered.length) {
-      cells = reordered
-    }
-
-    return cells
+    return reordered(cells)
   })
 
   allLines.push(...lines.filter(Boolean))
