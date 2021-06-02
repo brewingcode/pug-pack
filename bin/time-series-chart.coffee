@@ -57,7 +57,7 @@ do ->
   points = []
   format = argv.f or argv.format or undefined
   isNumber = (s) -> s.toString().replace(/,/g, '').match(/^([\-\+])?[\d\.]+$/)
-  isMoment = (s) -> moment(s, format, true).isValid()
+  isMoment = (s) -> moment.utc(s, format, true).isValid()
 
   content.split('\n').forEach (line, i) ->
     [t, y] = line.split(/\s*[\t,]\s*/)
@@ -69,12 +69,12 @@ do ->
         console.warn "missing timestamp on line #{i+1}: #{line}"
         return
       points.push
-        t: moment(y, format, true)
+        t: moment.utc(y, format, true)
         y: parseFloat(t)
     else if isMoment(t)
       y = if y and isNumber(y) then y else 1
       points.push
-        t: moment(t, format, true)
+        t: moment.utc(t, format, true)
         y: parseFloat(y)
     else
       console.warn "skipping line #{i+1}: #{line}"
