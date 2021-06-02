@@ -47,7 +47,7 @@ widthCheck = ->
 drawChart = _.debounce ->
   if typeof globalPoints[0]?.t is 'string'
     globalPoints.forEach (p) ->
-      p.t = moment(p.t)
+      p.t = moment.utc(p.t)
       p.y = +p.y
 
   if app.$refs.mr.hasError or app.$refs.gb.hasError
@@ -78,10 +78,11 @@ drawChart = _.debounce ->
     yValues = app.points.map (p) -> p.y
     sum += y for y in yValues
 
+    #console.log 'app.points:', app.points.length, ', yValues: ', yValues, ', sum:', sum
     app.stats =
       'Number of Points': app.points.length
-      'First Date': min(app.points).t.format('ddd MMM D, YYYY h:mm:ssa')
-      'Last Date': max(app.points).t.format('ddd MMM D, YYYY h:mm:ssa')
+      'First Date': min(app.points).t.format()
+      'Last Date': max(app.points).t.format()
 
     app.moreStats =
       'Average': (sum / app.points.length).toFixed(2)
