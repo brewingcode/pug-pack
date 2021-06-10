@@ -89,7 +89,27 @@ do ->
     process.exit(2)
 
   dir = tmp.dirSync()
+  tmpChart = "#{dir.name}/vue-chart.html"
   chartHtml = fs.readFileSync(chartFile).toString().replace /(globalPoints\s*=\s*)\[\]/, '$1' + JSON.stringify(points)
-  fs.writeFileSync "#{dir.name}/vue-chart.html", chartHtml
-  console.log "graphing #{points.length} points via #{dir.name}/vue-chart.html"
-  execSync "open '#{dir.name}/vue-chart.html'"
+  fs.writeFileSync tmpChart, chartHtml
+  console.log "graphing #{points.length} points via #{tmpChart}"
+
+  if points.length > 1000
+    # divide into 10ths
+    span = moment(points[points.length-1].t).diff(moment(points[0].t))/1000
+    gb = if span < 60
+      '5s'
+    else if span < 3600           # an hour
+      '5m'
+    else if span < 3600*24        # a day
+      '1h'
+    else if span < 3600*24*7      # a week
+      '1d'
+    else if span < 3600*24*30*6   # six months
+      '1w'
+    else
+      '1M'
+    chartHtml = fs.readFileSync(tmpChart).toString().replace /(initialGroupBy\s*=\s*)null/, "$1'#{gb}'"
+    fs.writeFileSync tmpChart, chartHtml
+
+  execSync "open '#{tmpChart}'"

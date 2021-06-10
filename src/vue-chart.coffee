@@ -102,6 +102,7 @@ randomPoints = [1..500].map (i) ->
 randomPoints.sort (a,b) -> +a.t - +b.t
 
 globalPoints = []
+initialGroupBy = null
 
 config =
   type: 'bar'
@@ -155,7 +156,10 @@ app = new Vue
   mounted: ->
     bindInputQueryParam '#mr', null, null, (v) => @mostRecent = v
     bindInputQueryParam '#gb', null, null, (v) => @groupBy = v
-    drawChart()
+    if initialGroupBy
+      @groupBy = initialGroupBy
+    else
+      drawChart()
 
   watch:
     groupBy: -> drawChart()
