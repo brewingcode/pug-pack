@@ -2,9 +2,9 @@ FROM mhart/alpine-node:10
 
 WORKDIR /app
 
-RUN apk add --no-cache --update tzdata curl jq python py2-pip \
+RUN apk add --no-cache --update tzdata curl jq python py2-pip build-base \
   && pip install yq \
-  && npm install coffeescript express cors morgan mkdirp bluebird knex sqlite3 moment
+  && npm install coffeescript express cors morgan mkdirp bluebird knex @vscode/sqlite3 moment
 
 COPY server.coffee bgg-api.coffee ./
 
