@@ -14,19 +14,25 @@ const usage = `usage: mdtable [options and filename(s)]
 Reads lines from filename(s) and/or stdin and outputs them in a nicely
 formatted Markdown table.
 
+Input options:
+
+-i INDEXES   include columns via 1-based indexes in CSV form (eg "2,-1,4")
+-e INDEXES   exclude columns via 1-based indexes in CSV form
 -r REGEX     regex used to split each row into cells ("\t" by default)
--a ALIGN     string of "l", "r", and "c" to specify alignments for each cell
--n NAMES     CSV of header names (if first line of input is not headers)
--t N         number of characters to truncate each cell to
--i INDEXES   CSV of 1-based indexes to specify cells to include
--e INDEXES   CSV of 1-based indexes to specify cells to exclude
--s           flag for strict: only include lines that parse to the same number
+-w           whitepsace-based inference for column boundaries: use the first
+             line as a template (eg, see Docker's CLI output)
+-j           json-formatted input (ignore -r and -w)
+-c           csv-formatted input (ignore -r and -w)
+
+Output options:
+
+-a ALIGN     align each cell with "l", "r", and "c" (eg "llr")
+-n NAMES     names for column headers as CSV (if first line of input is not
+             headers)
+-t N         truncate all cells to N characters
+-p           plaintext output: un-markdownify the final result
+-s           strict parsing: only output lines that parse to the same number
              of cells as the first line of input
--w           flag for whitespace: infer cells based on how whitespace is laid
-             out on first line of input (see docker's CLI output)
--p           plain text output: un-markdownify the final result
--j           input is json-formatted
--c           input is csv-formatted
 
 Long args are also supported: --regex, --align, --names, --truncate,
 --include/--indexes, --exclude, --strict, --whitespace, --plaintext, --json,
@@ -34,7 +40,6 @@ and --csv. A filename of "-" will read from stdin.
 
 -a and -n are used AFTER -i and -e. i.e., if you -i three columns, you should
 ALSO pass three values for -a and/or -n.`
-
 
 if (argv.help || argv.h) {
   console.log(usage)
