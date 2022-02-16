@@ -83,10 +83,14 @@ fetchUrl = (url) ->
       throw e
 
 onePage = (username, page) ->
-  await fetchUrl "https://www.boardgamegeek.com/xmlapi2/plays?username=#{username}&page=#{page or 1}"
+  url = "https://boardgamegeek.com/xmlapi2/plays?username=#{username}&page=#{page or 1}"
+  console.log "onePage: #{url}"
+  await fetchUrl url
 
 oneThing = (id) ->
-  await fetchUrl "https://www.boardgamegeek.com/xmlapi2/thing?id=#{id}"
+  url = "https://boardgamegeek.com/xmlapi2/thing?id=#{id}"
+  console.log "oneThing: #{url}"
+  await fetchUrl url
 
 allPlays = (username) ->
   first = await onePage(username)
