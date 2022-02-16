@@ -4,7 +4,10 @@ WORKDIR /app
 
 RUN apk add --no-cache --update tzdata curl jq python py2-pip build-base \
   && pip install yq \
-  && npm install coffeescript express cors morgan mkdirp bluebird knex @vscode/sqlite3 moment
+  && npm install coffeescript express cors morgan mkdirp bluebird knex @vscode/sqlite3 moment \
+  && npm cache clean --force \
+  && apk del py2-pip build-base \
+  && rm -rf /var/cache/apk/*
 
 COPY server.coffee bgg-api.coffee ./
 
