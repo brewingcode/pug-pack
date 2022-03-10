@@ -14,19 +14,42 @@ min = (arr) ->
     if +prev.t < +curr.t then prev else curr
   , {}
 
+
 bucketize = (points, count, unit) ->
   return [] unless points.length > 0
   points.sort (a,b) -> +a.t - +b.t
-  ref = points[0].t.clone().add(count, unit)
-  buckets = [{t: points[0].t.clone(), y: 0}]
-  points.forEach (p) ->
-    if p.t.isSameOrBefore(ref)
-      buckets[buckets.length-1].y += p.y
-    else
-      buckets.push
-        t: ref.clone()
-        y: p.y
-      ref.add(count, unit)
+
+  ref = points[0].t.clone()
+  buckets = []
+  i = 0
+  sum = (arr) ->
+    x = 0
+    x += a.y for a in arr
+    return x
+
+  while ref.isSameOrBefore(points[points.length-1].t)
+    while i < points.length
+      p = points[i]
+      if p.t.isBefore(ref)
+        # inside the current ref
+        buckets[buckets.length-1].y += p.y
+        i++
+      else
+        # exceeded the current ref
+        break
+
+    # start a new bucket (or the first one)
+    buckets.push {t:ref.clone(), y:0}
+    ref = ref.add(count, unit)
+
+    # if we're out of points
+    if i > points.length - 1
+      break
+
+  # if we're out of of buckets, catch any remaining points in the last one
+  if i <= points.length - 1
+    buckets[buckets.length-1].y += sum(points.slice(i))
+
   return buckets
 
 mostRecent = (points, count, unit) ->
