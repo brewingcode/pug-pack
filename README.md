@@ -326,6 +326,7 @@ These all use Vuetify to demonstrate how small a useful page can be:
 | bind-input-query-param.coffee  | Easily wrangle query params in the url (see below)                        |
 | mdtable.js                     | Convert JS array-of-arrays to a string of nicely-formatted Markdown table |
 | commify.js                     | Inject commas as thousands separators into a number                       |
+| day-hour-min-sec.js            | Convert a number of seconds into a nicer "1d 2h 3m 4s"-style string       |
 
 #### bind-input-query-param.coffee
 
@@ -355,7 +356,15 @@ mdtable(['foo', 'bar'], ['first',2], ['second',4], { align: 'lr' })
 Adds commas to a number to make it easier to read.
 
 ```js
-commify(3423545656356923.1231255)
+commify(3423545656356923.1231255) // 3,423,545,656,356,923.123,125,5
+```
+
+#### day-hour-min-sec.js
+
+Converts a number of seconds into something that makes more sense to a human
+
+```js
+dhms(344) // 5m 44s
 ```
 
 # Misc CLI Tools
@@ -407,6 +416,16 @@ usage: commify [-j] [NUMBER ...]
 
 Inserts commas as thousands separators in one or more NUMBER, and outputs each
 on its own line. -j outputs as JSON for Alfred Workflow integration.
+```
+
+## dhms
+
+A CLI wrapper around `day-hour-min-sec.js`.
+
+```
+usage: dhms [NUMBER ...]
+
+Convert a number of seconds into human numbers.
 ```
 
 ## tsc
