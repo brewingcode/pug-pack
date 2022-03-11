@@ -109,6 +109,7 @@ drawChart = _.debounce ->
       'Average': (sum / app.points.length).toFixed(2)
       'Min': commify Math.min(yValues...)
       'Max': commify Math.max(yValues...)
+      'Duration': dhms( ( max(app.points).t - min(app.points).t ) / 1000 )
   else
     app.stats = null
     app.moreStats = null
