@@ -112,9 +112,6 @@ app = new Vue
         @plays = []
         getUser()
 
-  methods:
-    commify: (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
-
   computed:
     players: ->
       names = {}

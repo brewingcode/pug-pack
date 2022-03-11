@@ -1,7 +1,5 @@
 chart = null
 
-commify = (s) -> s.toString().replace /// \B (?= (\d{3})+ (?!\d) ) ///g, ','
-
 max = (arr) ->
   # each element has a .t property than can be coerced to a number
   arr.reduce (prev, curr) ->
