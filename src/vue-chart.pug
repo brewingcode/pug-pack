@@ -14,7 +14,7 @@ html
         v-container(fluid)
           v-row(dense)
             v-col(xs6)
-              v-text-field(label="Group By", placeholder="30 minutes, 1 h, etc."
+              v-text-field(label="Group By", placeholder="30 minutes, 1 h, etc. + optional 'sum'/'avg'"
                            v-model="groupBy" :rules="[momentable]" ref="gb" id="gb")
             v-col(xs6)
               v-text-field(label="Most Recent", placeholder="1 week, 1 y, etc."

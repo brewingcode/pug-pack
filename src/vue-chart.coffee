@@ -17,7 +17,7 @@ sum = (arr) ->
   x += a for a in arr
   return x
 
-bucketize = (points, count, unit) ->
+bucketize = (points, count, unit, method) ->
   return [] unless points.length > 0
   points.sort (a,b) -> +a.t - +b.t
 
@@ -48,6 +48,12 @@ bucketize = (points, count, unit) ->
   if i <= points.length - 1
     buckets[buckets.length-1].vals.push ...points.slice(i).map (p) -> p.y
 
+  for b in buckets
+    if method is 'sum' or not method
+      b.y = sum b.vals
+    else if method is 'avg'
+      b.y = (sum(b.vals) / b.vals.length).toFixed(3)
+
   return buckets
 
 mostRecent = (points, count, unit) ->
@@ -58,10 +64,7 @@ mostRecent = (points, count, unit) ->
 
 widthCheck = ->
   meta = chart.getDatasetMeta(0).data
-  sum = meta.reduce (acc, cur) ->
-    acc + cur._model.width
-  , 0
-  if sum / meta.length < 1
+  if sum(meta.map (m) -> m._model.width) / meta.length < 1
     chart.options.scales.xAxes[0].barThickness = 3
     chart.update()
 
@@ -81,7 +84,7 @@ drawChart = _.debounce ->
     app.points = mostRecent(app.points, m[1], m[2])
   if app.groupBy and not app.$refs.gb.hasError
     m = app.groupBy.match(app.regex)
-    app.points = bucketize(app.points, m[1], m[2])
+    app.points = bucketize(app.points, m[1], m[2], m[3])
 
   if not chart
     Chart.defaults.global.defaultFontSize = 16
@@ -104,7 +107,7 @@ drawChart = _.debounce ->
       'Last Date': max(app.points).t.format()
 
     app.moreStats =
-      'Average': (sum(yValues) / app.points.length).toFixed(2)
+      'Average': (sum(yValues) / app.points.length).toFixed(3)
       'Min': commify Math.min(yValues...)
       'Max': commify Math.max(yValues...)
       'Duration': dhms( ( max(app.points).t - min(app.points).t ) / 1000 )
@@ -160,7 +163,7 @@ app = new Vue
     groupBy: null
     mostRecent: null
     useRandomData: false
-    regex: /^\s*(\d+)\s*([a-z]+)\s*$/i
+    regex: /^\s*(\d+)\s*([a-z]+)\s*(\w+)?$/i
     points: [1] # this will get correctly set on first drawChart()
     stats: null
     moreStats: null
