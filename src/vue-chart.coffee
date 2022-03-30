@@ -12,6 +12,10 @@ min = (arr) ->
     if +prev.t < +curr.t then prev else curr
   , {}
 
+sum = (arr) ->
+  x = 0
+  x += a for a in arr
+  return x
 
 bucketize = (points, count, unit) ->
   return [] unless points.length > 0
@@ -20,24 +24,20 @@ bucketize = (points, count, unit) ->
   ref = points[0].t.clone()
   buckets = []
   i = 0
-  sum = (arr) ->
-    x = 0
-    x += a.y for a in arr
-    return x
 
   while ref.isSameOrBefore(points[points.length-1].t)
     while i < points.length
       p = points[i]
       if p.t.isBefore(ref)
         # inside the current ref
-        buckets[buckets.length-1].y += p.y
+        buckets[buckets.length-1].vals.push p.y
         i++
       else
         # exceeded the current ref
         break
 
     # start a new bucket (or the first one)
-    buckets.push {t:ref.clone(), y:0}
+    buckets.push {t:ref.clone(), vals:[]}
     ref = ref.add(count, unit)
 
     # if we're out of points
@@ -46,7 +46,7 @@ bucketize = (points, count, unit) ->
 
   # if we're out of of buckets, catch any remaining points in the last one
   if i <= points.length - 1
-    buckets[buckets.length-1].y += sum(points.slice(i))
+    buckets[buckets.length-1].vals.push ...points.slice(i).map (p) -> p.y
 
   return buckets
 
@@ -95,9 +95,7 @@ drawChart = _.debounce ->
   widthCheck()
 
   if app.points.length > 0
-    sum = 0
     yValues = app.points.map (p) -> p.y
-    sum += y for y in yValues
 
     #console.log 'app.points:', app.points.length, ', yValues: ', yValues, ', sum:', sum
     app.stats =
@@ -106,7 +104,7 @@ drawChart = _.debounce ->
       'Last Date': max(app.points).t.format()
 
     app.moreStats =
-      'Average': (sum / app.points.length).toFixed(2)
+      'Average': (sum(yValues) / app.points.length).toFixed(2)
       'Min': commify Math.min(yValues...)
       'Max': commify Math.max(yValues...)
       'Duration': dhms( ( max(app.points).t - min(app.points).t ) / 1000 )
