@@ -53,7 +53,12 @@ bucketize = (points, count, unit, method) ->
       b.y = sum b.vals
     else if method is 'avg'
       b.y = (sum(b.vals) / b.vals.length).toFixed(3)
-
+    else if method is 'max'
+      b.y = Math.max b.vals...
+    else if method is 'min'
+      b.y = Math.min b.vals...
+    else
+      b.y = 0
   return buckets
 
 mostRecent = (points, count, unit) ->
