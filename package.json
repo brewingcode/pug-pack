@@ -20,7 +20,7 @@
     "browser-sync": "^2.26.14",
     "coffeescript": "^2.5.1",
     "csso": "^4.2.0",
-    "csv-parse": "^4.15.4",
+    "csv-parse": "^5.1.0",
     "get-stdin": "7.0.0",
     "html-minifier": "^4.0.0",
     "js-yaml": "^4.1.0",

@@ -2,7 +2,7 @@
 
 const mdtable = require('../src/mdtable')
 const fs = require('fs')
-const csvparse = require('csv-parse/lib/sync')
+const csv = require('csv-parse/sync')
 
 const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['h', 'help', 's', 'strict', 'w', 'whitespace', 'p', 'plaintext',
@@ -167,7 +167,7 @@ function add(str) {
     }
   }
   else if (csv_in) {
-    lines = csvparse(str)
+    lines = csv.parse(str)
   }
   else {
     str.toString().split('\n').forEach(function(line) {

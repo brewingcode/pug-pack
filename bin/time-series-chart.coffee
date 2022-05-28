@@ -7,6 +7,7 @@ moment = require 'moment'
 tmp = require 'tmp'
 { execSync } = require 'child_process'
 getStdin = require 'get-stdin'
+csv = require 'csv-parse/sync'
 
 moment.suppressDeprecationWarnings = true
 
@@ -59,14 +60,14 @@ do ->
   isNumber = (s) -> s.toString().replace(/,/g, '').match(/^([\-\+])?[\d\.]+$/)
   isMoment = (s) -> moment.utc(s, format, true).isValid()
 
-  content.split('\n').forEach (line, i) ->
-    [t, y] = line.split(/\s*[\t,]\s*/)
+  csv.parse(content).forEach (row) ->
+    [t, y] = row
     return unless t or y
     t = if t then t.trim()
     y = if y then y.trim()
     if isNumber(t)
       unless isMoment(y)
-        console.warn "missing timestamp on line #{i+1}: #{line}"
+        console.warn "missing timestamp in row: #{row}"
         return
       points.push
         t: moment.utc(y, format, true)
@@ -77,7 +78,7 @@ do ->
         t: moment.utc(t, format, true)
         y: parseFloat(y)
     else
-      console.warn "skipping line #{i+1}: #{line}"
+      console.warn "skipping row: #{row}"
 
   if points.length is 0
     console.error "no data points found"
