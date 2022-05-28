@@ -1,5 +1,8 @@
 chart = null
 
+# https://github.com/chartjs/Chart.js/issues/4334
+moment.tz.setDefault "UTC"
+
 max = (arr) ->
   # each element has a .t property than can be coerced to a number
   arr.reduce (prev, curr) ->
