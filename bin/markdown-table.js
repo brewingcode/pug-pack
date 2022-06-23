@@ -228,7 +228,9 @@ function add(str) {
     return reordered(cells)
   })
 
-  allLines.push(...lines.filter(Boolean))
+  lines.filter(Boolean).forEach(function(l) {
+      allLines.push(l);
+  })
 }
 
 argv._.forEach(function(arg) {
