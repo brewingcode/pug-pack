@@ -2,7 +2,9 @@
 
 const mdtable = require('../src/mdtable')
 const fs = require('fs')
-const csv = require('csv-parse/sync')
+const csv = require('csv-parse')
+const readline = require('readline')
+const JSONStream = require('JSONStream')
 
 const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['h', 'help', 's', 'strict', 'w', 'whitespace', 'p', 'plaintext',
@@ -11,7 +13,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 
 const usage = `usage: mdtable [options and filename(s)]
 
-Reads lines from filename(s) and/or stdin and outputs them in a nicely
+Reads lines from filename(s) or stdin and outputs them in a nicely
 formatted Markdown table.
 
 Input options:
@@ -82,13 +84,36 @@ if (exclude) {
 }
 
 const allLines = []
-let lineNumber = 0
 
 function finish() {
+  allLines.sort(function(a,b) { return a[0] - b[0] })
+  const modifiedLines = allLines.map(function(line, i) {
+    let cells = line[1]
+    if (strict === true) {
+      // init
+      strict = cells.length
+    }
+    if (typeof strict === 'number') {
+      if (cells.length !== strict) {
+        console.warn(`skipping line ${i+1}: expected ${strict} cells, but saw ${cells.length}`)
+        return false
+      }
+    }
+
+    if (!isNaN(truncate)) {
+      cells = cells.map(function(cell) {
+         return cell.slice(0, truncate)
+      })
+    }
+
+    return reordered(cells)
+  }).filter(Boolean)
+
   if (names) {
-    allLines.unshift(names.toString().split(','))
+    modifiedLines.unshift(names.toString().split(','))
   }
-  let table = mdtable(allLines, {align})
+
+  let table = mdtable(modifiedLines, {align})
   if (plaintext) {
     const lines = table.split(/\n/)
     const layout = lines.splice(1,1) // remove second line
@@ -140,113 +165,97 @@ function reordered(cells) {
   return cells
 }
 
-function add(str) {
-  let lines = []
-  if (json_in) {
-    lines = JSON.parse(str)
-    // use first record as example for all other records
-    const first = lines[0]
-    if (Array.isArray(first)) {
-      // each record is an array, nothing needs to be done
+function read(order, path) {
+  return new Promise(function(resolve, reject) {
+    let parser
+
+    if (json_in) {
+      let first
+      parser = JSONStream.parse('*')
+      parser.on('data', function(data) {
+        if (!first) {
+          first = data
+          if (!names) {
+            names = reordered(Object.keys(first))
+          }
+        }
+        if (typeof(first) === 'string') {
+          allLines.push([order, [data]])
+        }
+        else if (Array.isArray(first)) {
+          allLines.push([order, data])
+        }
+        else {
+          allLines.push([order, Object.values(data).map(function(v) {
+            return typeof(v) === 'string' ? v : JSON.stringify(v)
+          })])
+        }
+      })
+    }
+    else if (csv_in) {
+      parser = csv.parse({
+        relax_column_count_less: true,
+        relax_column_count_more: true,
+      })
+      parser.on('readable', function() {
+        let rec
+        while ((rec = parser.read()) !== null) {
+          allLines.push([order, rec])
+        }
+      })
     }
     else {
-      if (typeof(first) === 'object') {
-        if (!names) {
-          names = reordered(Object.keys(first))
+      parser = readline.createInterface({
+        input: fs.createReadStream(path),
+      })
+      parser.on('line', function(line) {
+        if (!line.match(/\S/)) {
+          return
         }
-        lines = lines.map(function(obj) {
-          return Object.values(obj)
-        })
-      }
-      else {
-        // some kind of scalar, so uh.... make it an array of one I suppose
-        lines = lines.map(function(x) {
-          return [x]
-        })
-      }
-    }
-  }
-  else if (csv_in) {
-    lines = csv.parse(str)
-  }
-  else {
-    str.toString().split('\n').forEach(function(line) {
-      if (!line.match(/\S/)) {
-        return
-      }
 
-      if (whitespace === true) {
-        // init
-        whitespace = []
-        let space = 2
-        for (let i = 0; i < line.length; i++) {
-          if (line[i].match(/\s/)) {
-            space++
-          }
-          else if (space >= 2) {
-            space = 0
-            whitespace.push(i)
+        if (whitespace === true) {
+          // init
+          whitespace = []
+          let space = 2
+          for (let i = 0; i < line.length; i++) {
+            if (line[i].match(/\s/)) {
+              space++
+            }
+            else if (space >= 2) {
+              space = 0
+              whitespace.push(i)
+            }
           }
         }
-      }
 
-      let cells = []
-      if (typeof whitespace === 'object') {
-        for (let i = 0; i < whitespace.length; i++) {
-          const end = i === whitespace.length - 1 ? undefined : whitespace[i+1]
-          cells.push(line.slice(whitespace[i], end))
+        let cells = []
+        if (typeof whitespace === 'object') {
+          for (let i = 0; i < whitespace.length; i++) {
+            const end = i === whitespace.length - 1 ? undefined : whitespace[i+1]
+            cells.push(line.slice(whitespace[i], end))
+          }
         }
-      }
-      else {
-        cells = line.split(regex)
-      }
+        else {
+          cells = line.split(regex)
+        }
 
-      lines.push(cells)
-    })
-  }
-
-  lines = lines.map(function(cells) {
-    lineNumber++
-
-    if (strict === true) {
-      // init
-      strict = cells.length
-    }
-    if (typeof strict === 'number') {
-      if (cells.length !== strict) {
-        console.warn(`skipping line ${lineNumber}: expected ${strict} cells, but saw ${cells.length}`)
-        return null
-      }
-    }
-
-    if (!isNaN(truncate)) {
-      cells = cells.map(function(cell) {
-         return cell.slice(0, truncate)
+        allLines.push([order, cells])
       })
     }
 
-    return reordered(cells)
-  })
-
-  lines.filter(Boolean).forEach(function(l) {
-      allLines.push(l);
+    parser.on('end', resolve)
+    parser.on('error', reject)
+    fs.createReadStream(path).pipe(parser)
   })
 }
 
-argv._.forEach(function(arg) {
-  if (arg === '-') { arg = '/dev/stdin' }
-   add(fs.readFileSync(arg))
-})
-
+const prs = []
 if (!process.stdin.isTTY || argv._.length === 0) {
-  let stdin = ''
-  process.stdin
-    .on('data', function(chunk) { stdin += chunk })
-    .on('end', function() {
-      add(stdin)
-      finish()
-    })
+  prs.push(read(0, '/dev/stdin'))
 }
 else {
-  finish()
+  argv._.forEach(function(arg, i) {
+    prs.push(read(i, arg == '-' ? '/dev/stdin' : arg))
+  })
 }
+Promise.all(prs).then(finish)
