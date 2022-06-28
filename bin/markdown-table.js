@@ -206,7 +206,7 @@ function read(order, path) {
     }
     else {
       parser = readline.createInterface({
-        input: fs.createReadStream(path),
+        input: path === '-' ? process.stdin : fs.createReadStream(path),
       })
       parser.on('line', function(line) {
         if (!line.match(/\S/)) {
@@ -241,21 +241,26 @@ function read(order, path) {
 
         allLines.push([order, cells])
       })
+
+      parser.on('close', resolve)
+      parser.on('error', reject)
+      return // readline doesn't match the events or flow of streams
     }
 
     parser.on('end', resolve)
     parser.on('error', reject)
-    fs.createReadStream(path).pipe(parser)
+    const stream = arg === '-' ? process.stdin : fs.createReadStream(path)
+    stream.pipe(parser)
   })
 }
 
 const prs = []
 if (!process.stdin.isTTY || argv._.length === 0) {
-  prs.push(read(0, '/dev/stdin'))
+  prs.push(read(0, '-'))
 }
 else {
   argv._.forEach(function(arg, i) {
-    prs.push(read(i, arg == '-' ? '/dev/stdin' : arg))
+    prs.push(read(i, arg))
   })
 }
 Promise.all(prs).then(finish)
