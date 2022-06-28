@@ -4,7 +4,9 @@
   "description": "Pseudo-webpack for developers who like clean formatting",
   "scripts": {
     "dev": "coffee bin/cli.coffee -w",
-    "build": "coffee bin/cli.coffee -p"
+    "build": "coffee bin/cli.coffee -p",
+    "test": "./best/bin/best.sh",
+    "snapshot": "./best/bin/best.sh --snapshot:generate --verbose"
   },
   "bin": {
     "pug-pack": "bin/cli.coffee",

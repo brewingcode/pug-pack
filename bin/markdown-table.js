@@ -20,7 +20,7 @@ Input options:
 
 -i INDEXES   include columns via 1-based indexes in CSV form (eg "2,-1,4")
 -e INDEXES   exclude columns via 1-based indexes in CSV form
--r REGEX     regex used to split each row into cells ("\t" by default)
+-r REGEX     regex used to split each row into cells ("\\t" by default)
 -w           whitepsace-based inference for column boundaries: use the first
              line as a template (eg, see Docker's CLI output)
 -j           json-formatted input (ignore -r and -w)
@@ -175,8 +175,9 @@ function read(order, path) {
     }
     else if (csv_in) {
       parser = csv.parse({
-        relax_column_count_less: true,
-        relax_column_count_more: true,
+        relax_column_count: true,
+        relax_quotes: true,
+        bom: true,
       })
       parser.on('readable', function() {
         let rec
@@ -230,7 +231,7 @@ function read(order, path) {
 
     parser.on('end', resolve)
     parser.on('error', reject)
-    const stream = arg === '-' ? process.stdin : fs.createReadStream(path)
+    const stream = path === '-' ? process.stdin : fs.createReadStream(path)
     stream.pipe(parser)
   })
 }
