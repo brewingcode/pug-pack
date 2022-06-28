@@ -177,6 +177,10 @@
         columnLength = mostCellsPerRow;
         line = [];
 
+        if (settings.noalign && rowIndex == 1) {
+          continue;
+        }
+
         while (++columnIndex < columnLength) {
           cell = row[columnIndex] || '';
           before = '';
@@ -236,17 +240,15 @@
           line = line.replace(trailingWhitespace, '');
         }
 
-        lines.push(line);
+        if (settings.stream) {
+          settings.stream.write(line + lineFeed)
+        }
+        else {
+          lines.push(line);
+        }
       }
 
-      if (settings.noalign) {
-        // Removes the line of dashes that denote both alignment and the table
-        // headers. Note this style of markdown table is only supported by
-        // some oddball markdowns (eg pandoc) and IS NOT supported by Github.
-        lines.splice(1, 1);
-      }
-
-      return lines.join(lineFeed);
+      return settings.stream ? undefined : lines.join(lineFeed);
     })();
 
     return string;

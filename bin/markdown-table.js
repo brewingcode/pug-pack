@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --max-old-space-size=8000
 
 const mdtable = require('../src/mdtable')
 const fs = require('fs')
@@ -133,6 +133,7 @@ function finish() {
     }).join('\n')
   }
   console.log(table)
+  mdtable(modifiedLines, {align, stream:process.stdout})
 }
 
 function reordered(cells) {
