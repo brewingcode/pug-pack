@@ -113,27 +113,7 @@ function finish() {
     modifiedLines.unshift(names.toString().split(','))
   }
 
-  let table = mdtable(modifiedLines, {align})
-  if (plaintext) {
-    const lines = table.split(/\n/)
-    const layout = lines.splice(1,1) // remove second line
-    const indexes = []
-    const re = / \| /g
-    let m
-    while (m = re.exec(layout)) {
-      indexes.push(m.index)
-    }
-    table = lines.map(function(line) {
-      indexes.forEach(function(i) {
-        line = line.substring(0, i) + '\0\0\0' + line.substring(i+3)
-      })
-      return line.replace(/\0\0\0/g, ' ')
-        .replace(/^\| /, '')
-        .replace(/ \|$/, '')
-    }).join('\n')
-  }
-  console.log(table)
-  mdtable(modifiedLines, {align, stream:process.stdout})
+  mdtable(modifiedLines, {align, plaintext, stream:process.stdout})
 }
 
 function reordered(cells) {

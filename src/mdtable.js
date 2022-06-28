@@ -177,7 +177,7 @@
         columnLength = mostCellsPerRow;
         line = [];
 
-        if (settings.noalign && rowIndex == 1) {
+        if ( (settings.noalign || settings.plaintext) && rowIndex == 1) {
           continue;
         }
 
@@ -232,6 +232,10 @@
           if (end === true || columnIndex !== columnLength - 1) {
             line.push(verticalBar);
           }
+        }
+
+        if (settings.plaintext) {
+          line = line.filter(function(cell) { return cell !== verticalBar })
         }
 
         line = line.join('');
