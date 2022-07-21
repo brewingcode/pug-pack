@@ -21,6 +21,8 @@ Input options:
 -i INDEXES   include columns via 1-based indexes in CSV form (eg "2,-1,4")
 -e INDEXES   exclude columns via 1-based indexes in CSV form
 -r REGEX     regex used to split each row into cells ("\\t" by default)
+-f N         force number of columns to N by combining columns, starting
+             from the right and working back to the left
 -w           whitepsace-based inference for column boundaries: use the first
              line as a template (eg, see Docker's CLI output)
 -j           json-formatted input (ignore -r and -w)
@@ -36,7 +38,7 @@ Output options:
 -s           strict parsing: only output lines that parse to the same number
              of cells as the first line of input
 
-Long args are also supported: --regex, --align, --names, --truncate,
+Long args are also supported: --regex, --force, --align, --names, --truncate,
 --include/--indexes, --exclude, --strict, --whitespace, --plaintext, --json,
 and --csv. A filename of "-" will read from stdin.
 
@@ -49,6 +51,7 @@ if (argv.help || argv.h) {
 }
 
 let regex = argv.regex || argv.r
+const force = argv.force || argv.f
 const align = argv.align || argv.a
 let names = argv.names || argv.n
 const truncate = argv.truncate || argv.t
@@ -106,6 +109,12 @@ function finish() {
       })
     }
 
+    if (force) {
+      if (cells.length > force) {
+        const lastCell = cells.slice(force-1).join(' ')
+        cells.splice(force-1, cells.length, lastCell)
+      }
+    }
     return reordered(cells)
   }).filter(Boolean)
 
