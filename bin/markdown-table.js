@@ -2,13 +2,14 @@
 
 const mdtable = require('../src/mdtable')
 const fs = require('fs')
-const csv = require('csv-parse')
+const csvparse = require('csv-parse')
+const csvstringify = require('csv-stringify/sync')
 const readline = require('readline')
 const JSONStream = require('JSONStream')
 
 const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['h', 'help', 's', 'strict', 'w', 'whitespace', 'p', 'plaintext',
-    'j', 'json', 'c', 'csv'],
+    'j', 'json', 'c', 'csv', 'C', 'csv-out', '-J', 'json-out'],
 })
 
 const usage = `usage: mdtable [options and filename(s)]
@@ -37,10 +38,12 @@ Output options:
 -p           plaintext output: un-markdownify the final result
 -s           strict parsing: only output lines that parse to the same number
              of cells as the first line of input
+-C           output as CSV
+-J           output as JSON
 
 Long args are also supported: --regex, --force, --align, --names, --truncate,
 --include/--indexes, --exclude, --strict, --whitespace, --plaintext, --json,
-and --csv. A filename of "-" will read from stdin.
+--json-out, --csv, --csv-out. A filename of "-" will read from stdin.
 
 -a and -n are used AFTER -i and -e. i.e., if you -i three columns, you should
 ALSO pass three values for -a and/or -n.`
@@ -62,6 +65,8 @@ let exclude = argv.exclude || argv.e
 let strict = argv.strict || argv.s
 let whitespace = argv.whitespace || argv.w
 const plaintext = argv.plaintext || argv.p
+const outCSV = argv['out-csv'] || argv.C
+const outJSON= argv['out-json'] || argv.J
 
 if (names) {
     names = names.toString().split(',')
@@ -122,7 +127,15 @@ function finish() {
     modifiedLines.unshift(names.toString().split(','))
   }
 
-  mdtable(modifiedLines, {align, plaintext, stream:process.stdout})
+  if (outCSV || outJSON) {
+    modifiedLines.forEach(function(row) {
+      if (outCSV) process.stdout.write(csvstringify.stringify([row]))
+      if (outJSON) console.log(JSON.stringify(row))
+    })
+  }
+  else {
+    mdtable(modifiedLines, {align, plaintext, stream:process.stdout})
+  }
 }
 
 function reordered(cells) {
@@ -183,7 +196,7 @@ function read(order, path) {
       })
     }
     else if (csv_in) {
-      parser = csv.parse({
+      parser = csvparse.parse({
         relax_column_count: true,
         relax_quotes: true,
         bom: true,
