@@ -124,7 +124,7 @@
         while (++columnIndex < columnLength) {
           alignments[columnIndex] = code;
         }
-      } // Inject the alignment row.
+      } // Calculate the alignment row.
 
 
       columnIndex = -1;
@@ -163,9 +163,11 @@
         row[columnIndex] = cell;
       } // Inject the alignment row.
 
+      if (!settings.noAlign) {
+        cellMatrix.splice(1, 0, row);
+        sizeMatrix.splice(1, 0, sizes);
+      }
 
-      cellMatrix.splice(1, 0, row);
-      sizeMatrix.splice(1, 0, sizes);
       rowIndex = -1;
       rowLength = cellMatrix.length;
       lines = [];

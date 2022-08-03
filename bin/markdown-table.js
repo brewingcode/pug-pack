@@ -15,7 +15,7 @@ catch (e) {
 
 const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['h', 'help', 's', 'strict', 'w', 'whitespace', 'p', 'plaintext',
-    'j', 'json', 'c', 'csv', 'C', 'csv-out', '-J', 'json-out'],
+    'j', 'json', 'c', 'csv', 'C', 'csv-out', '-J', 'json-out', 'A'],
 })
 
 const usage = `usage: mdtable [options and filename(s)]
@@ -38,6 +38,7 @@ Input options:
 Output options:
 
 -a ALIGN     align each cell with "l", "r", and "c" (eg "llr")
+-A           omit alignment row (not strictly valid markdown table)
 -n NAMES     names for column headers as CSV (if first line of input is not
              headers)
 -t N         truncate all cells to N characters
@@ -73,6 +74,7 @@ let whitespace = argv.whitespace || argv.w
 const plaintext = argv.plaintext || argv.p
 const outCSV = argv['out-csv'] || argv.C
 const outJSON= argv['out-json'] || argv.J
+const noAlign = argv['no-align'] || argv.A
 
 if (names) {
     names = names.toString().split(',')
@@ -140,7 +142,7 @@ function finish() {
     })
   }
   else {
-    mdtable(modifiedLines, {align, plaintext, stream:process.stdout})
+    mdtable(modifiedLines, {align, plaintext, noAlign, stream:process.stdout})
   }
 }
 
