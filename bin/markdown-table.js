@@ -73,6 +73,7 @@ const json_in = argv.json || argv.j
 const csv_in = argv.csv || argv.c
 let indexes = argv.indexes || argv.include || argv.i
 let exclude = argv.exclude || argv.e
+const excludeRows = argv['exclude-rows'] || argv.E
 let strict = argv.strict || argv.s
 let whitespace = argv.whitespace || argv.w
 const plaintext = argv.plaintext || argv.p
@@ -107,6 +108,9 @@ const allLines = []
 
 function finish() {
   allLines.sort(function(a,b) { return a[0] - b[0] })
+  if (excludeRows) {
+    allLines.splice(0, excludeRows)
+  }
   const modifiedLines = allLines.map(function(line, i) {
     let cells = line[1]
     if (strict === true) {
