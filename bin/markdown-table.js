@@ -60,6 +60,10 @@ if (argv.help || argv.h) {
   process.exit(0)
 }
 
+process.stdout.on('error', function(err) {
+  if (err.code == 'EPIPE') process.exit(0)
+})
+
 let regex = argv.regex || argv.r
 const force = argv.force || argv.f
 const align = argv.align || argv.a
