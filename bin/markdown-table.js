@@ -1,4 +1,4 @@
-#!/usr/bin/env node --max-old-space-size=8000
+#!/usr/bin/env -S node --max-old-space-size=8000
 
 const mdtable = require('../src/mdtable')
 const fs = require('fs')
