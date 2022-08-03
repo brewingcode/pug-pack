@@ -27,9 +27,10 @@ Input options:
 
 -i INDEXES   include columns via 1-based indexes in CSV form (eg "2,-1,4")
 -e INDEXES   exclude columns via 1-based indexes in CSV form
+-E N         exclude first N rows
 -r REGEX     regex used to split each row into cells ("\\t" by default)
--f N         force number of columns to N by combining columns, starting
-             from the right and working back to the left
+-f N         force number of columns to N by leaving the first N-1 columns,
+             then glomming the rest into the final column
 -w           whitepsace-based inference for column boundaries: use the first
              line as a template (eg, see Docker's CLI output)
 -j           json-formatted input (ignore -r and -w)
@@ -48,9 +49,11 @@ Output options:
 -C           output as CSV
 -J           output as JSON
 
-Long args are also supported: --regex, --force, --align, --names, --truncate,
---include/--indexes, --exclude, --strict, --whitespace, --plaintext, --json,
---json-out, --csv, --csv-out. A filename of "-" will read from stdin.
+Long args are also supported: --include, --exclude, --exclude-rows (-E),
+--regex, --force, --whitespace, --json, --csv, --align, --no-align (-A),
+--names, --truncate, --plaintext, --strict, --json-out (-J), --csv-out (-C).
+
+A filename of "-" will read from stdin.
 
 -a and -n are used AFTER -i and -e. i.e., if you -i three columns, you should
 ALSO pass three values for -a and/or -n.`
