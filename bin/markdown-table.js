@@ -3,9 +3,15 @@
 const mdtable = require('../src/mdtable')
 const fs = require('fs')
 const csvparse = require('csv-parse')
-const csvstringify = require('csv-stringify/sync')
 const readline = require('readline')
 const JSONStream = require('JSONStream')
+
+try {
+  const csvstringify = require('csv-stringify/sync')
+}
+catch (e) {
+  const csvstringify = require('csv-stringify/dist/cjs/sync.cjs')
+}
 
 const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['h', 'help', 's', 'strict', 'w', 'whitespace', 'p', 'plaintext',
