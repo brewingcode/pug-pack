@@ -6,7 +6,6 @@ argv = require('minimist') process.argv.slice(2),
 moment = require 'moment'
 tmp = require 'tmp'
 { execSync } = require 'child_process'
-getStdin = require 'get-stdin'
 csv = require 'csv-parse/sync'
 
 moment.suppressDeprecationWarnings = true
@@ -46,14 +45,14 @@ do ->
     process.exit()
 
   content = ''
-  if not process.stdin.isTTY
-    content += await getStdin()
-
-  argv._.forEach (filename) ->
-    if filename is '-'
-      content += await getStdin()
-    else
-      content += fs.readFileSync(filename).toString()
+  if argv._.length < 1
+    content = String fs.readFileSync '/dev/stdin'
+  else
+    argv._.forEach (filename) ->
+      if filename is '-'
+        content += String fs.readFileSync '/dev/stdin'
+      else
+        content += String fs.readFileSync filename
 
   points = []
   format = argv.f or argv.format or undefined
