@@ -6,7 +6,7 @@ pug = require 'pug'
 coffeescript = require 'coffeescript'
 uglify = require 'uglify-es'
 styl = require 'stylus'
-svgo = require 'svgo'
+{ optimize } = require 'svgo'
 csso = require 'csso'
 htmlmin = require 'html-minifier'
 yaml = require 'js-yaml'
@@ -140,19 +140,18 @@ module.exports = self =
         prs = []
 
         plugins.push
-          removeDimensions: true
+          name: 'removeDimensions'
 
-        prs.push pr.try ->
-          new svgo( {plugins} ).optimize s
+        prs.push optimize s, {plugins}
 
         plugins.push
-          addClassesToSVGElement:
+          name: 'addClassesToSVGElement'
+          params:
             classNames: [name]
         plugins.push
-          removeXMLNS: true
+          name: 'removeXMLNS'
 
-        prs.push pr.try ->
-          new svgo( {plugins} ).optimize s
+        prs.push optimize s, {plugins}
 
         pr.all(prs).then ([forCSS, forDOM]) ->
           forCSS: forCSS.data
