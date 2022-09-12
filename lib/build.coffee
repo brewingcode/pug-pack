@@ -216,7 +216,6 @@ module.exports = self =
             outfile = f.replace /\.pug$/i, '.html'
             { srcname } = self.parsename outfile
             self.pug f, srcname
-    .catch console.error
 
   self: (testPug) ->
     self.crawl("#{__dirname}/../src", true).then =>
