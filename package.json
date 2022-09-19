@@ -1,6 +1,6 @@
 {
   "name": "pug-pack",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "Pseudo-webpack for developers who like clean formatting",
   "scripts": {
     "dev": "coffee bin/cli.coffee -w",
