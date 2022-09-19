@@ -7,7 +7,7 @@ path = require 'path'
 mkdirp = require 'mkdirp'
 argv = require('minimist') process.argv.slice(2),
   boolean: ['p', 'prod', 'production', 'w', 'watch', 'v', 'verbose', 'V', 'version',
-    'init', 'i']
+    'init', 'i', 'clean', 'c']
 pr = require 'bluebird'
 
 if argv.h or argv.help
@@ -15,7 +15,7 @@ if argv.h or argv.help
 usage:
 
 pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
-  [-v|--verbose]
+  [-v|--verbose] [-c|--clean]
 
 pug-pack [-l|--list] [-i|--init] [-h|--help] [-V|--version]
 
@@ -36,6 +36,9 @@ if argv.v or argv.verbose
 
 src = if argv._.length > 0 then argv._[0] else './src'
 build.dist = if argv._.length > 1 then argv._[1] else './dist'
+
+if argv.c or argv.clean
+  try fs.rmSync(build.dist, {recursive:true, force:true})
 
 fullBuild = ->
   build.self().then ->

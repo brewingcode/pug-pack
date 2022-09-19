@@ -71,6 +71,11 @@ See [`non-pug files`](#non-pug-files) for more details, or some examples in
 * injected content can be asyncronously generated, which is not possible with
 standard `pug`
 
+**NOTE:**
+
+The `:inject(file="...")` pug filter will read file relative to your `src`
+directory, NOT relative to the .pug file the filter is in
+
 ```pug
 html
   head
@@ -194,6 +199,8 @@ such as:
 
 * `--watch`/`w` will use `browser-sync` to watch `src` and re-run your build
 on every change
+
+* `--clean`/`-c` will remove the output directory first
 
 * `--verbose`/`-v` for more verbose output
 
