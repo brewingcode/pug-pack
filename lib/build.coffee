@@ -178,7 +178,7 @@ module.exports = self =
     self.vars.basedir = path.resolve rootDir
 
     execAsync("cd '#{self.vars.basedir}' && git rev-parse --short HEAD").then (stdout) =>
-      self.vars.src.GIT_HEAD = stdout.toString()
+      self.vars.src.GIT_HEAD = stdout.toString().trim()
     .catch ->
       self.vars.src.GIT_HEAD = null
 
