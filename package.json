@@ -6,11 +6,12 @@
     "dev": "coffee bin/cli.coffee -w",
     "build": "coffee bin/cli.coffee -p",
     "test": "./best/bin/best.sh",
-    "snapshot": "./best/bin/best.sh --snapshot:generate --verbose"
+    "snapshot": "./best/bin/best.sh --snapshot:generate --verbose",
+    "build-tools": "lib/build-tools.sh"
   },
   "bin": {
-    "pug-pack": "bin/cli.coffee",
-    "tsc": "bin/time-series-chart.coffee",
+    "pug-pack": "bin/cli.js",
+    "tsc": "bin/time-series-chart.js",
     "cs": "bin/coffee-shortcut.sh",
     "pugs": "bin/pug-shortcut.sh",
     "mdtable": "bin/markdown-table.js",
