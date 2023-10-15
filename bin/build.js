@@ -1,4 +1,4 @@
-var coffeescript, csso, execAsync, fs, htmlmin, log, mkdirp, path, pr, pug, self, styl, svgo, uglify, yaml;
+var coffeescript, csso, execAsync, fs, htmlmin, log, mkdirp, optimize, path, pr, pug, self, styl, uglify, yaml;
 
 pr = require('bluebird');
 
@@ -16,7 +16,7 @@ uglify = require('uglify-es');
 
 styl = require('stylus');
 
-svgo = require('svgo');
+({optimize} = require('svgo'));
 
 csso = require('csso');
 
@@ -176,22 +176,19 @@ module.exports = self = {
         plugins = [];
         prs = [];
         plugins.push({
-          removeDimensions: true
+          name: 'removeDimensions'
         });
-        prs.push(pr.try(function() {
-          return new svgo({plugins}).optimize(s);
-        }));
+        prs.push(optimize(s, {plugins}));
         plugins.push({
-          addClassesToSVGElement: {
+          name: 'addClassesToSVGElement',
+          params: {
             classNames: [name]
           }
         });
         plugins.push({
-          removeXMLNS: true
+          name: 'removeXMLNS'
         });
-        prs.push(pr.try(function() {
-          return new svgo({plugins}).optimize(s);
-        }));
+        prs.push(optimize(s, {plugins}));
         return pr.all(prs).then(function([forCSS, forDOM]) {
           return {
             forCSS: forCSS.data,
@@ -225,7 +222,7 @@ module.exports = self = {
     var head;
     self.vars.basedir = path.resolve(rootDir);
     execAsync(`cd '${self.vars.basedir}' && git rev-parse --short HEAD`).then((stdout) => {
-      return self.vars.src.GIT_HEAD = stdout.toString();
+      return self.vars.src.GIT_HEAD = stdout.toString().trim();
     }).catch(function() {
       return self.vars.src.GIT_HEAD = null;
     });

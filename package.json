@@ -3,11 +3,11 @@
   "version": "1.11.1",
   "description": "Pseudo-webpack for developers who like clean formatting",
   "scripts": {
-    "dev": "coffee bin/cli.coffee -w",
-    "build": "coffee bin/cli.coffee -p",
+    "dev": "coffee lib/cli.coffee -w",
+    "build": "coffee lib/cli.coffee -p",
     "test": "./best/bin/best.sh",
     "snapshot": "./best/bin/best.sh --snapshot:generate --verbose",
-    "build-tools": "lib/build-tools.sh"
+    "postinstall": "lib/build-tools.sh"
   },
   "bin": {
     "pug-pack": "bin/cli.js",
@@ -40,7 +40,7 @@
     "tmp": "^0.2.1",
     "uglify-es": "^3.3.9"
   },
-  "main": "lib/build.coffee",
+  "main": "bin/build.js",
   "keywords": [],
   "author": "",
   "license": "ISC",

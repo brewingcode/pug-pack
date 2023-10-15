@@ -14,7 +14,7 @@ path = require('path');
 mkdirp = require('mkdirp');
 
 argv = require('minimist')(process.argv.slice(2), {
-  boolean: ['p', 'prod', 'production', 'w', 'watch', 'v', 'verbose', 'V', 'version', 'init', 'i']
+  boolean: ['p', 'prod', 'production', 'w', 'watch', 'v', 'verbose', 'V', 'version', 'init', 'i', 'clean', 'c']
 });
 
 pr = require('bluebird');
@@ -23,7 +23,7 @@ if (argv.h || argv.help) {
   console.log(`usage:
 
 pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
-  [-v|--verbose]
+  [-v|--verbose] [-c|--clean]
 
 pug-pack [-l|--list] [-i|--init] [-h|--help] [-V|--version]
 
@@ -48,6 +48,15 @@ if (argv.v || argv.verbose) {
 src = argv._.length > 0 ? argv._[0] : './src';
 
 build.dist = argv._.length > 1 ? argv._[1] : './dist';
+
+if (argv.c || argv.clean) {
+  try {
+    fs.rmSync(build.dist, {
+      recursive: true,
+      force: true
+    });
+  } catch (error) {}
+}
 
 fullBuild = function() {
   return build.self().then(function() {

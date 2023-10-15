@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 //!/usr/bin/env coffee
-var argv, csv, execSync, fs, getStdin, moment, tmp;
+var argv, csv, execSync, fs, moment, tmp;
 
 fs = require('fs');
 
@@ -14,13 +14,11 @@ tmp = require('tmp');
 
 ({execSync} = require('child_process'));
 
-getStdin = require('get-stdin');
-
 csv = require('csv-parse/sync');
 
 moment.suppressDeprecationWarnings = true;
 
-(async function() {
+(function() {
   var chartFile, chartHtml, content, dir, format, gb, isMoment, isNumber, points, span, tmpChart;
   if (argv.h || argv.help) {
     console.log(`usage: tsc [file ...] [-f FORMAT]
@@ -54,16 +52,17 @@ Timestamps are parsed strictly.
     process.exit();
   }
   content = '';
-  if (!process.stdin.isTTY) {
-    content += (await getStdin());
+  if (argv._.length < 1) {
+    content = String(fs.readFileSync('/dev/stdin'));
+  } else {
+    argv._.forEach(function(filename) {
+      if (filename === '-') {
+        return content += String(fs.readFileSync('/dev/stdin'));
+      } else {
+        return content += String(fs.readFileSync(filename));
+      }
+    });
   }
-  argv._.forEach(async function(filename) {
-    if (filename === '-') {
-      return content += (await getStdin());
-    } else {
-      return content += fs.readFileSync(filename).toString();
-    }
-  });
   points = [];
   format = argv.f || argv.format || void 0;
   isNumber = function(s) {
