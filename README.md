@@ -310,7 +310,7 @@ Markdown and Pug are a great combo, use this filter like so:
 | moment.js                        | Moment.js                                                             |
 | showdown.js                      | Showdown.js to render Markdown to HTML on the client                  |
 | sorttable.js                     | An ancient way to make table sortable; use JQuery.tablesorter instead |
-| sugar.min.js                     | The Sugar.js framework
+| sugar.min.js                     | The Sugar.js framework                                                |
 | tablesorter-theme-bootstrap4.css | Nice CSS for the tablsorter plugin                                    |
 | vue-dev.js                       | Vue.js dev build                                                      |
 | vue-prod.js                      | Vue.js prod build                                                     |
@@ -320,11 +320,11 @@ Markdown and Pug are a great combo, use this filter like so:
 
 These all use Vuetify to demonstrate how small a useful page can be:
 
-| Template        | Notes                                                                          |
-| --------------- | ------------------------------------------------ |
-| bgg.pug         | View BoardGameGeek data for a given username     |
-| github-user.pug | Display all repos of a GitHub user               |
-| vue-chart.pug   | Plot time series data (see `tsc` CLI tool below) | 
+| Template        | Notes                                               |
+| --------------- | --------------------------------------------------- |
+| bgg.pug         | View BoardGameGeek data for a given username        |
+| github-user.pug | Display all repos of a GitHub user                  |
+| vue-chart.pug   | Plot time series data (see `timesc` CLI tool below) |
 
 ## Client-side helpers
 
@@ -435,15 +435,15 @@ usage: dhms [NUMBER ...]
 Convert a number of seconds into human numbers.
 ```
 
-## tsc
+## timesc
 
 This is a command-line tool to feed newline-based timestamps into
 vue-chart.pug on your local machine.
 
 ```
-tsc - (t)ime (s)eries (c)hart
+timesc - (time) (s)eries (c)hart
 
-usage: tsc [file ...] [-f fmt>]
+usage: timesc [file ...] [-f fmt>]
 
 Parse timestamps from lines of input and graph it using Vue and Chart.js. The
 chart includes:
@@ -498,7 +498,7 @@ line of stdin. Without args, just opens the REPL.
 A CLI to run `pug` in the context of your local pug-pack installation. `src`
 in this context is the `pug-pack/src` directory itself, not your own `src`
 directory. Use this if you're intentionally trying to use files in this repo,
-something like the `tsc` script.
+something like the `timesc` script.
 
 ```
 $ pugs -h

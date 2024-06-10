@@ -21,9 +21,9 @@ moment.suppressDeprecationWarnings = true;
 (function() {
   var chartFile, chartHtml, content, dir, format, gb, isMoment, isNumber, points, span, tmpChart;
   if (argv.h || argv.help) {
-    console.log(`usage: tsc [file ...] [-f FORMAT]
+    console.log(`usage: timesc [file ...] [-f FORMAT]
 
-tsc - (t)ime (s)eries (c)hart
+timesc - (time) (s)eries (c)hart
 
 Parse timestamps from lines of input and graph it using Vue and Chart.js. The
 chart includes:

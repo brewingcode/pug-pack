@@ -11,7 +11,7 @@
   },
   "bin": {
     "pug-pack": "bin/cli.js",
-    "tsc": "bin/time-series-chart.js",
+    "timesc": "bin/time-series-chart.js",
     "cs": "bin/coffee-shortcut.sh",
     "pugs": "bin/pug-shortcut.sh",
     "mdtable": "bin/markdown-table.js",
