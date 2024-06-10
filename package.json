@@ -32,7 +32,7 @@
     "jstransformer-markdown-it": "^3.0.0",
     "minimist": "^1.2.6",
     "mkdirp": "^1.0.4",
-    "pug": "3.0.2",
+    "pug": "3.0.3",
     "pug-cli": "brewingcode/pug-cli",
     "stylus": "^0.59.0",
     "sugar": "^2.0.6",
