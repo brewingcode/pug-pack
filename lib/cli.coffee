@@ -15,7 +15,7 @@ if argv.h or argv.help
 usage:
 
 pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
-  [-v|--verbose] [-c|--clean]
+  [-v|--verbose] [-c|--clean] [-s|--single FILE]
 
 pug-pack [-l|--list] [-i|--init] [-h|--help] [-V|--version]
 
@@ -120,6 +120,10 @@ pr.try ->
       """
 
     console.log "run 'pug-pack -w' to build and view the example index file in 'dist/index.html'"
+
+  else if filename = (argv.s or argv.single)
+    build.dist = path.dirname(filename)
+    await build.pug filename, path.basename(filename, '.pug') + '.html'
 
   else
     fullBuild()

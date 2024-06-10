@@ -23,7 +23,7 @@ if (argv.h || argv.help) {
   console.log(`usage:
 
 pug-pack [src] [dist] [-p|--prod|--production] [-w|--watch]
-  [-v|--verbose] [-c|--clean]
+  [-v|--verbose] [-c|--clean] [-s|--single FILE]
 
 pug-pack [-l|--list] [-i|--init] [-h|--help] [-V|--version]
 
@@ -64,8 +64,8 @@ fullBuild = function() {
   });
 };
 
-pr.try(function() {
-  var touched, update;
+pr.try(async function() {
+  var filename, touched, update;
   if (argv.w || argv.watch) {
     return fullBuild().then(function() {
       var bs;
@@ -152,6 +152,9 @@ append body
     p Hello from pug-pack and Bootstrap`);
     }
     return console.log("run 'pug-pack -w' to build and view the example index file in 'dist/index.html'");
+  } else if (filename = argv.s || argv.single) {
+    build.dist = path.dirname(filename);
+    return (await build.pug(filename, path.basename(filename, '.pug') + '.html'));
   } else {
     return fullBuild();
   }
